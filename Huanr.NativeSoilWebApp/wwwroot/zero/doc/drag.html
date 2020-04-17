@@ -1,0 +1,127 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>drag zeroJs</title>
+    <link href="../css/zero.adminUI.css" rel="stylesheet" />
+    <script type="text/javascript" src="../js/zero.js"></script>
+    <script type="text/javascript" src="../js/zero.ch.js"></script>
+    <script type="text/javascript">
+        zero.ready(function () {
+            zero(document.body, 'div').filter('class=demo').foreach(function (num) {
+                var s = zero(this).html();
+                s = zero.codeHighlight.html(s).match(/.+/g);
+                if (s) {
+                    s = '<li>' + s.join('</li><li>') + '</li>'
+                } else {
+                    s = '<li></li>'
+                }
+                zero(document.createElement('div')).appendTo(this).html('<div style="background:#f2f2f2;">CODE VIEW</div><ol class="zero_code_highlight">' + s + '</ol>');
+            });
+        });
+    </script>
+</head>
+<body class="zero_ifram_page"><div class="zero_demo_main">
+    <h2>zero.drag</h2>
+    <table class="zero_datatable">
+        <thead><tr><td>构造</td></tr></thead>
+        <tbody>
+        <tr><td>zero.drag(ele)</td></tr>
+        <tr><td>将要拖到的页面节点传入</td></tr>
+    </tbody></table>
+    <table class="zero_datatable">
+        <thead><tr><td>属性</td></tr></thead>
+        <tbody>
+        <tr><td>node</td></tr>
+        <tr><td>构造时传入的页面节点</td></tr>
+    </tbody></table>
+    <table class="zero_datatable">
+        <thead><tr><td>方法</td></tr></thead>
+        <tbody>
+        <tr><td>begin(callback)</td></tr>
+        <tr><td>
+            <p>拖动开始回调，在onmousedown或ontouchstart时触发</p>
+            <p>传给callback的参数分别是：node, point, para</p>
+            <p>参数node是构造时传入的页面节点，参数point是触点坐标，参数para是自定义的参考参数，会在move和end中贯通传递</p>
+            </td></tr>
+        <tr><td>move(callback)</td></tr>
+        <tr><td>
+            <p>拖动中回调，在onmousemove或ontouchmove时触发</p>
+            <p>传给callback的参数分别是：node, point, para</p>
+            <p>参数node是构造时传入的页面节点，参数point是触点坐标，参数para是bengin回调方法中引用的para参数</p>
+            </td></tr>
+        <tr><td>end(callback)</td></tr>
+        <tr><td>
+            <p>拖动结束时回调，在onmouseup或ontouchend时触发</p>
+            <p>传给callback的参数分别是：node, point, para</p>
+            <p>参数node是构造时传入的页面节点，参数point是触点坐标，参数para是bengin回调方法中引用的para参数</p>
+            </td></tr>
+        <tr><td>range(x,y,width,height)</td></tr>
+        <tr><td>设置可拖动范围(默认是整个页面)</td></tr>
+     </tbody></table>
+    
+    <h3>运用示例：</h3>
+    <div class="demo">
+        <div id="mydiv002" style="height:300px;border:solid 1px #090;background:#f7f7f7;">
+            <div>
+                <div class="drag_node">拖动我01</div>
+                <div class="drag_node">拖动我02</div>
+                <div class="drag_node">拖动我03</div>
+                <div class="drag_node">拖动我04</div>
+                <div class="drag_node">拖动我05</div>
+                <div class="drag_node">拖动我06</div>
+                <div class="drag_node">拖动我07</div>
+                <div class="drag_node">拖动我08</div>
+                <div class="drag_node">拖动我09</div>
+                <div class="drag_node">拖动我10</div>
+                <div class="drag_node">拖动我11</div>
+                <div class="drag_node">拖动我12</div>
+            </div>
+        </div>
+        <style type="text/css">
+            /*可拖动节点样式*/
+            div.drag_node{width:100px;height:100px;background:#090;position:absolute;cursor:move;}
+            /*可拖动节点拖动中样式*/
+            div.drag_node_on{background:#f90;}
+        </style>
+        <script type="text/javascript">
+            zero.ready(function () {
+            
+                var myDragFunc = function (ele) {
+                    zero.drag(ele).begin(function (node, point, para) {
+                        var box = zero(node).parent(2),//向上2级的节点(id=mydiv002)
+                            boxPoint = zero(box).getAbsPoint(),//获得限定范围节点的坐标
+                            boxSize = zero(box).getSize(),//获得限定范围节点的尺寸
+                            nodeSize = zero(node).getSize();//获得拖动节点的尺寸
+                        //设置可拖动范围(默认是整个页面)
+                        this.range(boxPoint.x,
+                            boxPoint.y,
+                            boxSize.width - nodeSize.width,
+                            boxSize.height - nodeSize.height);
+                        //设置拖动中的样式
+                        zero(this.node).addClass('drag_node_on');
+                    }).move(function (node, point, para) {
+                        //point参数是相对于页面的
+                        var cssText = 'left:' + parseInt(point.x,10) + 'px; top:' + parseInt(point.y,10) + 'px;'
+                        //设置样式及内部文本
+                        zero(this.node).cssText(cssText).html(cssText);
+                    }).end(function (node, point, para) {
+                        //移除拖动中的样式
+                        zero(this.node).removeClass('drag_node_on');
+                    });
+                };
+                //选择id=mydiv002下所有class含有drag_node的节点
+                zero('mydiv002', 'class>drag_node').foreach(function (index) {
+                    myDragFunc(this);//拖动节点
+                });
+
+            });
+        </script>
+    </div>
+
+    <div>
+        <p>本文终。</p>
+    </div>
+</div></body>
+</html>

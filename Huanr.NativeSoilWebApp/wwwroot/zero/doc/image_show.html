@@ -1,0 +1,105 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>imageShow zeroJs</title>
+    <link href="../css/zero.adminUI.css" rel="stylesheet" />
+    <script type="text/javascript" src="../js/zero.js"></script>
+    <script type="text/javascript" src="../js/zero.ch.js"></script>
+    <script type="text/javascript" src="../js/zero.UI.js"></script>
+    <script type="text/javascript" src="../js/zero.adminUI.js"></script>
+    <script type="text/javascript" src="../js/zero.imageShow.js"></script>
+    <script type="text/javascript">
+        zero.ready(function () {
+            zero(document.body, 'div').filter('class=demo').foreach(function (num) {
+                var s = zero(this).html();
+                s = zero.codeHighlight.html(s).match(/.+/g);
+                if (s) {
+                    s = '<li>' + s.join('</li><li>') + '</li>'
+                } else {
+                    s = '<li></li>'
+                }
+                zero(document.createElement('div')).appendTo(this).html('<div style="background:#f2f2f2;">CODE VIEW</div><ol class="zero_code_highlight">' + s + '</ol>');
+            });
+        });
+    </script>
+</head>
+<body class="zero_ifram_page"><div class="zero_demo_main">
+    <h2>zero.imageShow</h2>
+    <table class="zero_datatable">
+        <thead><tr><td>构造</td></tr></thead>
+        <tbody>
+        <tr><td>zero.imageShow(config)</td></tr>
+        <tr><td>&nbsp;</td></tr>
+    </tbody></table>
+    <table class="zero_datatable">
+        <thead><tr><td>参数config</td></tr></thead>
+        <tbody>
+        <tr><td>source</td></tr>
+        <tr><td>数组，图片URL</td></tr>
+        <tr><td>index</td></tr>
+        <tr><td>第一张图片的索引，默认0</td></tr>
+        <tr><td>behavior</td></tr>
+        <tr><td>图片呈现方式，可选：'SH', 'SV', 'SC', 'SCH', 'SCV', 'MH', 'MV'，默认随机选取</td></tr>
+        <tr><td>useDirectionKey</td></tr>
+        <tr><td>是否使用方向键控制图片切换</td></tr>
+        <tr><td>zIndex</td></tr>
+        <tr><td>图片展示层的zIndex值，默认1</td></tr>
+        <tr><td>win</td></tr>
+        <tr><td>在哪个window对象下进行展示，默认当前页面所属window对象，该参数主要用于iframe布局中由子页面向父页面提升图片展示层</td></tr>
+        <tr><td>onShowed(coverNode, index, length)</td></tr>
+        <tr><td>图片呈现出来后的回调，参数coverNode是覆盖在图片上的一个div节点，参数index是当前图片在源数组中的索引，参数length是源数组的长度</td></tr>
+    </tbody></table>
+    <h3>运用示例</h3>
+    <div class="demo">
+        <div id="mydiv001" style="border:solid 1px #090;background:#f7f7f7;">
+            <div style="border:solid 1px #dedede;height:300px;overflow:hidden;">
+                <textarea name="source" style="width:100%;height:100%;max-width:100%;max-height:100%;min-width:100%;min-height:100%;overflow:hidden;padding:0;margin:0;border:0;">
+http://youimg1.c-ctrip.com/target/fd/tg/g2/M02/43/08/CghzgFVtmyiALqJlACMQkexwVZg304.jpg
+http://youimg1.c-ctrip.com/target/tg/534/317/401/6f204cc09b414ccfad8752c5a2bb2e4f.jpg
+http://s3.lvjs.com.cn/uploads/pc/place2/2015-01-09/a2e1b4b7-fb3e-40fc-8def-8f85729d1bd7.jpg
+http://dik.img.kttpdq.com/pic/194/135246/5e451c7f573017a2_480x640.gif
+http://dik.img.kttpdq.com/pic/39/26718/2fb9032b5f481f8d_640x1136.jpg
+http://dik.img.kttpdq.com/pic/174/121606/d9411c244814a96f_768x1024.jpg
+http://dik.img.kttpdq.com/pic/23/15759/f25af53c3d915970_320x480.jpg
+http://dik.img.kttpdq.com/pic/155/108054/cd3549c7831907fb_1024x768.jpg
+http://pics.sc.chinaz.com/files/pic/pic9/201809/zzpic13944.jpg
+</textarea>
+                
+            </div>
+            <input type="button" name="btnImgShowTopWin" value="浏览图片(顶层页面)" />
+                <input type="button" name="btnImgShow" value="浏览图片(当前页面)" />
+        </div>
+        <script type="text/javascript">
+            zero.ready(function () {
+                var topWin = window;
+                while (topWin.parent && topWin != topWin.parent) { topWin = topWin.parent; }
+
+                var inputs = zero.form('mydiv001').inputs;
+                var func = function (win) {
+                    var imgArr = ('' + inputs.source.value).match(/[^\s].[^\s]+\.(jpg|jpeg|png|gif|bmp)\b/ig);
+                    if (!imgArr) { return; }
+                    zero.imageShow({
+                        source: imgArr,
+                        index: 0,
+                        behavior: '',//'SH', 'SV', 'SC', 'SCH', 'SCV', 'MH', 'MV'
+                        useDirectionKey: true,
+                        onShowed: function (coverNode, index, len) {
+                            zero(coverNode).html('<p style="color:#02484f;text-align:center;background:rgba(255,255,255,.5);margin:0;padding:5px 0;">' + (index + 1 < 10 ? '0' + (index + 1) : (index + 1)) + '/' + (len < 10 ? '0' + len : len) + '</p>');
+                        },
+                        zIndex: 9999,
+                        win: win
+                    });
+                };
+                inputs.btnImgShowTopWin.onclick = function () { func(topWin); };
+                inputs.btnImgShow.onclick = function () { func(window); };
+            });
+        </script>
+    </div>
+    
+    <div>
+        <p>本文终。</p>
+    </div>
+</div></body>
+</html>

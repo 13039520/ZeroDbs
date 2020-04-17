@@ -1,0 +1,37 @@
+﻿@{
+    List<Huanr.Models.NativeSoil.tSystemMenuGroup> tSystemMenuGroupList = ViewBag.tSystemMenuGroupList;
+    Huanr.Models.NativeSoil.tSystemMenu tSystemMenu =ViewBag.tSystemMenu;
+
+    ViewData["Title"] = "MenuEdit";
+    Layout = "~/Views/Shared/_AdminDialogPageLayout.cshtml";
+}
+<form class="zero_form zero_form_btns_fixed" id="menuEditForm" action="/admin/system/menuEditSave" method="post">
+    <input type="hidden" name="MenuID" value="@tSystemMenu.MenuID" />
+    <dl class="zero_form_group">
+        <dt>菜单信息</dt>
+        <dd><div class="zero_form_text">菜单组：</div><div class="zero_form_input"><select name="GroupID">@foreach (var group in tSystemMenuGroupList) {
+                @if (group.GroupID == tSystemMenu.GroupID) {<option value="@group.GroupID" selected="selected">@group.GroupName</option>
+                } else {<option value="@group.GroupID">@group.GroupName</option>}
+             }</select></div></dd>
+        <dd><div class="zero_form_text">菜单名称：</div><div class="zero_form_input"><input type="text" name="MenuName" value="@tSystemMenu.MenuName" maxlength="50" /></div></dd>
+        <dd><div class="zero_form_text">菜单链接：</div><div class="zero_form_input"><input type="text" name="MenuLink" value="@tSystemMenu.MenuLink" maxlength="400" /></div></dd>
+        <dd><div class="zero_form_text">菜单备注：</div><div class="zero_form_input"><input type="text" name="MenuRemark" value="@tSystemMenu.MenuRemark" maxlength="200" /></div></dd>
+        <dd><div class="zero_form_text">菜单排序：</div><div class="zero_form_input"><input  type="number" name="MenuSort" value="@tSystemMenu.MenuSort" max="999999999" min="0" /></div></dd>
+        <dd><div class="zero_form_text">菜单删除：</div><div class="zero_form_input">
+                <input type="hidden" name="MenuDeleteStatus" value="0" />
+                <label><input type="radio" name="MenuDeleteStatus" value="0" readonly="readonly"@if (!tSystemMenu.MenuDeleteStatus) {@(new StringHtmlContent(" checked=\"checked\"")) } /> 否</label>
+                <label><input type="radio" name="MenuDeleteStatus" value="1" readonly="readonly"@if (tSystemMenu.MenuDeleteStatus) {@(new StringHtmlContent(" checked=\"checked\"")) } /> 是</label>
+                 </div></dd>
+    </dl>
+    <div class="zero_form_btns">
+        <input type="button" name="zero_btnCancel" value="取消" onclick="parentDialogObj.close()" />
+        <input type="submit" name="zero_btnSubmit" value="提交" />
+    </div>
+</form>
+@section StyleSection{ }
+@section JavaScriptSection{
+<script type="text/javascript" src="~/huanr/javascript/adminSystem.js"></script>
+<script type="text/javascript">
+    zero.ready(function () { adminSystemMenuEdit.initFunc('menuEditForm') });
+</script>
+}

@@ -1,0 +1,138 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>drag zeroJs</title>
+    <link href="../css/zero.adminUI.css" rel="stylesheet" />
+    <script type="text/javascript" src="../js/zero.js"></script>
+    <script type="text/javascript" src="../js/zero.UI.js"></script>
+    <script type="text/javascript" src="../js/zero.ch.js"></script>
+    <script type="text/javascript">
+        zero.ready(function () {
+            zero(document.body, 'div').filter('class=demo').foreach(function (num) {
+                var s = zero(this).html();
+                s = zero.codeHighlight.html(s).match(/.+/g);
+                if (s) {
+                    s = '<li>' + s.join('</li><li>') + '</li>'
+                } else {
+                    s = '<li></li>'
+                }
+                zero(document.createElement('div')).appendTo(this).html('<div style="background:#f2f2f2;">CODE VIEW</div><ol class="zero_code_highlight">' + s + '</ol>');
+            });
+        });
+    </script>
+</head>
+<body class="zero_ifram_page"><div class="zero_demo_main">
+    <h2>zero.autocomplete</h2>
+    <table class="zero_datatable">
+        <thead><tr><td>构造</td></tr></thead>
+        <tbody><tr><td>zero.autocomplete(config)</td></tr>
+        <tr><td>&nbsp;</td></tr>
+    </tbody></table>
+    <table class="zero_datatable">
+        <thead><tr><td >配置参数config</td></tr></thead>
+        <tbody>
+        <tr><td>url</td></tr>
+        <tr><td>用户输入文本提交到服务器的地址，在缺少服务器端支持的情况下可以定义成方法以便生成测试数据，在定义成方法时传入该方法的参数是提交到服务器的参数的组合对象</td></tr>
+        <tr><td>queryKey</td></tr>
+        <tr><td>用户输入文本提交到服务器的键名，默认 'keyword' </td></tr>
+        <tr><td>queryLogic</td></tr>
+        <tr><td>用户输入文本提交到服务器的处理逻辑，默认 'or' ，键名 'logic' </td></tr>
+        <tr><td>queryMethod</td></tr>
+        <tr><td>提交方式，默认 GET</td></tr>
+        <tr><td>queryHeader</td></tr>
+        <tr><td>请求头，示例：{ Authorization: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ' }</td></tr>
+        <tr><td>items</td></tr>
+        <tr><td>列表中显示的数据项数，将以 'items' 为键名提交该参数到服务器，默认 10 ，最大值 50 </td></tr>
+        <tr><td>chars</td></tr>
+        <tr><td>触发数据检索的输入字符数，默认 1 </td></tr>
+        <tr><td>target</td></tr>
+        <tr><td>目标文本框</td></tr>
+        <tr><td>onSelected(dataItem)</td></tr>
+        <tr><td>选中项回调</td></tr>
+    </tbody></table>
+
+    <h3>运用示例：</h3>
+    <div class="demo">
+        <div id="mydiv002" style="border:solid 1px #090;background:#f7f7f7;">
+            <div class="zero_form">
+                <dl class="zero_form_group">
+                    <dd>
+                        <div class="zero_form_text"><span class="zero_form_input_label">地区城市：</span></div>
+                        <div class="zero_form_input"><input type="text" name="myText" id="myText" /> </div>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+        <script type="text/javascript">
+            //zero.debug(1);
+            zero.ready(function () {
+                zero.ajax('../js/data-area.txt').send(function (res) {
+                    var d = null;
+                    try { d = eval('(' + res + ')'); } catch (e) { d = null; }
+                    if (!d) { return; }
+                    d.data = zero.decompressionListData(d.data);
+                    /*合并出地区城市的全名*/
+                    for (var i = 0; i < d.data.length; i++) {
+                        var func = function (item) {
+                            var v = [item.AreaName + item.AreaNameSuffix],
+                                r = function (item) {
+                                    for (var j = 0; j < d.data.length; j++) {
+                                        if (d.data[j].AreaCode == item.AreaParent) {
+                                            v.push(d.data[j].AreaName + d.data[j].AreaNameSuffix);
+                                            r(d.data[j]);
+                                        }
+                                    }
+                                };
+                            r(item);
+                            return v.reverse();
+                        };
+                        var v = func(d.data[i]);
+                        d.data[i].AreaFullName = v.join('');
+                    }
+
+                    //启动自动完成输入功能
+                    zero.UI.autocomplete({
+                        url: function (request) {
+                            //检索数据
+                            var reval = [];
+                            var isOrLogic = 'or' === request.queryData.logic;
+                            for (var i = 0, j = 0; i < d.data.length && j < request.queryData.items; i++) {
+                                var text = '[' + d.data[i]['AreaCode'] + ']' + d.data[i].AreaFullName,
+                                     words = request.queryData.keyword.split(' '),
+                                     exists = function () {
+                                         var n = 0, m = 0;
+                                         while (n < words.length) {
+                                             if (text.indexOf(words[n]) > -1) {
+                                                 if (isOrLogic) { return true; }
+                                                 m++;
+                                             }
+                                             n++;
+                                         }
+                                         return m == words.length;
+                                     };
+                                if (exists()) {
+                                    reval.push({ text: text, code: d.data[i]['AreaCode'] });
+                                    j++;
+                                }
+                            }
+                            request.end({ status: 1, data: reval });
+                        },
+                        queryKey: 'keyword',
+                        queryLogic: 'and',
+                        items: 15,
+                        target: zero('myText')[0]
+                    });
+
+                    zero.log('city data loaded.');
+                });
+            });
+        </script>
+    </div>
+
+    <div>
+        <p>本文终。</p>
+    </div>
+</div></body>
+</html>

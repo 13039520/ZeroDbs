@@ -1,0 +1,31 @@
+﻿@{
+    Huanr.Models.NativeSoil.tSystemMenuGroup tSystemMenuGroup =ViewBag.tSystemMenuGroup;
+
+    ViewData["Title"] = "MenuGroupEdit";
+    Layout = "~/Views/Shared/_AdminDialogPageLayout.cshtml";
+}
+<form class="zero_form zero_form_btns_fixed" id="menuGroupEditForm" action="/admin/system/menuGroupEditSave" method="post">
+    <input type="hidden" name="GroupID" value="@tSystemMenuGroup.GroupID" maxlength="50" />
+    <dl class="zero_form_group">
+        <dt>菜单组信息</dt>
+        <dd><div class="zero_form_text">分组名称：</div><div class="zero_form_input"><input type="text" name="GroupName" value="@tSystemMenuGroup.GroupName" maxlength="50" /></div></dd>
+        <dd><div class="zero_form_text">分组备注：</div><div class="zero_form_input"><input type="text" name="GroupRemark" value="@tSystemMenuGroup.GroupRemark" maxlength="200" /></div></dd>
+        <dd><div class="zero_form_text">分组排序：</div><div class="zero_form_input"><input  type="number" name="GroupSort" value="@tSystemMenuGroup.GroupSort" max="999999999" min="0" /></div></dd>
+        <dd><div class="zero_form_text">分组删除：</div><div class="zero_form_input">
+            <input type="hidden" name="GroupDeleteStatus" value="0" />
+            <label><input type="radio" name="GroupDeleteStatus" value="0" readonly="readonly"@if (!tSystemMenuGroup.GroupDeleteStatus) {@(new StringHtmlContent(" checked=\"checked\"")) } /> 否</label>
+            <label><input type="radio" name="GroupDeleteStatus" value="1" readonly="readonly"@if (tSystemMenuGroup.GroupDeleteStatus) {@(new StringHtmlContent(" checked=\"checked\"")) } /> 是</label>
+             </div></dd>
+    </dl>
+    <div class="zero_form_btns">
+        <input type="button" name="zero_btnCancel" value="取消" onclick="parentDialogObj.close()" />
+        <input type="submit" name="zero_btnSubmit" value="提交" />
+    </div>
+</form>
+@section StyleSection{ }
+@section JavaScriptSection{
+<script type="text/javascript" src="~/huanr/javascript/adminSystem.js"></script>
+<script type="text/javascript">
+    zero.ready(function () { adminSystemMenuGroupEdit.initFunc('menuGroupEditForm') });
+</script>
+}

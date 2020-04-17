@@ -1,0 +1,32 @@
+﻿@{
+    List<Huanr.Models.NativeSoil.tSystemMenuGroup> tSystemMenuGroupList = ViewBag.tSystemMenuGroupList;
+    ViewData["Title"] = "AreaList";
+    Layout = "~/Views/Shared/_AdminIframePageLayout.cshtml";
+}
+<div class="zero_main">
+    <div id="permissionCtrl"><input type="hidden" name="add" value="1" /><input type="hidden" name="del" value="1" /><!----><input type="hidden" name="edit" value="1" /></div>
+    <div class="zero_data_list">
+        <div class="zero_title_bar clearfix noprint">
+            <div class="zero_left"><span class="zero_title">地区城市列表</span></div>
+            <div class="zero_right">
+                <select class="zero_iframe_page_ctrl zero_bg_icon zero_bg_icon_screen">
+                    <option value="">--页面操作--</option>
+                    <option value="page_lock">锁定页面</option>
+                    <option value="page_unlock">解锁页面</option>
+                    <option value="page_refresh">刷新页面</option>
+                    <option value="page_source">查看原始源码</option>
+                    <option value="page_source_now">查看当前源码</option>
+                    <option value="page_full">全屏切换</option>
+                </select>
+            </div>
+        </div>
+        <div id="zero_tree_box"></div>
+    </div>
+</div>
+@section StyleSection{ }
+@section JavaScriptSection{
+<script type="text/javascript" src="~/huanr/javascript/adminSystem.js"></script>
+<script type="text/javascript">
+    zero.ready(adminSystemAreaList.initFunc);
+</script>
+}

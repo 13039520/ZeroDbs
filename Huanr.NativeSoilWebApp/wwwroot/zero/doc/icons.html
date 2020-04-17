@@ -1,0 +1,44 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>icons zeroAdminUI</title>
+    <link href="../css/zero.adminUI.css" rel="stylesheet" />
+    <style>
+        #icon_style_show table{border-collapse:collapse;border:solid 1px #236363;margin:10px auto;}
+        #icon_style_show table thead{background:#236363;font-size:1.5em;font-weight:bold;color:#fff;}
+        #icon_style_show table td{border:solid 1px #236363;padding:3px;}
+    </style>
+</head>
+<body>
+<div>
+    <div id="icon_style_show"></div>
+</div>
+<script type="text/javascript" src="../js/zero.js"></script>
+<script type="text/javascript" src="../js/zero.ch.js"></script>
+ <script type="text/javascript" src="../js/zero.UI.js"></script>
+<script type="text/javascript" src="../js/zero.adminUI.js"></script>
+<script type="text/javascript">
+    var iconCla = 'accessibility,address_book,aid,airplane,alarm,alarm2,android,angry,angry2,apple,arrow_down_left,arrow_down_left2,arrow_down_left3,arrow_down_right,arrow_down_right2,arrow_down_right3,arrow_down,arrow_down2,arrow_down3,arrow_left,arrow_left2,arrow_left3,arrow_right,arrow_right2,arrow_right3,arrow_up_left,arrow_up_left2,arrow_up_left3,arrow_up_right,arrow_up_right2,arrow_up_right3,arrow_up,arrow_up2,arrow_up3,attachment,backward,backward2,barcode,bars,bars2,bell,binoculars,blocked,blog,blogger,blogger2,bold,book,bookmark,bookmarks,books,box_add,box_remove,briefcase,brightness_contrast,brightness_medium,bubble,bubble2,bubbles,bubbles2,bubbles3,bubbles4,bug,bullhorn,busy,cabinet,calculate,calendar,calendar2,camera,camera2,cancel_circle,cart,cart2,cart3,checkbox_checked,checkbox_partial,checkbox_unchecked,checkmark_circle,checkmark,checkmark2,chrome,clock,clock2,close,cloud_download,cloud_upload,cloud,clubs,code,cog,cog2,cogs,coin,compass,confused,confused2,connection,console,contract,contract2,contrast,cool,cool2,copy,copy2,copy3,credit,crop,css3,dashboard,delicious,deviantart,deviantart2,diamonds,dice,disk,download,download2,download3,drawer,drawer2,drawer3,dribbble,dribbble2,dribbble3,droplet,earth,eject,embed,enter,envelop,equalizer,evil,evil2,exit,expand,expand2,eye_blocked,eye,eye2,facebook,facebook2,facebook3,feed,feed2,feed3,feed4,file_css,file_excel,file_openoffice,file_pdf,file_powerpoint,file_word,file_xml,file_zip,file,file2,file3,file4,film,filter,filter2,finder,fire,firefox,first,flag,flattr,flickr,flickr2,flickr3,flickr4,flip,flip2,folder_open,folder,font,food,forrst,forrst2,forward,forward2,forward3,foursquare,foursquare2,gift,github,github2,github3,github4,github5,glass,globe,google_drive,google_plus,google_plus2,google_plus3,google_plus4,google,grin,grin2,hammer,hammer2,happy,happy2,headphones,heart_broken,heart,heart2,history,home,home2,home3,html5,html52,icomoon,ie,image,image2,images,indent_decrease,indent_increase,info,info2,insert_template,instagram,italic,joomla,key,key2,keyboard,lab,lanyrd,laptop,last,lastfm,lastfm2,leaf,left_to_right,library,libreoffice,lightning,link,linkedin,list,list2,location,location2,lock,lock2,loop,loop2,loop3,magnet,mail,mail2,mail3,mail4,map,map2,menu,menu2,meter,meter2,minus,mobile,mobile2,mug,music,neutral,neutral2,new_tab,newspaper,next,notebook,notification,numbered_list,office,omega,opera,pacman,paint_format,paragraph_center,paragraph_center2,paragraph_justify,paragraph_justify2,paragraph_left,paragraph_left2,paragraph_right,paragraph_right2,paste,paste2,paste3,pause,pause2,pawn,paypal,paypal2,paypal3,pen,pencil,pencil2,phone_hang_up,phone,picassa,picassa2,pie,pilcrow,pinterest,pinterest2,play,play2,play3,plus,podcast,point_down,point_left,point_right,point_up,power_cord,previous,print,profile,pushpin,qrcode,question,quill,quotes_left,radio_checked,radio_unchecked,reddit,redo,redo2,remove,remove2,reply,right_to_left,road,rocket,sad,sad2,safari,scissors,screen,search,settings,share,shield,shocked,shocked2,shuffle,sigma,signup,skype,smiley,smiley2,soundcloud,soundcloud2,spades,spam,spell_check,spinner,spinner2,spinner3,spinner4,spinner5,spinner6,stack,stackoverflow,star,star2,star3,stats,steam,steam2,stop,stop2,stopwatch,storage,strikethrough,stumbleupon,stumbleupon2,support,switch,tab,table,table2,tablet,tag,tags,target,text_height,text_width,thumbs_up,thumbs_up2,ticket,tongue,tongue2,tree,trophy,truck,tumblr,tumblr2,tux,tv,twitter,twitter2,twitter3,underline,undo,undo2,unlocked,upload,upload2,upload3,user,user2,user3,user4,users,users2,vimeo,vimeo2,vimeo3,volume_decrease,volume_high,volume_increase,volume_low,volume_medium,volume_mute,volume_mute2,wand,warning,windows,windows8,wink,wink2,wondering,wondering2,wordpress,wordpress2,wrench,xing,xing2,yahoo,yelp,youtube,youtube2,zoom_in,zoom_out'.split(',');
+    zero.ready(function () {
+        var ib = ['<table><thead><tr><td colspan="3">icons(' + iconCla.length + ')</td></tr></thead><tbody>'];
+        for (var i = 0; i < iconCla.length; i++) {
+            ib.push('<tr>');
+            var s = '<input type="button" value="' + iconCla[i] + '" class="zero_bg_icon zero_bg_icon_' + iconCla[i] + '" />'
+            ib.push('<td>');
+            ib.push(i+1);
+            ib.push('</td><td>');
+            ib.push(s);
+            ib.push('</td><td>');
+            ib.push(zero.codeHighlight.html(s));
+            ib.push('</td></tr>')
+        }
+        ib.push('</tbody></table>');
+
+        zero('icon_style_show').html(ib.join(''));
+
+    });
+</script>
+</body>
+</html>

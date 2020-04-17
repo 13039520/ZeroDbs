@@ -1,0 +1,193 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>新建用户</title>
+    <link href="../css/zero.adminUI.css" rel="stylesheet" />
+</head>
+<body class="zero_dialog_page">
+    <form class="zero_form zero_form_btns_fixed" id="input_model">
+        <dl class="zero_form_group zero_form_group_cols3">
+            <dt><span class="zero_bg_icon zero_bg_icon_folder_open"></span><span>账号资料(*项必填必选)</span></dt>
+            <dd><div class="zero_form_text">
+                <h2 class="zero_form_input_label">用户名(*)：</h2>
+            </div><div class="zero_form_input"><input type="text" name="account" /></div></dd>
+            <dd><div class="zero_form_text">
+                <h2 class="zero_form_input_label">密码(*)：</h2>
+            </div><div class="zero_form_input"><input type="password" name="pwd1" /></div></dd>
+            <dd><div class="zero_form_text">
+                <h2 class="zero_form_input_label">确认密码(*)：</h2>
+            </div><div class="zero_form_input"><input type="password" name="pwd2" /></div></dd>
+        </dl>
+        <dl class="zero_form_group zero_form_group_cols2">
+            <dt><span class="zero_bg_icon zero_bg_icon_folder_open"></span><span>联系方式(*项必填必选)</span></dt>
+            <dd><div class="zero_form_text">
+                <h2 class="zero_form_input_label">电子邮箱(*)：</h2>
+            </div><div class="zero_form_input"><input type="text" name="email" /></div></dd>
+            <dd><div class="zero_form_text">
+                <h2 class="zero_form_input_label">手机号码(*)：</h2>
+            </div><div class="zero_form_input"><input type="text" name="phone" /></div></dd>
+            <dd><div class="zero_form_text">
+                <h2 class="zero_form_input_label">详细地址(*)：</h2>
+            </div><div class="zero_form_input"><input type="text" name="address" /></div></dd>
+            <dd><div class="zero_form_text">
+                <h2 class="zero_form_input_label">邮政编码(*)：</h2>
+            </div><div class="zero_form_input"><input type="text" name="post" /></div></dd>
+        </dl>
+        <dl class="zero_form_group zero_form_group_cols2">
+            <dt><span class="zero_bg_icon zero_bg_icon_folder_open"></span><span>基础资料(*项必填必选)</span></dt>
+            <dd><div class="zero_form_text">
+                <h2 class="zero_form_input_label">姓名(*)：</h2>
+            </div><div class="zero_form_input"><input type="text" name="name" /></div></dd>
+            <dd><div class="zero_form_text">
+                <h2 class="zero_form_input_label">性别(*)：</h2>
+            </div><div class="zero_form_input">
+                 <input type="hidden" name="gender" value="0" /><!--默认值-->
+                <label><input type="radio" name="gender" value="1" /> 男</label>
+                <label><input type="radio" name="gender" value="2" /> 女</label>
+                <label><input type="radio" name="gender" value="3" /> 其它</label>
+                 </div></dd>
+            <dd><div class="zero_form_text">
+                <h2 class="zero_form_input_label">生日(*)：</h2>
+            </div><div class="zero_form_input"><input type="text" name="birthday" /></div></dd>
+            <dd><div class="zero_form_text">
+                <h2 class="zero_form_input_label">居住城市(*)：</h2>
+            </div><div class="zero_form_input"><input type="text" name="city" /></div></dd>
+            <dd><div class="zero_form_text">
+                <h2 class="zero_form_input_label">从事行业(*)：</h2>
+            </div><div id="myDiv001" class="zero_form_input zero_form_input_box">
+                 <input type="hidden" name="industry" value="X" /><!--默认值-->
+                <label><input type="checkbox" name="industry" value="A" />  农、林、牧、渔业</label>
+                <label><input type="checkbox" name="industry" value="B" />  采矿业</label>
+                <label><input type="checkbox" name="industry" value="C" />  制造业</label>
+                <label><input type="checkbox" name="industry" value="D" />  电力、热力、燃气及水生产和供应业</label>
+                <label><input type="checkbox" name="industry" value="E" />  建筑业</label>
+                <label><input type="checkbox" name="industry" value="F" />  批发和零售业</label>
+                <label><input type="checkbox" name="industry" value="G" /> 交通运输、仓储和邮政业</label>
+                <label><input type="checkbox" name="industry" value="H" />  住宿和餐饮业</label>
+                <label><input type="checkbox" name="industry" value="I" /> 信息传输、软件和技术服务业</label>
+                <label><input type="checkbox" name="industry" value="J" />  金融业</label>
+                <label><input type="checkbox" name="industry" value="K" />  房地产业</label>
+                <label><input type="checkbox" name="industry" value="L" />  租赁和商务服务业</label>
+                <label><input type="checkbox" name="industry" value="M" />  科学研究和技术服务业</label>
+                <label><input type="checkbox" name="industry" value="N" />  水利、环境和公共设施管理业</label>
+                <label><input type="checkbox" name="industry" value="O" />  居民服务、修理和其他服务业</label>
+                <label><input type="checkbox" name="industry" value="P" />  教育</label>
+                <label><input type="checkbox" name="industry" value="Q" />  卫生和社会工作</label>
+                <label><input type="checkbox" name="industry" value="R" />  文化、体育和娱乐业</label>
+                <label><input type="checkbox" name="industry" value="S" />  公共管理、社会保障和社会组织</label>
+                <label><input type="checkbox" name="industry" value="T" />  国际组织</label>
+                 </div></dd>
+            <dd><div class="zero_form_text">
+                <h2 class="zero_form_input_label">工作职责(*)：</h2>
+                <p class="zero_form_input_tips">不能为空</p>
+                </div><div id="myDiv002" class="zero_form_input zero_form_input_box">
+                 <input type="hidden" name="job" value="None" /><!--默认值-->
+                <label><input type="checkbox" name="job" value="Director" /> 总监</label>
+                <label><input type="checkbox" name="job" value="Manager" /> 经理</label>
+                <label><input type="checkbox" name="job" value="Supervisor" /> 主管</label>
+                <label><input type="checkbox" name="job" value="Secretary" /> 秘书</label>
+                <label><input type="checkbox" name="job" value="Assistant" /> 助理</label>
+                <label><input type="checkbox" name="job" value="Coordinator" /> 协调人</label>
+                <label><input type="checkbox" name="job" value="Representative" /> 代表</label>
+                <label><input type="checkbox" name="job" value="Account" /> 客服</label>
+                <label><input type="checkbox" name="job" value="Copywriter" /> 文案</label>
+                <label><input type="checkbox" name="job" value="Planner" /> 策划</label>
+                <label><input type="checkbox" name="job" value="Typist" /> 打字员</label>
+                <label><input type="checkbox" name="job" value="Proof-reader" /> 校对</label>
+                <label><input type="checkbox" name="job" value="Interpreter" /> 口译员</label>
+                <label><input type="checkbox" name="job" value="Translator" /> 翻译员</label>
+                <label><input type="checkbox" name="job" value="Designer" /> 设计师</label>
+                <label><input type="checkbox" name="job" value="Operator" /> 操作员</label>
+                <label><input type="checkbox" name="job" value="Engineer" /> 工程师</label>
+                <label><input type="checkbox" name="job" value="Buyer" /> 采购员</label>
+                <label><input type="checkbox" name="job" value="Cashier" /> 出纳</label>
+                <label><input type="checkbox" name="job" value="Accountant" /> 会计</label>
+                <label><input type="checkbox" name="job" value="Consultant" /> 专家顾问</label>
+                <label><input type="checkbox" name="job" value="Adviser" /> 意见顾问</label>
+                <label><input type="checkbox" name="job" value="Trader" /> 交易员</label>
+                <label><input type="checkbox" name="job" value="Analyst" /> 分析师</label>
+                <label><input type="checkbox" name="job" value="Telephonist" /> 接线员</label>
+                <label><input type="checkbox" name="job" value="Employee" /> 雇员</label>
+                <label><input type="checkbox" name="job" value="Clerk" /> 职员</label>
+                <label><input type="checkbox" name="job" value="Staff" /> 工作人员</label>
+                <label><input type="checkbox" name="job" value="Worker" /> 工人</label>
+                <label><input type="checkbox" name="job" value="Receptionist" /> 接待/前台</label>
+                <label><input type="checkbox" name="job" value="Guide" /> 向导/导游</label>
+                <label><input type="checkbox" name="job" value="Guard" /> 门卫/安保</label>
+                <label><input type="checkbox" name="job" value="Cleaner" /> 保洁</label>
+                 </div></dd>
+        </dl>
+
+        <div class="zero_form_btns">
+            <input type="button" name="zero_btnCancel" value="取消" onclick="parentDialogObj.close()" />
+            <input type="submit" name="zero_btnSubmit" value="提交" />
+        </div>
+    </form>
+
+    <script type="text/javascript" src="../js/zero.js"></script>
+    <script type="text/javascript" src="../js/zero.ch.js"></script>
+    <script type="text/javascript" src="../js/zero.UI.js"></script>
+    <script type="text/javascript" src="../js/zero.adminUI.js"></script>
+    <script type="text/javascript" src="../js/zero.tree.js"></script>
+    <script type="text/javascript">
+        zero.ready(function () {
+            var myForm = zero.form('input_model'),
+                inputs = myForm.inputs,
+                checkResult = myForm.checkResult;
+            inputs.birthday.onfocus = function () {
+                zero.dateInput('选择生日').editType(1).format('yyyy-MM-dd').target(this).ok(function (str, json, date) {
+                    this.value = str;
+                    return true;//返回任意为true的值表示处理成功
+                }).show(1);
+            };
+
+            zero.ajax('../js/data-area.txt').send(function (res) {
+                var d = null;
+                try { d = eval('(' + res + ')'); } catch (e) { d = null; }
+                if (!d) { return; }
+                zero.treeInput({
+                    target: inputs.city,
+                    data: d.data,
+                    valueField: 'AreaCode',
+                    textField: 'AreaName',
+                    parentField: 'AreaParent',
+                    onTextBuilder: function (data) { return '[' + data.AreaCode + ']' + data.AreaName + data.AreaNameSuffix; },
+                    onSelect: function (data) { /*选中项的valueField已经写入到了target中*/ }
+                });
+                zero.log('city data loaded.');
+            });
+            var waitingDialog = null;
+            myForm.onCheck = function (data) {
+                var tips = '此项不能留空';
+                checkResult.account = { fail: !data.account, msg: tips };
+                checkResult.pwd1 = { fail: !data.pwd1, msg: tips };
+                if (!data.pwd2) {
+                    checkResult.pwd2 = { fail: true, msg: tips };
+                } else {
+                    checkResult.pwd2 = { fail: data.pwd1 != data.pwd2, msg: '两次密码输入不一致' };
+                }
+                checkResult.email = { fail: !/^\w{2,50}@\w{1,50}(\.\w{1,50}){1,3}$/.test(data.email), msg: '输入不合格式要求' };
+                checkResult.phone = { fail: !/^1[1-9]\d{9}$/.test(data.phone), msg: '输入不合格式要求' };
+                checkResult.address = { fail: !data.address, msg: tips };
+                checkResult.post = { fail: !data.post, msg: tips };
+                checkResult.name = { fail: !data.name, msg: tips };
+                checkResult.gender = { fail: '0' === data.gender, msg: tips };
+                checkResult.birthday = { fail: !data.birthday, msg: tips };
+                checkResult.city = { fail: !data.city, msg: tips };
+                checkResult.industry = { fail: data.industry == 'X', msg: tips };
+                checkResult.job = { fail: data.job == 'None', msg: tips };
+            };
+            myForm.onRequest = function () {
+                waitingDialog = dialog.waiting('……正在提交……');
+            };
+            myForm.onResponse = function (res) {
+                waitingDialog && waitingDialog.close();
+                dialog.alert('responseText', '<ol class="zero_code_highlight"><li>' + zero.codeHighlight.html(res).replace(/(\r\n|\n)/g, '</li><li>') + '</li></ol>', null, 800);
+            };
+            //myForm.submit();
+        });
+    </script>
+</body>
+</html>

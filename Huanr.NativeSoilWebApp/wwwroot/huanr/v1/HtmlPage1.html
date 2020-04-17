@@ -1,0 +1,447 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no" />
+    <title>树形控件 </title>
+    <style type="text/css">
+        input[type="text"]{width:300px;}
+
+        div.tree_node_root{display:block;width:500px; height:300px;position:absolute;z-index:1;background:#fff; margin:0;padding:0;overflow:hidden;overflow-y:visible;border:solid 1px #05a59d;font-family:'Microsoft YaHei';}
+        div.tree_node_root .tree_node_item{overflow:hidden;}
+        div.tree_node_root .tree_node_item:last-child{border-bottom:none;}
+        div.tree_node_root .tree_node_item:after{content:"0";display:block;height:0;clear:both;visibility:hidden;}
+        div.tree_node_root .tree_node_item b{display:block;border-right:solid 1px #05a59d;color:#fff; width:30px;margin:0;height:30px;background:#03d6d0; line-height:30px;text-align:center;float:left;}
+        div.tree_node_root .tree_node_item p{display:block;margin:0;padding:0; cursor:pointer; overflow:hidden; background:#fff; height:30px;line-height:30px;border-bottom:solid 1px #05a59d;}
+        div.tree_node_root .tree_node_item p span{padding-left:5px;font-size:12px;}
+        div.tree_node_root .tree_node_item p:hover{background:#fcc8c8;}
+        div.tree_node_root .tree_node_item p:hover b{background:#f00;color:#fff;}
+        div.tree_node_root .tree_node_item.selected p{background:#ff6a00;color:#fff;}
+        div.tree_node_root .tree_node_item.selected p b{background:#ff9900;}
+        div.tree_node_root .tree_node_item.selected p:hover{background:#ffcc00;color:#fff;}
+        div.tree_node_root .tree_node_item.selected p:hover b{background:#f00;}
+        div.tree_node_root .tree_node_item .tree_node_item_children{margin-left:30px;border-left:solid 1px #05a59d;overflow:hidden;}
+        div.tree_node_root .tree_node_item .tree_node_item_children i{font-size:12px;border-bottom:solid 1px #05a59d;color:#999;display:block;padding:0;margin:0;height:16px;line-height:16px;overflow:hidden;}
+        div.tree_node_root .tree_node_item .tree_node_item_children i i{display:block;border-top:none;margin:0;margin:0;width:30px;height:16px;float:left;background:#ddd;font-style:normal;}
+        div.tree_node_root .tree_node_item .tree_node_item_children i em{display:block;margin:0;margin:0;height:16px;float:left;font-style:normal;text-indent:5px;}
+    </style>
+    <script type="text/javascript" src="JScripts/id.js"></script>
+    <script type="text/javascript" src="JavaScript1.js"></script>
+    <script type="text/javascript">        //
+        var allOrganData = [
+            { "id": 24798223201743612, "name": "云南师范大学附属中学呈贡校区", "code": "o=1000", "parent_code": null, "organ_type": 0, "organ_all_name": "云南师范大学附属中学呈贡校区", "organ_all_code": "o=1000" },
+            { "id": 24798223201743664, "name": "初一年级", "code": "o=1001", "parent_code": "o=1000", "organ_type": 1, "organ_all_name": "云南师范大学附属中学呈贡校区/初一年级", "organ_all_code": "o=1000/o=1001" },
+            { "id": 24798223201743670, "name": "1班", "code": "o=1002", "parent_code": "o=1001", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/初一年级/1班", "organ_all_code": "o=1000/o=1001/o=1002" },
+            { "id": 24798223201743706, "name": "2班", "code": "o=1003", "parent_code": "o=1001", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/初一年级/2班", "organ_all_code": "o=1000/o=1001/o=1003" },
+            { "id": 24798223201743731, "name": "3班", "code": "o=1004", "parent_code": "o=1001", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/初一年级/3班", "organ_all_code": "o=1000/o=1001/o=1004" },
+            { "id": 24798223201743814, "name": "高一年级", "code": "o=1007", "parent_code": "o=1000", "organ_type": 1, "organ_all_name": "云南师范大学附属中学呈贡校区/高一年级", "organ_all_code": "o=1000/o=1007" },
+            { "id": 24798223201743816, "name": "1班", "code": "o=1008", "parent_code": "o=1007", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/高一年级/1班", "organ_all_code": "o=1000/o=1007/o=1008" },
+            { "id": 24798223201743848, "name": "2班", "code": "o=1009", "parent_code": "o=1007", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/高一年级/2班", "organ_all_code": "o=1000/o=1007/o=1009" },
+            { "id": 24798223201743862, "name": "3班", "code": "o=1010", "parent_code": "o=1007", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/高一年级/3班", "organ_all_code": "o=1000/o=1007/o=1010" },
+            { "id": 24798223201743892, "name": "4班", "code": "o=1011", "parent_code": "o=1007", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/高一年级/4班", "organ_all_code": "o=1000/o=1007/o=1011" },
+            { "id": 24798223201743901, "name": "5班", "code": "o=1012", "parent_code": "o=1007", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/高一年级/5班", "organ_all_code": "o=1000/o=1007/o=1012" },
+            { "id": 24798223201743612, "name": "云南师范大学附属中学呈贡校区", "code": "o=1000", "parent_code": null, "organ_type": 0, "organ_all_name": "云南师范大学附属中学呈贡校区", "organ_all_code": "o=1000" },
+            { "id": 24798223201743664, "name": "初一年级", "code": "o=1001", "parent_code": "o=1000", "organ_type": 1, "organ_all_name": "云南师范大学附属中学呈贡校区/初一年级", "organ_all_code": "o=1000/o=1001" },
+            { "id": 24798223201743670, "name": "1班", "code": "o=1002", "parent_code": "o=1001", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/初一年级/1班", "organ_all_code": "o=1000/o=1001/o=1002" },
+            { "id": 24798223201743706, "name": "2班", "code": "o=1003", "parent_code": "o=1001", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/初一年级/2班", "organ_all_code": "o=1000/o=1001/o=1003" },
+            { "id": 24798223201743731, "name": "3班", "code": "o=1004", "parent_code": "o=1001", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/初一年级/3班", "organ_all_code": "o=1000/o=1001/o=1004" },
+            { "id": 24798223201743814, "name": "高一年级", "code": "o=1007", "parent_code": "o=1000", "organ_type": 1, "organ_all_name": "云南师范大学附属中学呈贡校区/高一年级", "organ_all_code": "o=1000/o=1007" },
+            { "id": 24798223201743816, "name": "1班", "code": "o=1008", "parent_code": "o=1007", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/高一年级/1班", "organ_all_code": "o=1000/o=1007/o=1008" },
+            { "id": 24798223201743848, "name": "2班", "code": "o=1009", "parent_code": "o=1007", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/高一年级/2班", "organ_all_code": "o=1000/o=1007/o=1009" },
+            { "id": 24798223201743862, "name": "3班", "code": "o=1010", "parent_code": "o=1007", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/高一年级/3班", "organ_all_code": "o=1000/o=1007/o=1010" },
+            { "id": 24798223201743892, "name": "4班", "code": "o=1011", "parent_code": "o=1007", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/高一年级/4班", "organ_all_code": "o=1000/o=1007/o=1011" },
+            { "id": 24798223201743901, "name": "5班", "code": "o=1012", "parent_code": "o=1007", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/高一年级/5班", "organ_all_code": "o=1000/o=1007/o=1012" },
+            { "id": 24798223201743612, "name": "云南师范大学附属中学呈贡校区", "code": "o=1000", "parent_code": null, "organ_type": 0, "organ_all_name": "云南师范大学附属中学呈贡校区", "organ_all_code": "o=1000" },
+            { "id": 24798223201743664, "name": "初一年级", "code": "o=1001", "parent_code": "o=1000", "organ_type": 1, "organ_all_name": "云南师范大学附属中学呈贡校区/初一年级", "organ_all_code": "o=1000/o=1001" },
+            { "id": 24798223201743670, "name": "1班", "code": "o=1002", "parent_code": "o=1001", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/初一年级/1班", "organ_all_code": "o=1000/o=1001/o=1002" },
+            { "id": 24798223201743706, "name": "2班", "code": "o=1003", "parent_code": "o=1001", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/初一年级/2班", "organ_all_code": "o=1000/o=1001/o=1003" },
+            { "id": 24798223201743731, "name": "3班", "code": "o=1004", "parent_code": "o=1001", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/初一年级/3班", "organ_all_code": "o=1000/o=1001/o=1004" },
+            { "id": 24798223201743814, "name": "高一年级", "code": "o=1007", "parent_code": "o=1000", "organ_type": 1, "organ_all_name": "云南师范大学附属中学呈贡校区/高一年级", "organ_all_code": "o=1000/o=1007" },
+            { "id": 24798223201743816, "name": "1班", "code": "o=1008", "parent_code": "o=1007", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/高一年级/1班", "organ_all_code": "o=1000/o=1007/o=1008" },
+            { "id": 24798223201743848, "name": "2班", "code": "o=1009", "parent_code": "o=1007", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/高一年级/2班", "organ_all_code": "o=1000/o=1007/o=1009" },
+            { "id": 24798223201743862, "name": "3班", "code": "o=1010", "parent_code": "o=1007", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/高一年级/3班", "organ_all_code": "o=1000/o=1007/o=1010" },
+            { "id": 24798223201743892, "name": "4班", "code": "o=1011", "parent_code": "o=1007", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/高一年级/4班", "organ_all_code": "o=1000/o=1007/o=1011" },
+            { "id": 24798223201743901, "name": "5班", "code": "o=1012", "parent_code": "o=1007", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/高一年级/5班", "organ_all_code": "o=1000/o=1007/o=1012" },
+            { "id": 24798223201743612, "name": "云南师范大学附属中学呈贡校区", "code": "o=1000", "parent_code": null, "organ_type": 0, "organ_all_name": "云南师范大学附属中学呈贡校区", "organ_all_code": "o=1000" },
+            { "id": 24798223201743664, "name": "初一年级", "code": "o=1001", "parent_code": "o=1000", "organ_type": 1, "organ_all_name": "云南师范大学附属中学呈贡校区/初一年级", "organ_all_code": "o=1000/o=1001" },
+            { "id": 24798223201743670, "name": "1班", "code": "o=1002", "parent_code": "o=1001", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/初一年级/1班", "organ_all_code": "o=1000/o=1001/o=1002" },
+            { "id": 24798223201743706, "name": "2班", "code": "o=1003", "parent_code": "o=1001", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/初一年级/2班", "organ_all_code": "o=1000/o=1001/o=1003" },
+            { "id": 24798223201743731, "name": "3班", "code": "o=1004", "parent_code": "o=1001", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/初一年级/3班", "organ_all_code": "o=1000/o=1001/o=1004" },
+            { "id": 24798223201743814, "name": "高一年级", "code": "o=1007", "parent_code": "o=1000", "organ_type": 1, "organ_all_name": "云南师范大学附属中学呈贡校区/高一年级", "organ_all_code": "o=1000/o=1007" },
+            { "id": 24798223201743816, "name": "1班", "code": "o=1008", "parent_code": "o=1007", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/高一年级/1班", "organ_all_code": "o=1000/o=1007/o=1008" },
+            { "id": 24798223201743848, "name": "2班", "code": "o=1009", "parent_code": "o=1007", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/高一年级/2班", "organ_all_code": "o=1000/o=1007/o=1009" },
+            { "id": 24798223201743862, "name": "3班", "code": "o=1010", "parent_code": "o=1007", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/高一年级/3班", "organ_all_code": "o=1000/o=1007/o=1010" },
+            { "id": 24798223201743892, "name": "4班", "code": "o=1011", "parent_code": "o=1007", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/高一年级/4班", "organ_all_code": "o=1000/o=1007/o=1011" },
+            { "id": 24798223201743901, "name": "5班", "code": "o=1012", "parent_code": "o=1007", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/高一年级/5班", "organ_all_code": "o=1000/o=1007/o=1012" },
+            { "id": 24798223201743612, "name": "云南师范大学附属中学呈贡校区", "code": "o=1000", "parent_code": null, "organ_type": 0, "organ_all_name": "云南师范大学附属中学呈贡校区", "organ_all_code": "o=1000" },
+            { "id": 24798223201743664, "name": "初一年级", "code": "o=1001", "parent_code": "o=1000", "organ_type": 1, "organ_all_name": "云南师范大学附属中学呈贡校区/初一年级", "organ_all_code": "o=1000/o=1001" },
+            { "id": 24798223201743670, "name": "1班", "code": "o=1002", "parent_code": "o=1001", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/初一年级/1班", "organ_all_code": "o=1000/o=1001/o=1002" },
+            { "id": 24798223201743706, "name": "2班", "code": "o=1003", "parent_code": "o=1001", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/初一年级/2班", "organ_all_code": "o=1000/o=1001/o=1003" },
+            { "id": 24798223201743731, "name": "3班", "code": "o=1004", "parent_code": "o=1001", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/初一年级/3班", "organ_all_code": "o=1000/o=1001/o=1004" },
+            { "id": 24798223201743814, "name": "高一年级", "code": "o=1007", "parent_code": "o=1000", "organ_type": 1, "organ_all_name": "云南师范大学附属中学呈贡校区/高一年级", "organ_all_code": "o=1000/o=1007" },
+            { "id": 24798223201743816, "name": "1班", "code": "o=1008", "parent_code": "o=1007", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/高一年级/1班", "organ_all_code": "o=1000/o=1007/o=1008" },
+            { "id": 24798223201743848, "name": "2班", "code": "o=1009", "parent_code": "o=1007", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/高一年级/2班", "organ_all_code": "o=1000/o=1007/o=1009" },
+            { "id": 24798223201743862, "name": "3班", "code": "o=1010", "parent_code": "o=1007", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/高一年级/3班", "organ_all_code": "o=1000/o=1007/o=1010" },
+            { "id": 24798223201743892, "name": "4班", "code": "o=1011", "parent_code": "o=1007", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/高一年级/4班", "organ_all_code": "o=1000/o=1007/o=1011" },
+            { "id": 24798223201743901, "name": "5班", "code": "o=1012", "parent_code": "o=1007", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/高一年级/5班", "organ_all_code": "o=1000/o=1007/o=1012" },
+            { "id": 24798223201743612, "name": "云南师范大学附属中学呈贡校区", "code": "o=1000", "parent_code": null, "organ_type": 0, "organ_all_name": "云南师范大学附属中学呈贡校区", "organ_all_code": "o=1000" },
+            { "id": 24798223201743664, "name": "初一年级", "code": "o=1001", "parent_code": "o=1000", "organ_type": 1, "organ_all_name": "云南师范大学附属中学呈贡校区/初一年级", "organ_all_code": "o=1000/o=1001" },
+            { "id": 24798223201743670, "name": "1班", "code": "o=1002", "parent_code": "o=1001", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/初一年级/1班", "organ_all_code": "o=1000/o=1001/o=1002" },
+            { "id": 24798223201743706, "name": "2班", "code": "o=1003", "parent_code": "o=1001", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/初一年级/2班", "organ_all_code": "o=1000/o=1001/o=1003" },
+            { "id": 24798223201743731, "name": "3班", "code": "o=1004", "parent_code": "o=1001", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/初一年级/3班", "organ_all_code": "o=1000/o=1001/o=1004" },
+            { "id": 24798223201743814, "name": "高一年级", "code": "o=1007", "parent_code": "o=1000", "organ_type": 1, "organ_all_name": "云南师范大学附属中学呈贡校区/高一年级", "organ_all_code": "o=1000/o=1007" },
+            { "id": 24798223201743816, "name": "1班", "code": "o=1008", "parent_code": "o=1007", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/高一年级/1班", "organ_all_code": "o=1000/o=1007/o=1008" },
+            { "id": 24798223201743848, "name": "2班", "code": "o=1009", "parent_code": "o=1007", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/高一年级/2班", "organ_all_code": "o=1000/o=1007/o=1009" },
+            { "id": 24798223201743862, "name": "3班", "code": "o=1010", "parent_code": "o=1007", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/高一年级/3班", "organ_all_code": "o=1000/o=1007/o=1010" },
+            { "id": 24798223201743892, "name": "4班", "code": "o=1011", "parent_code": "o=1007", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/高一年级/4班", "organ_all_code": "o=1000/o=1007/o=1011" },
+            { "id": 24798223201743901, "name": "5班", "code": "o=1012", "parent_code": "o=1007", "organ_type": 2, "organ_all_name": "云南师范大学附属中学呈贡校区/高一年级/5班", "organ_all_code": "o=1000/o=1007/o=1012" }
+        ];
+        //获取机构组织树
+        function getOrganTreeData() { var b = []; if (allOrganData && allOrganData.length) var d = function (b) { for (var c = [], a = 0; a < allOrganData.length; a++) allOrganData[a].parent_code == b && (c[c.length] = { id: allOrganData[a].organ_all_code, text: allOrganData[a].organ_all_name, attributes: { type: allOrganData[a].organ_type }, children: d(allOrganData[a].code) }); return c }, b = d(null); else alert("机构数据加载异常。"); return b };
+
+        function getTreeDataByParentID(parent_code) {
+            var b = []; 
+            if (allOrganData && allOrganData.length) {
+                for (var i = 0; i < allOrganData.length; i++) {
+                    if (allOrganData[i].parent_code == parent_code) {
+                        b.push({ id: allOrganData[i].organ_all_code, text: allOrganData[i].organ_all_name, attributes: { type: allOrganData[i].organ_type }, children: [] })
+                    }
+                }
+            }
+            return b;
+        }
+
+        var nnn = function () {
+            //AreaJsData
+            var b = []; 
+            if (AreaJsData && AreaJsData.length) {
+                var d = function (b) {
+                    for (var c = [], a = 0; a < AreaJsData.length; a++) {
+                        AreaJsData[a].AreaParentID == b && (c[c.length] = { id: AreaJsData[a].AreaID, text: AreaJsData[a].AreaConcatName.replace(AreaJsData[a].AreaName + AreaJsData[a].AreaNameSuffix, '<strong style="color:#f00;">' + AreaJsData[a].AreaName + AreaJsData[a].AreaNameSuffix + '</strong>'), attributes: AreaJsData[a], children: d(AreaJsData[a].AreaID) });
+                    }
+                    return c
+                }, b = d(1);
+            } else { alert("机构数据加载异常。"); }
+            return b
+        };
+
+        var treeData = getOrganTreeData();
+
+        var treeCore = function (id, initialData, idField, valueField, isExpand, selectedValue, itemSelected, expand) {
+            return new function (id, initialData, idField, valueField, isExpand, selectedValue, itemSelected, expand) {
+                var _this = this;
+                var template = '<div class="tree_node_item' + (isExpand ? ' open' : '') + '" Value="@Value" Attributes="@Attributes" HasChildren="@HasChildren" ChildrenLoaded="@ChildrenLoaded"><p class="tree_node_item_text"><b title="@CharTitle">@Char</b><span>@Text</span></p><div class="tree_node_item_children" style="display:@ChildrenDisplay;">@ValueChildren</div></div>';
+                var expandIsFun = 'function' == typeof expand;
+                var fun = function (o) {
+                    //alert(expand)
+                    var a = [];
+                    for (var i = 0; i < o.length; i++) {
+                        var hasChildren = o[i].children && o[i].children.length;
+                        a[a.length] = template.replace(/@Value\b/ig, encodeURIComponent(o[i][idField]))
+                            .replace(/@Text\b/ig, o[i][valueField])
+                            .replace(/@HasChildren\b/ig, hasChildren ? '1' : '0')
+                            .replace(/@ChildrenLoaded\b/ig, hasChildren ? '1' : '0')
+                            .replace(/@Char\b/ig, hasChildren ? (isExpand ? '-' : '+') : (expandIsFun ? '⊿' : '●'))
+                            .replace(/@CharTitle\b/ig, hasChildren ? (isExpand ? 'collapse item' : 'expand item') : (expandIsFun ? 'load subdata' : ''))
+                            .replace(/@ChildrenDisplay\b/ig, isExpand ? '' : 'none')
+                            .replace(/@Attributes\b/ig, o[i].attributes ? encodeURIComponent($id.json.toString(o[i].attributes)) : '')
+                            .replace(/@ValueChildren\b/ig, hasChildren ? fun(o[i].children) : '');
+                    }
+                    return a.join('');
+                }
+                var t = fun(initialData);
+                var obj = $id(id).addClass('tree_node_root');
+                if ($id(obj).attribute('treee') != '1') {
+                    var bClick = function () {
+                        var item = $id(this.parentNode.parentNode);
+                        if ($id(item).attribute('HasChildren') == '1') {
+                            if ($id(item).hasClass('open')) {
+                                $id(item).removeClass('open').find('class=tree_node_item_children', 1).cssText('display:none');
+                                $id(this).html('+').attribute('title', 'expand item');
+                            } else {
+                                $id(item).addClass('open').find('class=tree_node_item_children', 1).cssText('display:block');
+                                $id(this).html('-').attribute('title', 'collapse item');
+                            }
+                        } else {
+                            if (expandIsFun) {
+                                if ($id(item).attribute('ChildrenLoaded') == '1') {
+                                    pClick.apply(this.parentNode, []);
+                                } else {
+                                    if (!$id(item).attribute('ChildrenLoading')) {
+                                        $id(item).attribute('ChildrenLoading', '1');
+                                        var v = decodeURIComponent($id(item).attribute('Value')),
+                                        t = $id(item).find('span').first().html(),
+                                        attr = $id(item).attribute('Attributes');
+                                        if (attr) {
+                                            attr = decodeURIComponent(attr);
+                                            attr = eval('(' + attr + ')');
+                                        } else {
+                                            attr = {};
+                                        }
+                                        $id(item).find('class=tree_node_item_children', 1).cssText('display:block').html('<i><i></i><em>loading......</em></i>');
+                                        expand.apply(_this, [{ id: v, text: t, attributes: attr }, item[0]])
+                                    }
+                                }
+                            } else {
+                                pClick.apply(this.parentNode, []);
+                            }
+                        }
+                    },
+                    pClick = function () {
+                        //var bt = new Date();
+                        $id(obj).find('div').filter('class=selected').removeClass('selected');
+                        $id(this.parentNode).addClass('selected');
+                        if ('function' == typeof itemSelected) {
+                            var item = this.parentNode,
+                                v = decodeURIComponent($id(item).attribute('Value')),
+                                t = $id(item).find('span').first().html(),
+                                attr = $id(item).attribute('Attributes');
+                            if (attr) {
+                                attr = decodeURIComponent(attr);
+                                attr = eval('(' + attr + ')');
+                            } else {
+                                attr = {};
+                            }
+                            itemSelected(v, { id: v, text: t.replace(/<.[^<]*>/g,''), attributes: attr });
+                        }
+                        //alert((new Date()).getTime()-bt.getTime());
+                    };
+                    obj.addEvent('click', function (e) {
+                        var e = e || window.event;
+                        var target = e.target || e.srcElement;
+                        switch (target.nodeName) {
+                            case 'B':
+                                $id.stopEventBubble(e);
+                                bClick.apply(target, []);
+                                break;
+                            case 'P':
+                                pClick.apply(target, []);
+                                break;
+                            case 'SPAN':
+                                pClick.apply(target.parentNode, []);
+                                break;
+                            default:
+                                while (target != obj[0] && target.nodeName != 'P') {
+                                    target = target.parentNode;
+                                }
+                                pClick.apply(target, []);
+                                break;
+                        }
+                    }).attribute('treee', '1');
+                }
+                obj.html(t);
+                var selItem = function (item) {
+                    $id(item).addClass('selected');
+                    while (item.parentNode != obj[0]) {
+                        item = item.parentNode.parentNode;
+                        if (!$id(item).hasClass('open')) {
+                            $id(item).find('b').first().triggerEvent('click');
+                        }
+                    }
+                },
+                selValue = function (value) {
+                    var item = $id(obj).find('div').filter('class=tree_node_item').filter('Value=' + encodeURIComponent(value));
+                    if (item.length) {
+                        selItem(item[0]);
+                    } else {
+                        //alert('value集合中不存在“' + selectedValue + '”');
+                    }
+                };
+                if (selectedValue) {
+                    selValue(selectedValue);
+                }
+                this.getSelectedData = function () {
+                    var n = $id(obj).find('div').filter('class=tree_node_item').filter('class=selected');
+                    var d = null;
+                    if (n.length) {
+                        var item = n[0],
+                                v = decodeURIComponent($id(item).attribute('Value')),
+                                t = $id(item).find('span').first().html(),
+                                attr = $id(item).attribute('Attributes');
+                        if (attr) {
+                            attr = decodeURIComponent(attr);
+                            attr = eval('(' + attr + ')');
+                        } else {
+                            attr = {};
+                        }
+                        d = { id: v, text: t, attributes: attr };
+                    }
+                    return d;
+                };
+                this.itemSelectedByValue = function (v) {
+                    selValue(v);
+                };
+                this.loadChildren = function (initialData, itemNode) {
+                    var div = $id(itemNode).attribute('ChildrenLoaded', '1').removeAttribute('ChildrenLoading').find('div', 1).filter('class=tree_node_item_children');
+                    var b = $id(itemNode).find('b').first();
+                    if (1 != b.length && 1 != div.length) { return; }
+                    if (!initialData) { div.cssText('display:none'); b.html('●').attribute('title', 'the subdata is empty.'); return; }//√
+                    if (!isArray(initialData)) { initialData = [initialData] } else {
+                        if (initialData.length < 1) { div.cssText('display:none'); b.html('●').attribute('title', 'the subdata is empty.'); return; }
+                    }
+                    if (b.length && div.length == 1) {
+                        $id(itemNode).addClass('open').attribute('HasChildren', '1');
+                        b.html('-').attribute('title', 'collapse item');
+                        div.html(fun(initialData));
+                    }
+                };
+            }(id, initialData, idField, valueField, isExpand, selectedValue, itemSelected, expand);
+        };
+        var treeInit = function (textInput, initialData, idField, valueField, isExpand, clickCallback, expand) {
+            if (textInput.nodeName && textInput.nodeName == 'INPUT' && textInput.type && textInput.type == 'text') {
+                var o = textInput;
+                var id = $id(o).attribute('id'),
+                    name = $id(o).attribute('name');
+                if (!id) {
+                    id = 't' + (new Date()).getTime();
+                    var i = 0;
+                    while ($id(id).length) {
+                        i++;
+                        id = id + i;
+                    }
+                    textInput.id = id;
+                }
+                if (!name) {
+                    textInput.name = id;
+                }
+                var nInputId = id + '_text',
+                    nInputName = name + '_text',
+                    nDivId = id + '_div';
+                var nInput = $id(nInputId),
+                    nDiv = $id(nDivId);
+                if (nInput.length){ nInput.remove() }
+                if (nDiv.length) { nDiv.remove(); }
+
+                nInput = $id(o.cloneNode()).insertBefore(o).attribute('id', nInputId).attribute('name', nInputName).value('');
+                $id(o).cssText('display:none');
+                nDiv = $id.htmlStrToDom('<div class="tree_node_root" style="display:none;" id="' + nDivId + '"></div>').prependTo();
+                var tree = treeCore(nDiv, initialData, idField, valueField, isExpand, o.value, function (v, d) {
+                    nDiv[0].style.display = 'none';
+                    o.value = v;
+                    nInput[0].value = d.text;
+                    'function' == typeof cliclCallback && clickCallback(v, d);
+                }, expand);
+                var selData = tree.getSelectedData();
+                if (selData) {
+                    nInput[0].value = selData.text;
+                }
+                var fun = function (e) {
+                    e = e || window.event;
+                    var target = e.target || e.srcElement;
+                    if (target.nodeName) {
+                        if (nDiv[0] != target && !nDiv[0].contains(target)) {
+                            nDiv[0].style.display = 'none';
+                            $id(document).removeEvent('click', fun);
+                        }
+                    }
+                };
+                nInput[0].onfocus = function (e) {
+                    this.blur();
+                    $id(document.body, 'div').filter('class=tree_node_root').cssText('display:none');
+                    nDiv[0].style.display = 'block';
+                    var point = $id.getAbsPoint(this);
+                    var dm = $id.getCurrentStyle(this, 'display');
+                    var isInlineM = false;
+                    var bodyT = parseInt($id.getCurrentStyle(document.body, 'marginTop'), 10) + parseInt($id.getCurrentStyle(document.body, 'paddingTop'), 10);
+                    var bodyL = parseInt($id.getCurrentStyle(document.body, 'marginLeft'), 10) + parseInt($id.getCurrentStyle(document.body, 'paddingLeft'), 10);
+
+                    nDiv[0].style.marginLeft = point.x - bodyL + 'px';
+                    nDiv[0].style.marginTop = point.y - bodyT + 'px';
+                    nDiv[0].style.display = 'block';
+
+                    $id(document).addEvent('click', fun);
+                };
+            }
+        };
+
+        var createTree = function (config) {
+            var o = $id(config.textInputIdOrNode);
+            if (o.length != 1) { return; }
+            config.textInputIdOrNode = o[0];
+            if (!config.initialData) { return; }
+            if (!isArray(config.initialData)) { config.initialData = [config.initialData]; }
+            if (!config.idField) { config.idField='id'; }
+            if (!config.valueField) { config.valueField = 'text'; }
+            if (config.isExpand == undefined || config.isExpand == null) {
+                config.isExpand = false;
+            }
+            if ('function' != typeof config.itemSelected) {
+                config.itemSelected = null;
+            }
+            if ('function' != typeof config.expand) {
+                config.expand = null;
+            }
+            treeInit(config.textInputIdOrNode, config.initialData, config.idField, config.valueField, config.isExpand, config.itemSelected, config.expand);
+        };
+
+        $id.documentReady(function () {
+            var treeInput = $id(document.body, 'input').filter('type=text').filter('class=tree_text');
+            var initialData = nnn();//getOrganTreeData();
+            var initialData002 = getTreeDataByParentID(null);
+            var ttt=function (itemData, itemNode) {
+                var ids = itemData.id.split('/');
+                var pid;
+                if (ids.length > 1) {
+                    pid = ids[ids.length - 1];
+                } else {
+                    pid = ids[0];
+                }
+                initialData = getTreeDataByParentID(pid);
+                var _this = this;
+                setTimeout(function () {
+                    _this.loadChildren(initialData, itemNode);
+                }, 2000);
+            };
+            for (var i = 0; i < treeInput.length; i++) {
+                if ((i + 1) % 2 != 0) {
+                    createTree({
+                        textInputIdOrNode: treeInput[i],
+                        initialData: initialData,
+                        idField: 'id',
+                        valueField: 'text'//,
+                        //isExpand: true,
+                        //itemSelected: null,
+                        //expand: null
+                    });
+                } else {
+                    createTree({
+                        textInputIdOrNode: treeInput[i],
+                        initialData: initialData002,
+                        idField: 'id',
+                        valueField: 'text',
+                        //isExpand: false,
+                        //itemSelected: null,
+                        expand: ttt
+                    });
+                }
+            }
+        });
+    </script>
+</head>
+<body style="padding:10px;margin:0px;">
+    <!--<div style="overflow:hidden;border:solid 1px #000; padding:10px;margin:50px;overflow:hidden; background:#fff;">
+    <input type="text" class="tree_text" name="aaaaa" />
+    <input type="text" class="tree_text" name="aaaaa" />
+    <input type="text" class="tree_text" name="aaaaa" />
+        <br /><br />
+    <input type="text" class="tree_text" name="aaaaa" style="display:block;" />
+    </div>-->
+    <div style="overflow:hidden;border:solid 1px #000; padding:10px;margin:50px;overflow:hidden; background:#fff;">
+    <input type="text" class="tree_text" name="aaaaa" value="o=1000/o=1001/o=1004" />
+    <input type="text" class="tree_text" name="aaaaa" />
+    <input type="text" class="tree_text" name="aaaaa" />
+        <br /><br />
+    <input type="text" class="tree_text" name="aaaaa" style="display:block;" />
+    </div>
+    <!--<div style="overflow:hidden;border:solid 1px #000; padding:10px;margin:50px;overflow:hidden; background:#fff;">
+    <input type="text" class="tree_text" name="aaaaa" />
+    <input type="text" class="tree_text" name="aaaaa" />
+    <input type="text" class="tree_text" name="aaaaa" />
+        <br /><br />
+    <input type="text" class="tree_text" name="aaaaa" style="display:block;" />
+    </div>-->
+    <div style="overflow:hidden;border:solid 1px #000; padding:10px;margin:50px;overflow:hidden; background:#fff;">
+        <textarea name="aaa" id="mytextarea" style="width:800px;height:300px;"></textarea>
+    </div>
+</body>
+</html>

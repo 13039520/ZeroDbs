@@ -1,0 +1,36 @@
+﻿@{
+    List<Huanr.Models.NativeSoil.tSystemRoleGroup> tSystemRoleGroupList = ViewBag.tSystemRoleGroupList;
+    Huanr.Models.NativeSoil.tSystemRole tSystemRole =ViewBag.tSystemRole;
+
+    ViewData["Title"] = "RoleAdd";
+    Layout = "~/Views/Shared/_AdminDialogPageLayout.cshtml";
+}
+<form class="zero_form zero_form_btns_fixed" id="roleEditForm" action="/admin/system/roleEditSave" method="post">
+        <dl class="zero_form_group">
+            <dt>角色信息</dt>
+            <dd><div class="zero_form_text">角色组：</div><div class="zero_form_input"><select name="GroupName">@foreach (var group in tSystemRoleGroupList) {
+                @if (group.GroupName == tSystemRole.GroupName) {<option value="@group.GroupName" selected="selected">@group.GroupName</option>
+                } else {<option value="@group.GroupName">@group.GroupName</option>}
+             }</select></div></dd>
+            <dd><div class="zero_form_text">角色名称：</div><div class="zero_form_input"><input type="text" name="RoleName" value="@tSystemRole.RoleName" maxlength="50" readonly="readonly" /></div></dd>
+            <dd><div class="zero_form_text">角色备注：</div><div class="zero_form_input"><input type="text" name="RoleRemark" value="@tSystemRole.RoleRemark" maxlength="200" /></div></dd>
+            <dd><div class="zero_form_text">角色排序：</div><div class="zero_form_input"><input  type="number" name="RoleSort" value="@tSystemRole.RoleSort" max="999999999" min="0" /></div></dd>
+            <dd><div class="zero_form_text">角色删除：</div><div class="zero_form_input">
+                <input type="hidden" name="RoleDeleteStatus" value="0" />
+                <label><input type="radio" name="RoleDeleteStatus" value="0" readonly="readonly"@if (!tSystemRole.RoleDeleteStatus) {@(new StringHtmlContent(" checked=\"checked\"")) } /> 否</label>
+                <label><input type="radio" name="RoleDeleteStatus" value="1" readonly="readonly"@if (tSystemRole.RoleDeleteStatus) {@(new StringHtmlContent(" checked=\"checked\"")) } /> 是</label>
+                 </div></dd>
+         </dl>
+
+        <div class="zero_form_btns">
+            <input type="button" name="zero_btnCancel" value="取消" onclick="parentDialogObj.close()" />
+            <input type="submit" name="zero_btnSubmit" value="提交" />
+        </div>
+</form>
+@section StyleSection{ }
+@section JavaScriptSection{
+<script type="text/javascript" src="~/huanr/javascript/adminSystem.js"></script>
+<script type="text/javascript">
+    zero.ready(function () { adminSystemRoleEdit.initFunc('roleEditForm') });
+</script>
+}

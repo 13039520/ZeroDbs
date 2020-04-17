@@ -1,0 +1,68 @@
+﻿@{
+    List<Huanr.Models.NativeSoil.tSystemRoleGroup> tSystemRoleGroupList = ViewBag.tSystemRoleGroupList;
+    ViewData["Title"] = "RoleList";
+    Layout = "~/Views/Shared/_AdminIframePageLayout.cshtml";
+}
+<div class="zero_main">
+    <div class="zero_data_list zero_page_bar_fixed">
+        <div class="zero_title_bar clearfix noprint">
+            <div class="zero_left">
+                <span class="zero_title">角色列表</span>
+                <a class="zero_iframe_page_filter_ctrl zero_bg_icon zero_bg_icon_filter2" onclick="zero.UI.upSideBar('filterSideBar', true)">过滤</a>
+            </div>
+            <div class="zero_right">
+                <input type="button" value="新建角色" class="zero_bg_icon zero_bg_icon_plus" onclick="adminSystemRoleList.addFunc()" />
+                <select class="zero_iframe_page_ctrl zero_bg_icon zero_bg_icon_screen MCW640H">
+                    <option value="">--页面操作--</option>
+                    <option value="page_lock">锁定页面</option>
+                    <option value="page_unlock">解锁页面</option>
+                    <option value="page_refresh">刷新页面</option>
+                    <option value="page_source">查看原始源码</option>
+                    <option value="page_source_now">查看当前源码</option>
+                    <option value="page_full">全屏切换</option>
+                </select>
+            </div>
+        </div>
+        <table class="zero_datatable">
+            <thead>
+                <tr><th style="width:14px;" class="noprint MCW640H"></th><th class="MCW640H">No.</th><th class="MCW640H">分组名称</th><th>角色名称</th><th class="MCW640H">录入时间</th><th class="ctrl noprint">操作</th></tr>
+            </thead>
+            <tbody id="dataInit">
+                <tr style="visibility:hidden;"><td class="noprint MCW640H"><input type="checkbox" value="@@RoleName" /></td><td class="MCW640H">#rownum#</td><td class="MCW640H">@@GroupName</td><td>@@RoleName</td><td class="MCW640H">@@RoleCreateTime</td><td class="zero_ctrl noprint"><input type="button" value="菜单权限" class="zero_bg_icon zero_bg_icon_calculate MCW640H" /><input type="button" value="操作权限" class="zero_bg_icon zero_bg_icon_calculate MCW640H" /><input type="button" value="查看" class="zero_bg_icon zero_bg_icon_eye2" /><input type="button" value="编辑" class="zero_bg_icon zero_bg_icon_pen" /><input type="button" value="删除" class="zero_bg_icon zero_bg_icon_remove2" /></td></tr>
+            </tbody>
+        </table>
+        <div class="zero_page_bar noprint"><div id="pageInit" class="zero_pager noprint"></div></div>
+    </div>
+</div>
+<div id="filterSideBar" class="zero_side_bar">
+    <div class="zero_mp_main">
+        <div class="zero_side_bar_header">
+            <div class="zero_side_bar_header_l"><a class="zero_bg_icon zero_bg_icon_filter2"></a></div>
+            <div class="zero_side_bar_header_c">角色列表过滤</div>
+            <div class="zero_side_bar_header_r"><a class="zero_side_bar_close zero_bg_icon zero_bg_icon_close"></a></div>
+        </div>
+        <div class="zero_side_bar_main">
+            <form class="zero_form" id="myForm1">
+                <dl class="zero_form_group">
+                    <dd>
+                        <div class="zero_form_text">
+                            <h2 class="zero_form_input_label">关键词：</h2>
+                        </div><div class="zero_form_input"><input type="text" name="keyword" maxlength="20" /></div>
+                    </dd>
+                </dl>
+                <div class="zero_form_btns">
+                    <input type="button" name="cancelBtn" value="取消" class="zero_side_bar_close" />
+                    <input type="submit" name="submitBtn" value="搜索" />
+                    <input type="reset" name="resetBtn" value="重置" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@section StyleSection{ }
+@section JavaScriptSection{
+<script type="text/javascript" src="~/huanr/javascript/adminSystem.js"></script>
+<script type="text/javascript">
+    zero.ready(adminSystemRoleList.initFunc);
+</script>
+}

@@ -1,0 +1,136 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>form zeroJs</title>
+    <link href="../css/zero.adminUI.css" rel="stylesheet" />
+    <style>
+        input[type=text]{min-width:320px;}
+    </style>
+    <script type="text/javascript" src="../js/zero.js"></script>
+    <script type="text/javascript" src="../js/zero.ch.js"></script>
+    <script type="text/javascript" src="../js/zero.tree.js"></script>
+    <script type="text/javascript">
+        zero.ready(function () {
+            zero(document.body, 'div').filter('class=demo').foreach(function (num) {
+                var s = zero(this).html();
+                s = zero.codeHighlight.html(s).match(/.+/g);
+                if (s) {
+                    s = '<li>' + s.join('</li><li>') + '</li>'
+                } else {
+                    s = '<li></li>'
+                }
+                zero(document.createElement('div')).appendTo(this).html('<div style="background:#f2f2f2;">CODE VIEW</div><ol class="zero_code_highlight">' + s + '</ol>');
+            });
+        });
+    </script>
+</head>
+<body class="zero_ifram_page"><div class="zero_demo_main">
+    <h2>zero.treeInput</h2>
+    <table class="zero_datatable">
+        <thead><tr><td>构造</td></tr></thead>
+        <tbody><tr><td>zero.treeInput(config)</td></tr>
+        <tr><td>zero.treeInput用于在表单输入的文本框上附加树控件，依赖zero.tree.js</td></tr>
+    </tbody></table>
+    <table class="zero_datatable">
+        <thead><tr><td>方法</td></tr></thead>
+        <tbody>
+        <tr><td>loadChildren(data,parentId)</td></tr>
+        <tr><td>向树控件中写入子级数据，参数data是子级数据列表，参数parentId是这些子级数据的归属，控件将根据该参数来确定子级数据列表的位置</td></tr>
+        <tr><td>append(data)</td></tr>
+        <tr><td>向树控件中追加数据</td></tr>
+        <tr><td>replace(data)</td></tr>
+        <tr><td>替换树控件中的数据</td></tr>
+        <tr><td>getData(id)</td></tr>
+        <tr><td>根据数据id获取完整的原始数据项</td></tr>
+    </tbody></table>
+    <table class="zero_datatable">
+        <thead><tr><td>配置参数config</td></tr></thead>
+        <tbody>
+        <tr><td>target</td></tr>
+        <tr><td>目标节点，生成的树控件将被放入该节点中</td></tr>
+        <tr><td>valueField</td></tr>
+        <tr><td>标识列名称，请注意大小写</td></tr>
+        <tr><td>textField</td></tr>
+        <tr><td>显示列名称，请注意大小写</td></tr>
+        <tr><td>parentField</td></tr>
+        <tr><td>上级关联列名称，请注意大小写</td></tr>
+        <tr><td>data</td></tr>
+        <tr><td>初始数据，无需生成树形结构，控件会根据指定的valueField和parentField的名称进行递归组合成树型，原始数据仍然是标准的二维格式</td></tr>
+        <tr><td>onExpand(dataItem)</td></tr>
+        <tr><td>展开时回调。如果初始数据已经是完整的则无需定义，该方法主要用于异步加载子级数据。如果定义了该方法，在该方法中取得子级数据列表之后要通过 loadChildren(datalist,parentId) 进行写入</td></tr>
+        <tr><td>onTextBuilder(dataItem)</td></tr>
+        <tr><td>树控件中显示文本的自定义生成，默认取 textField 指定名称的字段的数据 </td></tr>
+        <tr><td>onSelect(dataItem)</td></tr>
+        <tr><td>树控件中的项选中时回调，如果没有交互需要的话可以不做定义</td></tr>
+        <tr><td>onCheck(rows)</td></tr>
+        <tr><td>树控件中的项被勾选或取消勾选时回调，定义了该方法时，树控件就是多选的，默认多个选中项用"|"分隔</td></tr>
+        <tr><td></td></tr>
+    </tbody></table>
+
+    <h3>应用示例：</h3>
+    <div class="demo">
+        <form id="myform001" action="form.html" method="get">
+            <div style="border:solid 1px #dedede;padding:5px;">
+            <table class="group_table edit_table">
+                <tr><th>城市1(单选)：</th><td><input type="text" name="city1" /></td><td class="remark">不能为空</td></tr>
+                <tr><th>城市2(复选)：</th><td><input type="text" name="city2" /></td><td class="remark">不能为空</td></tr>
+            </table>
+            </div>
+        </form>
+        <script type="text/javascript">
+            zero.ready(function () {
+                var myForm = zero.form('myform001'),
+                    inputs = myForm.inputs,
+                    treeInitArea001 = function (data) {
+                        //单选
+                        zero.treeInput({
+                            target: inputs.city1,
+                            data: data,//初始化数据
+                            valueField: 'AreaCode',//标识列名称
+                            textField: 'AreaName',//显示列名称
+                            parentField: 'AreaParent',//父节点
+                            onTextBuilder: function (data) { return '[' + data.AreaCode + ']' + data.AreaName + data.AreaNameSuffix; },
+                            //选中回调：输入框的值为选中项的valueField字段
+                            onSelect: function (data) {
+                                //默认显示的文本为选中项的textField字段
+                                //this.changeText(data.AreaName);
+                            }
+                        });
+                        //复选
+                        zero.treeInput({
+                            target: inputs.city2,
+                            data: data,//初始化数据
+                            valueField: 'AreaCode',//标识列名称
+                            textField: 'AreaName',//显示列名称
+                            parentField: 'AreaParent',//父节点
+                            //onTextBuilder: function (data) { return data.OrgName; },
+                            //复选回调：多个选中的valueField用"|"分隔
+                            onCheck: function (rows) {
+                                //默认显示的文本为选中项的textField字段，多个选中项用"|"分隔
+                                /*var a = [];
+                                for (var i = 0; i < rows.length; i++) {
+                                    a.push(rows[i].OrgName + rows[i].OrgNameSuffix);
+                                }
+                                this.changeText(a.join('|'));*/
+                            }
+                        });
+                    };
+                zero.ajax('../js/data-area.txt').send(function (res) {
+                    var d = null;
+                    try { d = eval('(' + res + ')'); } catch (e) { d = null; }
+                    if (!d) { return; }
+                    
+
+                    treeInitArea001(d.data);
+                });
+            });
+        </script>
+    </div>
+
+    <div>
+        <p>本文终。</p>
+    </div>
+</div></body>
+</html>

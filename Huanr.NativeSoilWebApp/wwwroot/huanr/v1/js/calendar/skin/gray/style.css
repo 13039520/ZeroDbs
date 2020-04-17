@@ -1,0 +1,69 @@
+﻿.gray{width:318px;height:264px;overflow:hidden;border:solid 1px #686e7a;border-radius:5px; background:#fff;position:absolute;padding:1px 0 0 0; font-family:'微软雅黑';}
+.gray *{padding:0;}
+.gray .top{height:30px;padding-top:3px;overflow:hidden;background:#686e7a;width:316px;margin:0 auto;border-radius:5px 5px 0 0;}
+.gray .top span{display:block;float:left;height:30px;line-height:30px;font-size:18px;overflow:hidden;color:#fff;}
+.gray .top .title{width:130px;padding-left:8px;}
+.gray .con{width:314px;height:170px;margin:0 auto;overflow:hidden; }
+.gray .con .week{height:5px;overflow:hidden;}
+.gray .con .week b{display:block;position:absolute;width:127px;height:30px;line-height:30px;overflow:hidden;color:#686e7a;margin:-30px 0 0 190px;text-align:center;background:#fff;border-radius:30px 5px 0 0;}
+.gray .con .datetime{height:100px;/*background:#009; opacity:0.5;*/}
+.gray .con .datetime div{height:42px;line-height:40px;float:left;margin:0 0 5px 0; overflow:hidden;}
+.gray .con .datetime .input{width:84px;}
+.gray .con .datetime input{background:#f7f7f7;border:solid 1px #efefef;border-radius:5px;padding:0;margin:0;display:block;height:40px;line-height:40px;overflow:hidden;outline:none;width:82px;text-align:center;font-size:18px; font-family:Georgia; font-weight:bold; color:#686e7a;}
+.gray .con .datetime input:disabled{color:#ccc;}
+.gray .con .datetime .text{width:20px; text-align:center;}
+.gray .con .timectrl{height:70px;font-size:14px;}
+.gray .con .timectrl p{padding:0;margin:0;}
+.gray .con .timectrl .pt{height:16px;line-height:16px;}
+.gray .con .timectrl .pb{height:54px;line-height:54px;}
+.gray .con .timectrl span{height:54px;width:25%;display:block;color:#ccc;float:left;padding:0;margin:0;}
+.gray .con .timectrl b{width:10px;height:10px;display:block;float:left;border:solid 1px #ccc; border-radius:5px;margin:21px 2px 0 5px;}
+.gray .con .timectrl i{width:8px;height:8px;display:block;margin:1px 0 0 1px;border-radius:4px;}
+.gray .con .timectrl strong{display:block;width:33px; font-weight:normal;font-size:12px;white-space:nowrap;float:left;}
+.gray .con .timectrl .selected{color:#686e7a;}
+.gray .con .timectrl .selected b{border-color:#686e7a;}
+.gray .con .timectrl .selected i{background:#686e7a;}
+.gray .foot{width:316px;height:60px;margin:0 auto;overflow:hidden;}
+.gray .foot .now{height:20px;line-height:23px;color:#999;font-size:12px;text-align:center;}
+.gray .foot .now b{color:#f00;}
+.gray .foot .btn{height:40px;line-height:40px;text-align:center;color:#fff; background:#686e7a; border-radius:0 0 5px 5px; text-indent:-10px; letter-spacing:10px; cursor:pointer;}
+.gray .middle{width:318px;height:262px;line-height:264px;text-align:center; text-transform:uppercase; font-size:50px;color:#ddd;overflow:hidden;background:#fff;position:absolute;filter:alpha(opacity=90);opacity:0.9;z-index:1;margin:1px 0 0 1px;border-radius:5px;display:none;}
+.gray .frontM{width:318px;height:262px;font-weight:bold;overflow:hidden;position:absolute;z-index:1;margin:1px 0 0 1px; border-radius:5px;display:none;}
+.gray .yearM{/*不用写样式*/color:#686e7a;}
+.gray .yearM .pre{width:33.33%;float:left;display:block;padding:0;margin:0;cursor:pointer;}
+.gray .yearM .currYear{width:33.33%;float:left;display:block;padding:0;margin:0;color:#f90;}
+.gray .yearM .next{width:33.33%;float:left;display:block;padding:0;margin:0;cursor:pointer;}
+.gray .yearM .pre:hover,.gray .yearM .next:hover,.gray .yearM .cancelBtn:hover{color:#f90;}
+.gray .yearM .year{border:solid 1px #686e7a;color:#686e7a;cursor:pointer;}
+.gray .yearM .year:hover{background:#fff;border-color:#f00;color:#f00;}
+.gray .yearM .selYear{border:solid 1px #f90;color:#f90;cursor:pointer;}
+.gray .yearM .disabled,.gray .yearM .disabled:hover{cursor:default;border-color:#ccc;color:#ccc;}
+.gray .yearM .cancelBtn{cursor:pointer;}
+.gray .yearM .cancelBtn:hover{color:#f90;}
+.gray .monthM{/*不用写样式*/color:#686e7a;}
+.gray .monthM .month{border:solid 1px #686e7a;color:#686e7a;cursor:pointer;}
+.gray .monthM .month:hover{background:#fff;border-color:#f00;color:#f00;}
+.gray .monthM .selMonth{border:solid 1px #f90;color:#f90;cursor:pointer;}
+.gray .monthM .disabled,.gray .monthM .disabled:hover{cursor:default;border-color:#ccc;color:#ccc;}
+.gray .dayM{/*不用写样式*/color:#686e7a;}
+.gray .dayM .day{border:solid 1px #686e7a;color:#686e7a;cursor:pointer;}
+.gray .dayM .day:hover{background:#fff;border-color:#f00;color:#f00;}
+.gray .dayM .selDay{border:solid 1px #f90;color:#f90;cursor:pointer;}
+.gray .dayM .disabled,.gray .dayM .disabled:hover{cursor:default;border-color:#ccc;color:#ccc;}
+.gray .hourM{/*不用写样式*/color:#686e7a;}
+.gray .hourM .hour{border:solid 1px #686e7a;color:#686e7a;cursor:pointer;}
+.gray .hourM .hour:hover{background:#fff;border-color:#f00;color:#f00;}
+.gray .hourM .selHour{border:solid 1px #f90;color:#f90;cursor:pointer;}
+.gray .hourM .disabled,.gray .hourM .disabled:hover{cursor:default;border-color:#ccc;color:#ccc;}
+.gray .minuteM{/*不用写样式*/color:#686e7a;}
+.gray .minuteM .minute{border:solid 1px #686e7a;cursor:pointer;}
+.gray .minuteM .minute:hover{background:#fff;border-color:#f00;color:#f00;}
+.gray .minuteM .selMinute{border:solid 1px #f90;color:#f90;cursor:pointer;}
+.gray .minuteM .disabled,.gray .minuteM .disabled:hover{cursor:default;border-color:#ccc;color:#ccc;}
+.gray .secondM{/*不用写样式*/color:#686e7a;}
+.gray .secondM .second{border:solid 1px #686e7a; cursor:pointer;}
+.gray .secondM .second:hover{background:#fff;border-color:#f00;color:#f00;}
+.gray .secondM .selSecond{border:solid 1px #f90;color:#f90;cursor:pointer;}
+.gray .secondM .disabled,.gray .secondM .disabled:hover{cursor:default;border-color:#ccc;color:#ccc;}
+
+

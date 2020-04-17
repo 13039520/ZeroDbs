@@ -1,0 +1,296 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>dialog zeroJs</title>
+    <link href="../css/zero.adminUI.css" rel="stylesheet" />
+    <script type="text/javascript" src="../js/zero.js"></script>
+    <script type="text/javascript" src="../js/zero.ch.js"></script>
+    <script type="text/javascript">
+        zero.ready(function () {
+            zero(document.body, 'div').filter('class=demo').foreach(function (num) {
+                var s = zero(this).html();
+                s = zero.codeHighlight.html(s).match(/.+/g);
+                if (s) {
+                    s = '<li>' + s.join('</li><li>') + '</li>'
+                } else {
+                    s = '<li></li>'
+                }
+                zero(document.createElement('div')).appendTo(this).html('<div style="background:#f2f2f2;">CODE VIEW</div><ol class="zero_code_highlight">' + s + '</ol>');
+            });
+        });
+    </script>
+</head>
+<body class="zero_ifram_page"><div class="zero_demo_main">
+    <h2>zero.dialog</h2>
+    <table class="zero_datatable">
+        <thead><tr><td>对话框属性</td></tr></thead>
+        <tbody>
+        <tr><td>win</td></tr>
+        <tr><td>对话框所在window对象</td></tr>
+        <tr><td>doc</td></tr>
+        <tr><td>对话框所在document对象</td></tr>
+        <tr><td>contentNode</td></tr>
+        <tr><td>对话框内容所在节点</td></tr>
+        <tr><td>dialogNode</td></tr>
+        <tr><td>对话框节点</td></tr>
+    </tbody></table>
+    <table class="zero_datatable">
+        <thead><tr><td>对话框方法</td></tr></thead>
+        <tbody>
+        <tr><td>form()</td></tr>
+        <tr><td>获得以对话框内容所在节点作为参数构造成的zero.form对象</td></tr>
+        <tr><td>close()</td></tr>
+        <tr><td>关闭对话框</td></tr>
+    </tbody></table>
+    <table class="zero_datatable">
+        <thead><tr><td>全局方法</td></tr></thead>
+        <tbody>
+        <tr><td>dialog.popTop(flag)</td></tr>
+        <tr><td>该方法具有全局性，指示当前页面的对话框是否弹出到顶层窗口</td></tr>
+        <tr><td>dialog.show(config)</td></tr>
+        <tr><td>基础对话框，参数config请参考下文的注解："对话框配置参数config"，该方法是其它对话框的基础。</td></tr>
+        <tr><td>dialog.alert(title, content[, onClosed, width])</td></tr>
+        <tr><td>
+            <p>该对话框在用户操作了之后会自动关闭</p>
+            <p>参数onClosed是在对话框关闭后的回调</p></td></tr>
+        <tr><td>dialog.confirm(title, content, onResult[, width])</td></tr>
+        <tr><td>
+            <p>该对话框在用户操作了之后会自动关闭</p>
+            <p>参数onResult是确定或取消后的回调，参数是一个布尔值，表示用户是确定还是取消了操作</p></td></tr>
+        <tr><td>dialog.prompt(title, onResult[, value, mode, width])</td></tr>
+        <tr><td>
+            <p>该对话框在用户输入完成确定了之后不会自动关闭，请在onResult中校验过用户的输入后通过调用 this.close() 关闭对话框</p>
+            <p>参数onResult是用户输入完毕确定后的回调，参数是用户的输入内容</p>
+            <p>参数value是输入框默认值</p>
+            <p>参数mode是输入框类型，枚举：'text', 'password', 'multiLine', 默认值是 'text'</p>
+            </td></tr>
+        <tr><td>dialog.tips(content[, interval, width])</td></tr>
+        <tr><td>
+            <p>该对话框在指定的时间间隔之后会自动关闭</p>
+            <p>参数interval用于指定对话框显示的时长，单位是毫秒，默认值是700</p>
+            </td></tr>
+        <tr><td>dialog.contentOnly(content, onShowed[, width])</td></tr>
+        <tr><td>
+            <p>该对话框只显示内容模块</p>
+            </td></tr>
+        <tr><td>dialog.waiting(title)</td></tr>
+        <tr><td>
+            <p>该对话框是等待对话框</p>
+            </td></tr>
+        <tr><td>dialog.loadBigImage(title, url)</td></tr>
+        <tr><td>
+            <p>该对话框用于加载图片</p>
+            </td></tr>
+        <tr><td>dialog.loadIframe(title, url, width, height[, onLoad, onDataCallback])</td></tr>
+        <tr><td>
+            <p>该对话框用于通过iframe加载页面</p>
+            </td></tr>
+    </tbody></table>
+    <table class="zero_datatable">
+        <thead><tr><td>对话框配置参数config</td></tr></thead>
+        <tbody>
+        <tr><td>title</td></tr>
+        <tr><td>对话框标题</td></tr>
+        <tr><td>content</td></tr>
+        <tr><td>对话框内容</td></tr>
+        <tr><td>width</td></tr>
+        <tr><td>对话框宽度，默认320，如果指定的值大于窗口宽度则限制为窗口宽度。</td></tr>
+        <tr><td>showCloseBtn</td></tr>
+        <tr><td>一个布尔值，表示是否显示关闭按钮</td></tr>
+        <tr><td>showHeader</td></tr>
+        <tr><td>一个布尔值，表示是否显示标题栏</td></tr>
+        <tr><td>isAnimationEntry</td></tr>
+        <tr><td>一个布尔值，表示是否动画进入</td></tr>
+        <tr><td>onShowed</td></tr>
+        <tr><td>对话框呈现后回调</td></tr>
+        <tr><td>onClosed</td></tr>
+        <tr><td>对话框关闭后回调(此时对话框模块已经从页面移除)</td></tr>
+        <tr><td>btnConfig</td></tr>
+        <tr><td>
+            <p>操作按钮组配置，定义一个按钮示例：[text:'我知道了',func:function(){this.close()},isPrimary:true]，</p>
+            <p>text和func是必须的，isPrimary是标识页面上按下回车键时由该按钮进行响应，对普通按钮可以不用定义</p></td></tr>
+    </tbody></table>
+
+    <h3>运用示例(自定义对话框)：</h3>
+    <div class="demo">
+        <div id="mydiv001">
+            <div>
+                <p><input type="button" value="弹出一个登录对话框" /></p>
+            </div>
+        </div>
+        <script type="text/javascript">
+            zero.ready(function () {
+                zero('mydiv001', 'input').addEvent('click', function (e) {
+                    dialog.show({
+                        width: 300,
+                        title: '欢迎登录',
+                        content: '<table style="margin:0 auto;"><tr><td>手机号码</td><td><input type="text" name="userAccount" maxlength="11" /></td></tr><tr><td>登录密码</td><td><input type="password" name="userPassword" maxlength="64" /></td></tr></table>',
+                        showCloseBtn: true,
+                        showHeader: true,
+                        onShowed: function () {
+                            //以弹出内容为表单内容处理
+                            var form = this.form();
+                            form.loadData({ userAccount: '13500000000' });
+                            form.inputs.userPassword.focus();
+                        },
+                        isAnimationEntry:true,
+                        btnConfig: [
+                            { text: '取消', func: function () { this.close(); } },
+                            {
+                                text: '注册', func: function () {
+                                    this.close();
+                                    //code: 弹出注册模块
+                                }
+                            },
+                            {
+                                text: '登录', func: function () {
+                                    var loginDialog = this,
+                                        waitingDialog = null,
+                                        form = loginDialog.form();//以弹出内容为表单内容处理
+                                    //form.action = '/user/login';
+                                    //form.method = 'post';
+                                    form.onCustomTips = function (input, isFail, msg) {
+                                        input.style.borderColor = isFail ? '#f00' : '';
+                                    };
+                                    form.onCheck = function (data) {
+                                        this.checkResult.userAccount = { fail: !data.userAccount, msg: '用户名不能为空' }
+                                        this.checkResult.userPassword = { fail: !data.userPassword, msg: '密码不能为空' }
+                                    };
+                                    form.onRequest = function () {
+                                        waitingDialog = dialog.waiting('正在登录');
+                                    };
+                                    form.onResponse = function (res) {
+                                        waitingDialog && waitingDialog.close();
+                                        if (res === 'OK') {
+                                            loginDialog.close();
+                                            dialog.alert('操作提示', '登录成功！');
+                                        } else {
+                                            var s = '<ol class="zero_code_highlight"><li>' + zero.codeHighlight.html(res).replace(/(\r\n|\n)/g, '</li><li>') + '</li></ol>'
+                                            dialog.alert('登录失败', s, null, 800);
+                                        }
+                                    };
+                                    form.submit();
+                                }, isPrimary:true
+                            }
+                        ]
+                    });
+                });
+            })
+        </script>
+    </div>
+    <h3>运用示例(标准对话框)：</h3>
+    <div class="demo">
+        <div id="mydiv002">
+            <div>
+                <p>
+                    <input type="button" name="alert" value="alert" />
+                    <input type="button" name="confirm" value="confirm" />
+                    <input type="button" name="prompt" value="prompt" />
+                    <input type="button" name="tips" value="tips" />
+                    <input type="button" name="waiting" value="waiting" />
+                    <input type="button" name="contentOnly" value="contentOnly" />
+                    <input type="button" name="loadBigImage" value="loadBigImage" />
+                    <input type="button" name="loadIframe" value="loadIframe" />
+                </p>
+            </div>
+        </div>
+        <script type="text/javascript">
+            zero.ready(function () {
+                var form = zero.form(mydiv002),
+                    inputs = form.inputs;
+                inputs.alert.onclick = function () {
+                    dialog.alert(
+                        '操作提示',//对话框标题
+                        //对话框内容
+                        '<center>恭喜你，你的资料已经更新成功！</center>',
+                        //确定和关闭对话框后回调(可空)
+                        function () { },
+                        320);//宽度(可空)
+                };
+                inputs.confirm.onclick = function () {
+                    dialog.confirm(
+                        '操作确认',//对话框标题
+                        '<center>删除之后数据将无法再恢复，你确定要执行该操作吗？</center>',//对话框内容
+                        //确认后回调
+                        function (flag) {
+                            if (flag) {
+                                dialog.alert('操作提示', '<center>删除成功！</center>');
+                            } else {
+                                dialog.alert('操作提示', '<center>你放弃了删除操作！</center>');
+                            }
+                        },
+                        320);//宽度(可空)
+                };
+                inputs.prompt.onclick = function () {
+                    var defaultVal = '太赞了，我';
+                    dialog.prompt(
+                        '输入短评',//对话框标题
+                        //确定后回调
+                        function (result) {
+                            if (result.trim().length < 1) {
+                                dialog.tips('请输入短评内容！');
+                                return;
+                            }
+                            if (result === defaultVal) {
+                                dialog.tips('再补充点什么吧！');
+                                return;
+                            }
+                            dialog.alert('短评内容', result);
+                            this.close();//关闭对话框
+                        },
+                        defaultVal,//默认值
+                        'multiLine',//文本模式(multiLine|password|text,默认text)
+                        
+                        320);//宽度(可空)
+                };
+                inputs.tips.onclick = function () {
+                    dialog.tips(
+                        '这是定时提示内容，2秒后自动关闭！',//提示内容
+                        2000,//时长(毫秒，可空)
+                        320);//宽度(可空)
+                };
+                inputs.waiting.onclick = function () {
+                    var waitingDialog = dialog.waiting('……操作进行中(持续3秒)……');
+                    setTimeout(function () {
+                        waitingDialog.close();//必须通过代码关闭
+                    }, 3000);
+                };
+                inputs.contentOnly.onclick = function () {
+                    dialog.contentOnly(
+                        '<div>这是只显示内容的对话框，通过在呈现之后动态给呈现内容的节点绑定事件实现关闭对话框或其它操作。</div><div style="text-align:center;"><input type="button" name="closeBtn" value="关闭对话框" /></div>',
+                        //呈现后回调
+                        function () {
+                            var _this = this,
+                                form = this.form();
+                            form.inputs.closeBtn.onclick = function () { _this.close(); };
+                        },
+                        //宽度
+                        320);
+                };
+                inputs.loadBigImage.onclick = function () {
+                    dialog.loadBigImage(
+                        '加载图片示例',
+                        'http://pic4.bbzhi.com/fengjingbizhi/gaoqingkuanpingfengjingbizhixiazai/gaoqingkuanpingfengjingbizhixiazai_404987_10.jpg');
+                };
+                inputs.loadIframe.onclick = function () {
+                    dialog.loadIframe(
+                        '加载页面示例(Iframe)',//标题
+                        document.URL,//url
+                        1024,//宽度
+                        1024,//高度
+                        //onload回调(可空)
+                        function () { dialog.alert('操作提示', '<center>页面加载完成！</center>'); },
+                        //子页面数据传入(可空，子页面在onload之后通过parentDialogObj.dataCallback(data)发送数据到该方法中，要求符合浏览器同源策略)
+                        function (data) { });
+                };
+            })
+        </script>
+    </div>
+
+    <div>
+        <p>本文终。</p>
+    </div>
+</div></body>
+</html>

@@ -1,0 +1,32 @@
+﻿@{
+    List<Huanr.Models.NativeSoil.tSystemMenuGroup> tSystemMenuGroupList = ViewBag.tSystemMenuGroupList;
+    Guid selectedGroupID =ViewBag.selectedGroupID;
+
+    ViewData["Title"] = "MenuAdd";
+    Layout = "~/Views/Shared/_AdminDialogPageLayout.cshtml";
+}
+<form class="zero_form zero_form_btns_fixed" id="roleAddForm" action="/admin/system/menuAddSave" method="post">
+        <dl class="zero_form_group">
+            <dt>菜单信息</dt>
+            <dd><div class="zero_form_text">菜单组：</div><div class="zero_form_input"><select name="GroupID">@foreach (var group in tSystemMenuGroupList) {
+                @if (group.GroupID == selectedGroupID) {<option value="@group.GroupID" selected="selected">@group.GroupName</option>
+                } else {<option value="@group.GroupID">@group.GroupName</option>}
+             }</select></div></dd>
+            <dd><div class="zero_form_text">菜单名称：</div><div class="zero_form_input"><input type="text" name="MenuName" maxlength="50" /></div></dd>
+            <dd><div class="zero_form_text">菜单链接：</div><div class="zero_form_input"><input type="text" name="MenuLink" maxlength="400" /></div></dd>
+            <dd><div class="zero_form_text">菜单备注：</div><div class="zero_form_input"><input type="text" name="MenuRemark" maxlength="200" /></div></dd>
+            <dd><div class="zero_form_text">菜单排序：</div><div class="zero_form_input"><input type="number" name="MenuSort"  max="999999999" min="0" /></div></dd>
+        </dl>
+
+        <div class="zero_form_btns">
+            <input type="button" name="zero_btnCancel" value="取消" onclick="parentDialogObj.close()" />
+            <input type="submit" name="zero_btnSubmit" value="提交" />
+        </div>
+</form>
+@section StyleSection{ }
+@section JavaScriptSection{
+<script type="text/javascript" src="~/huanr/javascript/adminSystem.js"></script>
+<script type="text/javascript">
+    zero.ready(function () { adminSystemMenuAdd.initFunc('roleAddForm') });
+</script>
+}

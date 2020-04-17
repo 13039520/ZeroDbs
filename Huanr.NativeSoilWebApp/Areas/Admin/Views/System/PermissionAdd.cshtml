@@ -1,0 +1,31 @@
+﻿@{
+    List<Huanr.Models.NativeSoil.tSystemPermissionGroup> tSystemPermissionGroupList = ViewBag.tSystemPermissionGroupList;
+    string selectedGroupName =ViewBag.selectedGroupName;
+
+    ViewData["Title"] = "PermissionAdd";
+    Layout = "~/Views/Shared/_AdminDialogPageLayout.cshtml";
+}
+<form class="zero_form zero_form_btns_fixed" id="permissionAddForm" action="/admin/system/permissionAddSave" method="post">
+        <dl class="zero_form_group">
+            <dt>权限信息</dt>
+            <dd><div class="zero_form_text">权限组：</div><div class="zero_form_input"><select name="GroupName">@foreach (var group in tSystemPermissionGroupList) {
+                @if (group.GroupName == selectedGroupName) {<option value="@group.GroupName" selected="selected">@group.GroupName</option>
+                } else {<option value="@group.GroupName">@group.GroupName</option>}
+             }</select></div></dd>
+            <dd><div class="zero_form_text">权限名称：</div><div class="zero_form_input"><input type="text" name="PermissionName" maxlength="50" /></div></dd>
+            <dd><div class="zero_form_text">权限备注：</div><div class="zero_form_input"><input type="text" name="PermissionRemark" maxlength="200" /></div></dd>
+            <dd><div class="zero_form_text">权限排序：</div><div class="zero_form_input"><input type="number" name="PermissionSort"  max="999999999" min="0" /></div></dd>
+        </dl>
+
+        <div class="zero_form_btns">
+            <input type="button" name="zero_btnCancel" value="取消" onclick="parentDialogObj.close()" />
+            <input type="submit" name="zero_btnSubmit" value="提交" />
+        </div>
+</form>
+@section StyleSection{ }
+@section JavaScriptSection{
+<script type="text/javascript" src="~/huanr/javascript/adminSystem.js"></script>
+<script type="text/javascript">
+    zero.ready(function () { adminSystemPermissionAdd.initFunc('permissionAddForm') });
+</script>
+}

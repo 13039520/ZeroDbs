@@ -1,0 +1,226 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>form zeroJs</title>
+    <link href="../css/zero.adminUI.css" rel="stylesheet" />
+    <script type="text/javascript" src="../js/zero.js"></script>
+    <script type="text/javascript" src="../js/zero.ch.js"></script>
+    <script type="text/javascript">
+        zero.ready(function () {
+            zero(document.body, 'div').filter('class=demo').foreach(function (num) {
+                var s = zero(this).html();
+                s = zero.codeHighlight.html(s).match(/.+/g);
+                if (s) {
+                    s = '<li>' + s.join('</li><li>') + '</li>'
+                } else {
+                    s = '<li></li>'
+                }
+                zero(document.createElement('div')).appendTo(this).html('<div style="background:#f2f2f2;">CODE VIEW</div><ol class="zero_code_highlight">' + s + '</ol>');
+            });
+        });
+    </script>
+</head>
+<body class="zero_ifram_page"><div class="zero_demo_main">
+    <h2>zero.form</h2>
+    <table class="zero_datatable">
+        <thead><tr><td>构造</td></tr></thead>
+        <tbody><tr><td>zero.form(ele)</td></tr>
+        <tr><td>构造函数，ele 是节点或节点 id </td></tr>
+    </tbody></table>
+    <table class="zero_datatable">
+        <thead><tr><td >属性</td></tr></thead>
+        <tbody><tr><td>node</td></tr>
+        <tr><td>构造函数传入的节点</td></tr>
+        <tr><td>isForceAjax</td></tr>
+        <tr><td>强制异步提交表单，默认 true ,当 node 是 form 标签时生效</td></tr>
+        <tr><td>delay</td></tr>
+        <tr><td>表单提交到服务器响的延迟时间，默认 500 ，异步提交时生效</td></tr>
+        <tr><td>inputs</td></tr>
+        <tr><td>表单输入控件对象，以输入控件的 name 作为 key ，单选或复选按钮是数组形式</td></tr>
+        <tr><td>method</td></tr>
+        <tr><td>表单提交方式，默认 GET ，当表单中含有文件上传控件时是 POST ，如果 node 是 form 标签时将取标签上的定义</td></tr>
+        <tr><td>enctype</td></tr>
+        <tr><td>表单类型，默认 application/x-www-form-urlencoded ，当表单中含有文件上传控件时是 multipart/form-data ，如果 node 是 form 标签时将取标签上的定义</td></tr>
+        <tr><td>action</td></tr>
+        <tr><td>表单处理 URL ，如果 node 是 form 标签时将取标签上的定义</td></tr>
+        <tr><td>checkResult</td></tr>
+        <tr><td>表单输入校验结果对象，以输入控件的 name 作为 key ，单选或复选按钮是数组形式</td></tr>
+    </tbody></table>
+    <table class="zero_datatable">
+        <thead><tr><td>方法</td></tr></thead>
+        <tbody><tr><td>loadData(data)</td></tr>
+        <tr><td>写入数据</td></tr>
+        <tr><td>getData()</td></tr>
+        <tr><td>获取数据</td></tr>
+        <tr><td>submit()</td></tr>
+        <tr><td>提交表单</td></tr>
+        <tr><td>reset()</td></tr>
+        <tr><td>重置表单</td></tr>
+        <tr><td>onCustomSubmit(data)</td></tr>
+        <tr><td>自定义数据提交方法</td></tr>
+        <tr><td>onCustomTips(input,isFail,msg)</td></tr>
+        <tr><td>自定义输入结果校验提示方法</td></tr>
+        <tr><td>onCheck(data)</td></tr>
+        <tr><td>输入结果校验方法，通过设置 checkResult 进行控制</td></tr>
+        <tr><td>onRequest()</td></tr>
+        <tr><td>开始提交请求</td></tr>
+        <tr><td>onResponse(res)</td></tr>
+        <tr><td>服务器输出</td></tr>
+    </tbody></table>
+
+    <h3>运用示例(form标签)：</h3>
+    <div class="demo">
+        <form id="myform001" action="form.html" method="get">
+            <div style="border:solid 1px #dedede;padding:5px;">
+            <table>
+                <tr><th>姓名：</th><td><input type="text" name="name" style="width:200px;" /></td><td class="remark">不能为空</td></tr>
+                <tr><th>性别：</th><td>
+                    <input type="hidden" name="gender" value="0" /><!--默认值-->
+                    <label><input type="radio" name="gender" value="1" /> 男</label>
+                    <label><input type="radio" name="gender" value="2" /> 女</label>
+                    <label><input type="radio" name="gender" value="3" /> 其它</label>
+                    </td><td class="remark">不能为空</td></tr>
+                <tr><th>生日：</th><td><input type="text" name="birthday" style="width:200px;" /></td><td class="remark">不能为空</td></tr>
+                <tr><th>爱好：</th><td>
+                    <input type="hidden" name="hobby" value="0" /><!--默认值-->
+                    <label><input type="checkbox" name="hobby" value="1" checked="checked" /> 吃</label>
+                    <label><input type="checkbox" name="hobby" value="2" checked="checked" /> 喝</label>
+                    <label><input type="checkbox" name="hobby" value="3" /> 玩</label>
+                    <label><input type="checkbox" name="hobby" value="4" /> 乐</label>
+                    </td><td class="remark">不能为空</td></tr>
+                <tr><th>通知：</th><td><select name="notify" style="width:200px;"><option value="-1">--选择--</option><option value="0">不接收</option><option value="1">接收</option></select><td class="remark">不能为空</td></tr>
+                <tr><td colspan="2" style="text-align:center;">
+                    <input type="reset" name="btnReset" value="重置" />
+                    <input type="submit" name="btnSubmit" value="提交" />
+                    </td></tr>
+            </table>
+            </div>
+        </form>
+        <script type="text/javascript">
+            zero.ready(function () {
+                var myForm = zero.form('myform001'),
+                    inputs = myForm.inputs;
+                inputs.birthday.onfocus = function () {
+                    zero.dateInput('选择生日').editType(1).format('yyyy-MM-dd').target(this).ok(function (str, json, date) {
+                        this.value = str;
+                        return true;//返回任意为true的值表示处理成功
+                    }).show(1);
+                };
+                var waitingDialog = null;
+                myForm.onCheck = function (data) {
+                    this.checkResult.name = { fail: !data.name, msg: '不能为空' };
+                    this.checkResult.gender = { fail: '0' === data.gender, msg: '不能为空' };
+                    this.checkResult.birthday = { fail: !data.birthday, msg: '不能为空' };
+                    this.checkResult.hobby = { fail: '0' === data.hobby, msg: '不能为空' };
+                    this.checkResult.notify = { fail: '-1' === data.notify, msg: '不能为空' };
+                };
+                //当表单不是zeroUI的标准构造时自定义输入结果的提示方法
+                myForm.onCustomTips = function (input, isFail, msg) {
+                    var td;
+                    if (isArray(input)) {
+                        //checkbox或radio集合
+                        td = zero(input[0]).parent(3).find('td', 1).last();
+                    }
+                    else {
+                        td = zero(input).parent(2).find('td', 1).last();
+                    }
+                    td.cssText('color:' + (isFail ? '#f00' : 'inherit'));
+                };
+                myForm.onRequest = function () {
+                    waitingDialog = dialog.waiting('……正在提交……');
+                };
+                myForm.onResponse = function (res) {
+                    waitingDialog && waitingDialog.close();
+                    dialog.alert('responseText', '<ol class="zero_code_highlight" style="font-size:12px;"><li>' + zero.codeHighlight.html(res).replace(/(\r\n|\n)/g, '</li><li>') + '</li></ol>', null, 800);
+                };
+            });
+        </script>
+    </div>
+    <h3>运用示例(非form标签)：</h3>
+    <div class="demo">
+        <div id="mydiv001">
+            <div class="zero_form">
+                <dl class="zero_form_group">
+                    <dt><span class="zero_bg_icon zero_bg_icon_folder_open"></span><span>基础资料</span></dt>
+                    <dd>
+                        <div class="zero_form_text"><span class="zero_form_input_label">姓名：</span></div>
+                        <div class="zero_form_input"><input type="text" name="name" /></div>
+                    </dd>
+                    <dd>
+                        <div class="zero_form_text"><span class="zero_form_input_label">性别：</span></div>
+                        <div class="zero_form_input zero_form_input_box">
+                            <input type="hidden" name="gender" value="0" /><!--默认值-->
+                            <label><input type="radio" name="gender" value="1" /> 男</label>
+                            <label><input type="radio" name="gender" value="2" /> 女</label>
+                            <label><input type="radio" name="gender" value="3" /> 其它</label>
+                        </div>
+                    </dd>
+                    <dd>
+                        <div class="zero_form_text"><span class="zero_form_input_label">生日：</span></div>
+                        <div class="zero_form_input"><input type="text" name="birthday" /></div>
+                    </dd>
+                    <dd>
+                        <div class="zero_form_text"><span class="zero_form_input_label">爱好：</span></div>
+                        <div class="zero_form_input zero_form_input_box">
+                            <input type="hidden" name="hobby" value="0" /><!--默认值-->
+                            <label><input type="checkbox" name="hobby" value="1" checked="checked" /> 吃</label>
+                            <label><input type="checkbox" name="hobby" value="2" checked="checked" /> 喝</label>
+                            <label><input type="checkbox" name="hobby" value="3" /> 玩</label>
+                            <label><input type="checkbox" name="hobby" value="4" /> 乐</label>
+                        </div>
+                    </dd>
+                    <dd>
+                        <div class="zero_form_text"><span class="zero_form_input_label">通知：</span></div>
+                        <div class="zero_form_input zero_form_input_box">
+                            <select name="notify" style="width:200px;"><option value="-1">--选择--</option><option value="0">不接收</option><option value="1">接收</option></select>
+                        </div>
+                    </dd>
+                </dl>
+                <div class="zero_form_btns">
+                    <input type="reset" name="btnReset" value="重置" /><input type="submit" name="btnSubmit" value="提交" />
+                </div>
+            </div>
+        </div>
+        <script type="text/javascript">
+            zero.ready(function () {
+                var myForm = zero.form('mydiv001'),
+                    inputs = myForm.inputs;
+                inputs.birthday.onfocus = function () {
+                    zero.dateInput('选择生日').editType(1).format('yyyy-MM-dd').target(this).ok(function (str, json, date) {
+                        this.value = str;
+                        return true;
+                    }).show(1);
+                };
+                inputs.btnReset.onclick = function () { myForm.reset(); };
+                inputs.btnSubmit.onclick = function () { myForm.submit(); };
+
+                var waitingDialog = null;
+                myForm.onCheck = function (data) {
+                    this.checkResult.name = { fail: !data.name, msg: '不能为空' };
+                    this.checkResult.gender = { fail: '0' === data.gender, msg: '不能为空' };
+                    this.checkResult.birthday = { fail: !data.birthday, msg: '不能为空' };
+                    this.checkResult.hobby = { fail: '0' === data.hobby, msg: '不能为空' };
+                    this.checkResult.notify = { fail: '-1' === data.notify, msg: '不能为空' };
+                };
+                myForm.onRequest = function () {
+                    waitingDialog = dialog.waiting('……正在提交……');
+                };
+                myForm.onResponse = function (res) {
+                    waitingDialog && waitingDialog.close();
+                    dialog.alert('responseText', '<ol class="zero_code_highlight" style="font-size:12px;"><li>' + zero.codeHighlight.html(res).replace(/(\r\n|\n)/g, '</li><li>') + '</li></ol>', null, 800);
+                };
+
+                //myForm.action = '';
+                //myForm.method = 'get';
+                //myForm.enctype = '';
+
+            });
+        </script>
+    </div>
+    <div>
+        <p>本文终。</p>
+    </div>
+</div></body>
+</html>

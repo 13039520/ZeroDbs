@@ -1,0 +1,24 @@
+﻿@{
+    List<Huanr.Models.NativeSoil.tSystemPermissionGroup> tSystemPermissionGroupList = ViewBag.tSystemPermissionGroupList;
+    Huanr.Models.NativeSoil.tSystemPermission tSystemPermission =ViewBag.tSystemPermission;
+
+    ViewData["Title"] = "PermissionDetail";
+    Layout = "~/Views/Shared/_AdminDialogPageLayout.cshtml";
+}
+<form class="zero_form zero_form_btns_fixed zero_form_view" id="permissionViewForm">
+        <dl class="zero_form_group">
+            <dt>权限信息</dt>
+            <dd><div class="zero_form_text">权限组：</div><div class="zero_form_input">@tSystemPermission.GroupName</div></dd>
+            <dd><div class="zero_form_text">权限名称：</div><div class="zero_form_input">@tSystemPermission.PermissionName</div></dd>
+            <dd><div class="zero_form_text">权限备注：</div><div class="zero_form_input">@tSystemPermission.PermissionRemark</div></dd>
+            <dd><div class="zero_form_text">权限排序：</div><div class="zero_form_input">@tSystemPermission.PermissionSort</div></dd>
+            <dd><div class="zero_form_text">权限删除：</div><div class="zero_form_input">@if (tSystemPermission.PermissionDeleteStatus){<span>是</span>}else {<span>否</span> }</div></dd>
+            <dd><div class="zero_form_text">权限时间：</div><div class="zero_form_input">@tSystemPermission.PermissionCreateTime.ToString("yyyy年MM月dd日HH时mm分ss秒")</div></dd>
+        </dl>
+
+        <div class="zero_form_btns">
+            <input type="button" name="zero_btnCancel" value="关闭" onclick="parentDialogObj.close()" />
+        </div>
+</form>
+@section StyleSection{ }
+@section JavaScriptSection{}

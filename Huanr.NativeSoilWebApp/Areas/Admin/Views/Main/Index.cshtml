@@ -1,0 +1,179 @@
+﻿@{
+    Huanr.Models.NativeSoil.tUser currentUser = ViewBag.currentUser;
+    List<Huanr.Models.NativeSoil.tSystemRole> currentuserRoleList = ViewBag.userRoleList;
+    List<Huanr.Models.NativeSoil.tSystemMenuGroup> currentUserSystemMenuGroupList = ViewBag.currentUserSystemMenuGroupList;
+    List<Huanr.Models.NativeSoil.tSystemMenu> currentUserSystemMenuList = ViewBag.currentUserSystemMenuList;
+    Huanr.Models.NativeSoil.tUser tUser = ViewBag.tUser;
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>zeroAdminUI</title>
+    <link href="/zero/css/zero.adminUI.css" rel="stylesheet" />
+    <script type="text/javascript" src="/zero/js/zero.js"></script>
+    <script type="text/javascript" src="/zero/js/zero.ch.js"></script>
+    <script type="text/javascript" src="/zero/js/zero.adminUI.js"></script>
+    <script type="text/javascript" src="/huanr/javascript/admin.js"></script>
+
+</head>
+<body class="zero_top_page">
+    <div id="zero_ap_layout_main">
+        <div id="zero_ap_layout_left">
+            <a id="zero_ap_layout_left_ctrl_btn"></a>
+            <div id="zero_ap_layout_left_header">
+                <div id="zero_ap_layout_left_logo">
+                    <h1>ZeroAdminUI V1.0</h1>
+                    <h2>zeroAdminUI background management system</h2>
+                </div>
+            </div>
+            <div id="zero_ap_layout_left_menu_init">
+                <div id="zero_ap_layout_left_menu">
+                    <dl>
+                        <dt>welcome</dt>
+                        <dd><a href="/admin/main/welcome">欢迎使用</a></dd>
+                        <dd><a href="/admin/main/welcome">关于系统</a></dd>
+                    </dl>@foreach (var group in currentUserSystemMenuGroupList)
+                    {
+                        <dl>
+                            <dt>@group.GroupName</dt>
+                            @foreach (var menu in currentUserSystemMenuList.FindAll(o => o.GroupID == group.GroupID))
+                            {
+                                <dd><a href="@menu.MenuLink">@menu.MenuName</a></dd>
+}
+                        </dl>
+                    }
+                        <dl>
+                            <dt>document</dt>
+                            <dd><a href="/zero/doc/zero.html">zero</a></dd>
+                            <dd><a href="/zero/doc/ajax.html">zero.ajax</a></dd>
+                            <dd><a href="/zero/doc/date_input.html">zero.dateInput</a></dd>
+                            <dd><a href="/zero/doc/form.html">zero.form</a></dd>
+                            <dd><a href="/zero/doc/change_position.html">zero.changePosition</a></dd>
+                            <dd><a href="/zero/doc/change_size.html">zero.changeSize</a></dd>
+                            <dd><a href="/zero/doc/change_opacity.html">zero.changeOpacity</a></dd>
+                            <dd><a href="/zero/doc/image_show.html">zero.imageShow</a></dd>
+                            <dd><a href="/zero/doc/drag.html">zero.drag</a></dd>
+                            <dd><a href="/zero/doc/dialog.html">zero.dialog</a></dd>
+                            <dd><a href="/zero/doc/tree_input.html">zero.treeInput</a></dd>
+                            <dd><a href="/zero/doc/tree_box.html">zero.treeBox</a></dd>
+                            <dd><a href="/zero/doc/tree_edit.html">zero.treeEdit</a></dd>
+                            <dd><a href="/zero/doc/side_bar.html">zero.UI.sideBar</a></dd>
+                            <dd><a href="/zero/doc/autocomplete.html">zero.UI.autocomplete</a></dd>
+                            <dd><a href="/zero/doc/datatable.html">zero.UI.datatable</a></dd>
+                            <dd><a href="/zero/doc/datalist1.html">zero.UI.datalist1</a></dd>
+                            <dd><a href="/zero/doc/datalist2.html">zero.UI.datalist2</a></dd>
+                            <dd><a href="/zero/doc/datalist3.html">zero.UI.datalist3</a></dd>
+                            <dd><a href="/zero/doc/icons.html">zero.UI.icons</a></dd>
+                        </dl>
+                        <dl>
+                            <dt>系统设置</dt>
+                            <dd><a href="welcome.html">欢迎使用</a></dd>
+                            <dd><a href="about.html">关于系统</a></dd>
+                            <dd><a href="welcome.html">欢迎使用</a></dd>
+                            <dd><a href="about.html">关于系统</a></dd>
+                            <dd><a href="welcome.html">欢迎使用</a></dd>
+                        </dl>
+                        <dl>
+                            <dt>产品管理</dt>
+                            <dd><a href="welcome.html">欢迎使用</a></dd>
+                            <dd><a href="about.html">关于系统</a></dd>
+                            <dd><a href="welcome.html">欢迎使用</a></dd>
+                            <dd><a href="about.html">关于系统</a></dd>
+                            <dd><a href="welcome.html">欢迎使用</a></dd>
+                            <dd><a href="about.html">关于系统</a></dd>
+                            <dd><a href="welcome.html">欢迎使用</a></dd>
+                            <dd><a href="about.html">关于系统</a></dd>
+                        </dl>
+                        <dl>
+                            <dt>订单管理</dt>
+                            <dd><a href="welcome.html">欢迎使用</a></dd>
+                            <dd><a href="about.html">关于系统</a></dd>
+                            <dd><a href="welcome.html">欢迎使用</a></dd>
+                            <dd><a href="about.html">关于系统</a></dd>
+                            <dd><a href="welcome.html">欢迎使用</a></dd>
+                            <dd><a href="about.html">关于系统</a></dd>
+                            <dd><a href="welcome.html">欢迎使用</a></dd>
+                            <dd><a href="about.html">关于系统</a></dd>
+                        </dl>
+                        <dl>
+                            <dt>新闻管理</dt>
+                            <dd><a href="welcome.html">欢迎使用</a></dd>
+                            <dd><a href="about.html">关于系统</a></dd>
+                            <dd><a href="welcome.html">欢迎使用</a></dd>
+                            <dd><a href="about.html">关于系统</a></dd>
+                            <dd><a href="welcome.html">欢迎使用</a></dd>
+                            <dd><a href="about.html">关于系统</a></dd>
+                            <dd><a href="welcome.html">欢迎使用</a></dd>
+                            <dd><a href="about.html">关于系统</a></dd>
+                            <dd><a href="welcome.html">欢迎使用</a></dd>
+                            <dd><a href="about.html">关于系统</a></dd>
+                            <dd><a href="welcome.html">欢迎使用</a></dd>
+                            <dd><a href="about.html">关于系统</a></dd>
+                            <dd><a href="welcome.html">欢迎使用</a></dd>
+                            <dd><a href="about.html">关于系统</a></dd>
+                            <dd><a href="welcome.html">欢迎使用</a></dd>
+                        </dl>
+                        <dl>
+                            <dt>评论管理</dt>
+                            <dd><a href="welcome.html">欢迎使用</a></dd>
+                            <dd><a href="about.html">关于系统</a></dd>
+                            <dd><a href="welcome.html">欢迎使用</a></dd>
+                            <dd><a href="about.html">关于系统</a></dd>
+                            <dd><a href="welcome.html">欢迎使用</a></dd>
+                            <dd><a href="about.html">关于系统</a></dd>
+                            <dd><a href="welcome.html">欢迎使用</a></dd>
+                            <dd><a href="about.html">关于系统</a></dd>
+                            <dd><a href="welcome.html">欢迎使用</a></dd>
+                            <dd><a href="about.html">关于系统</a></dd>
+                            <dd><a href="welcome.html">欢迎使用</a></dd>
+                            <dd><a href="about.html">关于系统</a></dd>
+                            <dd><a href="welcome.html">欢迎使用</a></dd>
+                            <dd><a href="about.html">关于系统</a></dd>
+                        </dl>
+                        <dl>
+                            <dt>咨询管理</dt>
+                            <dd><a href="welcome.html">欢迎使用</a></dd>
+                            <dd><a href="about.html">关于系统</a></dd>
+                            <dd><a href="welcome.html">欢迎使用</a></dd>
+                            <dd><a href="about.html">关于系统</a></dd>
+                            <dd><a href="welcome.html">欢迎使用</a></dd>
+                            <dd><a href="about.html">关于系统</a></dd>
+                            <dd><a href="welcome.html">欢迎使用</a></dd>
+                            <dd><a href="about.html">关于系统</a></dd>
+                            <dd><a href="welcome.html">欢迎使用</a></dd>
+                            <dd><a href="about.html">关于系统</a></dd>
+                            <dd><a href="welcome.html">欢迎使用</a></dd>
+                            <dd><a href="about.html">关于系统</a></dd>
+                        </dl>
+                        <dl>
+                            <dt>任务管理</dt>
+                            <dd><a href="welcome.html">欢迎使用</a></dd>
+                            <dd><a href="about.html">关于系统</a></dd>
+                            <dd><a href="welcome.html">欢迎使用</a></dd>
+                            <dd><a href="about.html">关于系统</a></dd>
+                            <dd><a href="welcome.html">欢迎使用</a></dd>
+                            <dd><a href="about.html">关于系统</a></dd>
+                            <dd><a href="welcome.html">欢迎使用</a></dd>
+                            <dd><a href="about.html">关于系统</a></dd>
+                            <dd><a href="welcome.html">欢迎使用</a></dd>
+                            <dd><a href="about.html">关于系统</a></dd>
+                            <dd><a href="welcome.html">欢迎使用</a></dd>
+                            <dd><a href="about.html">关于系统</a></dd>
+                        </dl>
+                </div>
+            </div>
+        </div>
+        <div id="zero_ap_layout_right">
+            <div id="zero_ap_layout_right_header">
+                <div class="zero_left"><span class="MCW320H">欢迎光临！</span>现在是<span id="currentTime"></span></div>
+                <div class="zero_right"><span class="zero_bg_icon zero_bg_icon_user4"></span></div>
+            </div>
+            <div id="zero_ap_layout_right_tabs"></div>
+            <div id="zero_ap_layout_right_iframes"></div>
+        </div>
+    </div>
+</body>
+</html>

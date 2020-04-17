@@ -1,0 +1,285 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>zero.UI.datalist</title>
+    <link href="../css/zero.adminUI.css" rel="stylesheet" />
+</head>
+<body class="zero_ifram_page">
+    <div class="zero_main">
+        <div class="zero_data_list zero_page_bar_fixed">
+            <div class="zero_title_bar clearfix noprint">
+            <div class="zero_left"><span class="zero_title">用户列表</span><a class="zero_bg_icon zero_bg_icon_filter2" onclick="zero.UI.upSideBar('filterSideBar', true)">过滤</a></div>
+            <div class="zero_right">
+                <input type="button" value="新建" class="zero_bg_icon zero_bg_icon_plus" onclick="myPage.addFunc()" />
+                <select class="zero_bg_icon zero_bg_icon_checkmark_circle MCW1024H" onchange="myPage.selCmd(this)">
+                    <option value="">勾选</option>
+                    <option value="all">全选</option>
+                    <option value="reverse">反选</option>
+                    <option value="cancel">弃选</option>
+                </select>
+                <input type="button" value="删除" class="zero_bg_icon zero_bg_icon_remove" onclick="myPage.bulkDeleteFunc()" />
+                <select class="zero_bg_icon zero_bg_icon_enter MCW1024H" onchange="myPage.datafileFunc(this)">
+                    <option value="">导入导出</option>
+                    <option value="export">导出用户</option>
+                    <option value="import">导入用户</option>
+                </select>
+                <select class="zero_iframe_page_ctrl zero_bg_icon zero_bg_icon_screen MCW1024H">
+                    <option value="">--页面操作--</option>
+                    <option value="page_lock">锁定页面</option>
+                    <option value="page_unlock">解锁页面</option>
+                    <option value="page_refresh">刷新页面</option>
+                    <option value="page_print">打印页面</option>
+                    <option value="page_source">查看原始源码</option>
+                    <option value="page_source_now">查看当前源码</option>
+                    <option value="page_full">全屏切换</option>
+                </select>
+            </div></div>
+            <div class="zero_repeat zero_repeat_col4 zero_selected_single" id="dataInit">
+                <div class="zero_repeat_item" style="visibility:hidden;"><div class="zero_repeat_item_inside">
+                    <div class="zero_repeat_item_title"><input type="checkbox" /><span>@name</span></div>
+                    <div class="zero_repeat_item_con"><p>城市：@city</p><p>生日：@birthday</p><p>注册：@createTime</p></div>
+                    <div class="zero_repeat_item_btns"><input type="button" value="明细" class="zero_bg_icon zero_bg_icon_eye2" /><input type="button" value="修改" class="zero_bg_icon zero_bg_icon_pen" /><input type="button" value="删除" class="zero_bg_icon zero_bg_icon_remove" /></div>
+                 </div></div>
+            </div>
+            <div class="zero_page_bar noprint"><div id="pageInit" class="zero_pager noprint"></div></div>
+        </div>
+        <!--html comment-->
+    </div>
+    <div id="filterSideBar" class="zero_side_bar">
+        <div class="zero_mp_main">
+            <div class="zero_side_bar_header">
+                <div class="zero_side_bar_header_l"><a class="zero_bg_icon zero_bg_icon_filter2"></a></div>
+                <div class="zero_side_bar_header_c">用户过滤(上侧弹出)</div>
+                <div class="zero_side_bar_header_r"><a class="zero_side_bar_close zero_bg_icon zero_bg_icon_close"></a></div>
+            </div>
+            <div class="zero_side_bar_main"><form class="zero_form" id="myForm1">
+                <dl class="zero_form_group zero_form_group_cols2">
+                    <dd><div class="zero_form_text">
+                        <h2 class="zero_form_input_label">角色：</h2>
+                         </div><div class="zero_form_input"><select name="role"><option value="">--不限--</option><option value="1">管理员</option><option value="2">会员</option></select></div></dd>
+                    <dd><div class="zero_form_text">
+                        <h2 class="zero_form_input_label">性别：</h2>
+                        </div><div class="zero_form_input"><select name="sex"><option value="">--不限--</option><option value="1">男</option><option value="2">女</option></select></div></dd>
+                    <dd><div class="zero_form_text">
+                        <h2 class="zero_form_input_label">年龄：</h2>
+                        </div><div class="zero_form_input"><select name="age"><option value="">--不限--</option><option value="1-18">1-18岁</option><option value="18-59">18-58岁</option><option value="58-98">58-98岁</option><option value="98">98岁以上</option></select></div></dd>
+                    <dd><div class="zero_form_text">
+                        <h2 class="zero_form_input_label">排序：</h2>
+                        </div><div class="zero_form_input"><select name="sort"><option value="">--不限--</option><option value="1">按注册时间</option><option value="2">按年龄</option></select></div></dd>
+                    <dd class="zero_form_cells1"><div class="zero_form_text">
+                        <h2 class="zero_form_input_label">区域：</h2>
+                         </div><div class="zero_form_input"><input type="text" name="keyword" placeholder="请输入关键词" /></div></dd>
+                </dl>
+                <div class="zero_form_btns">
+                    <input type="button" name="cancelBtn" value="取消" class="zero_side_bar_close" />
+                    <input type="submit" name="submitBtn" value="搜索" />
+                    <input type="reset" name="resetBtn" value="重置" />
+                </div></form>
+            </div>
+        </div>
+    </div>
+    <style type="text/css">
+        /*style comment*/
+        #myDiv,.myDiv{border:solid 1px #dedede;background:#fff; margin:5px;width:180px;height:160px;overflow:hidden;float:left;}
+        .zero_selected{border-color:#f90;}
+    </style>
+    <script type="text/javascript" src="../js/zero.js"></script>
+    <script type="text/javascript" src="../js/zero.ch.js"></script>
+    <script type="text/javascript" src="../js/zero.UI.js"></script>
+    <script type="text/javascript" src="../js/zero.adminUI.js"></script>
+    <script type="text/javascript">
+        //zero.debug(1);
+        //封装成一个对象(避免变量重名)
+        var myPage = {
+            dataSource: {},
+            addFunc: function () {
+                //由于该对话框弹出到顶层页面，url也将是相对于顶层页面的
+                dialog.loadIframe('新建用户', "../doc/datatable_add.html", 800, 600, null, null);
+            },
+            showFunc : function (ele, data, row, isSelected) {
+                dialog.alert('查看明细', JSON.stringify(data));
+            },
+            editFunc: function (ele, data, row, isSelected) {
+                //由于该对话框弹出到顶层页面，url也将是相对于顶层页面的
+                dialog.loadIframe('用户资料修改-' + data.name, '../doc/datatable_add.html?id=' + data.id, 800, 600, null, null);
+            },
+            deleteFunc : function (ele, data, row, isSelected) {
+                dialog.confirm('操作确认', '确定要删除“' + data.name + '”吗？', function (flag) {
+                    flag && myPage.dataSource.removeRow(row);
+                });
+            },
+            bulkDeleteFunc : function () {
+                var rows = myPage.dataSource.getSelected();
+                if (rows.length) {
+                    dialog.confirm('操作确认', '本次将删除' + rows.length + '条数据，确定要删除吗？', function (flag) {
+                        flag && myPage.dataSource.removeSelected();
+                    })
+                }
+            },
+            datafileFunc: function (sel) {
+                var v = sel.value,
+                    text = sel.options[sel.selectedIndex].innerHTML;
+                sel.selectedIndex = 0;
+                switch (v) {
+                    case 'export':
+                        dialog.alert(text, '该功能\'尚未\'实现，敬请期待！');
+                        break;
+                    case 'import':
+                        var uploadBtnFunc = function () {
+                            var _this = this,
+                                form = this.form(),
+                                d = form.getData();
+                            if (!d.file) { return dialog.tips("<span style=\"font-size:12px;color:#f00;\">请选择一个Excel文件！</span>"); }
+                            if (!/\.xlsx?$/i.test(d.file)) {
+                                dialog.tips("<span style=\"font-size:12px;color:#f00;\">你当前选择的文件类型不对，请选择Excel文件！</span>");
+                                return;
+                            }
+                            var waiting = dialog.waiting('......uploading......'),
+                                endFunc = function (data) {
+                                    waiting.close();
+                                    if (data.status) {
+                                        _this.close();
+                                        dialog.alert('操作提示', data.msg);
+                                        myPage.dataSource.reload();
+                                    } else {
+                                        dialog.alert('操作提示', data.msg);
+                                    }
+                                };
+                            /*form.action = '/home/uploadFile';
+                            form.onAfterSubmit = function (res) {
+                                var data = {};
+                                try { data = eval('(' + res + ')'); } catch (e) {
+                                    endFunc({ status: 0, msg: e.message, source: res });
+                                    return;
+                                }
+                                endFunc(data);
+                            };
+                            form.submit();*/
+                            setTimeout(function () { endFunc({ status: 1, msg: '恭喜你，数据导入成功了！' }); }, 3000);
+                        };
+                        dialog.show({
+                            title: text,
+                            width: 400,
+                            showCloseBtn: true,
+                            showHeader: true,
+                            content: '<div style="margin:10px;"><div>请选择一个Excel文件：</div><div style="border:solid 1px #dedede;"><input type="file" name="file" style="width:100%;" /></div></div>',
+                            btnConfig: [ { text: '取消', func: function () { this.close(); } },{ text: '上传', func: uploadBtnFunc, isPrimary: true }]
+                        })
+                        break;
+                }
+            },
+            selCmd:function(sel){
+                switch (sel.value) {
+                    case 'all':
+                        this.dataSource.selectedAll();
+                        break;
+                    case 'reverse':
+                        this.dataSource.selectedReverse();
+                        break;
+                    case 'cancel':
+                        this.dataSource.selectedCancel();
+                        break;
+                }
+                sel.selectedIndex = 0;
+            },
+            searchFunc: function (data) {
+                for (var o in data) {
+                    var v = data[o];
+                    if ('' === v) {
+                        myPage.dataSource.queryDataRemove(o);
+                    } else {
+                        myPage.dataSource.queryDataSet(o, data[o]);
+                    }
+                }
+                myPage.dataSource.queryDataSet('page', 1);
+                myPage.dataSource.reload();
+            },
+            initFunc: function () {
+                myPage.dataSource = zeroUI.datalist({
+                    url: function (request) {
+                        var page = request.queryData.page,
+                            size = request.queryData.size,
+                            total = 123456;
+                        if (page < 1) { page = 1; }
+                        if (size < 1) { size = 1; }
+                        var pages = total % size === 0 ? total / size : parseInt(total / size) + 1;
+                        if (page > pages) { page = pages; }
+                        var reval = {total:total,data:[],status:1,msg:'OK'},
+                            startIndex = page * size - size,
+                            endIndex = startIndex + size;
+                        if (endIndex > total) { endIndex = total; }
+                        while (startIndex < endIndex) {
+                            startIndex++;
+                            var name = '张王李武孙赵钱韩楚魏陈宋秦陶吴杨谢林陆关'[Math.floor(Math.random() * 20)]
+                                            + '无有常玄启合远近师悟劝成'[Math.floor(Math.random() * 12)]
+                                            + '龙虎风云文武德胜芳菲燕雅娴淑慧兰麒麟琪琳玲珑'[Math.floor(Math.random() * 20)];
+                            reval.data.push({ id: startIndex, city: '昆明', name: name, birthday: '2020-01-01', createTime: '2020-01-01 10:30:20', sex: startIndex % 2 == 0 ? 1 : 2 });
+                        }
+                        request.end(reval);
+                    },
+                    delay: 0,
+                    pageNode: 'pageInit',
+                    dataNode: 'dataInit',
+                    queryData: { page: 1, size: 20 },
+                    queryHeader: {},
+                    queryMethod: 'get',
+                    pager: { left: 5, right: 5, showTotal: true, showPages: true, showGoto: true, size: [10, 20, 30, 40, 50, 80, 100] },
+                    rowFormat: function (html, index, page, size, row) { return html.replace('#rownum#', page * size + index + 1); },
+                    cellFormat: function (name, value, row) {
+                        switch (name) {
+                            case 'sex':
+                                value=value===0?'未知':(value===1?'男':'女');
+                                break;
+                            case 'birthday':
+                                value = value.replace(/(\s*\d{1,2}:\d{1,2}:\d{1,2}).*$/, '');
+                                break;
+                        }
+                        return value;
+                    },
+                    onRowClick: function (ele, data, row, isSelected) {
+                        switch (ele.value) {
+                            case '明细':
+                                myPage.showFunc(ele, data, row, isSelected);
+                                break;
+                            case '修改':
+                                myPage.editFunc(ele, data, row, isSelected);
+                                break;
+                            case '删除':
+                                myPage.deleteFunc(ele, data, row, isSelected);
+                                break;
+                        }
+                        if (!isSelected) {
+                            myPage.dataSource.selectedRow(row);
+                        } else {
+                            myPage.dataSource.selectedCancel(row);
+                        }
+                    },
+                    onDataLoad: function (data, page, size, total) {
+                        if (data && data.length) {
+                            var vLen = ('' + total).length;
+                            var fun = function (v) {
+                                v = '' + v;
+                                while (v.length < vLen) {
+                                    v = '0' + v;
+                                }
+                                return v;
+                            };
+                            for (var i = 0; i < data.length; i++) {
+                                var v = (page * size - size + i + 1);
+                                data[i].myCustomSerialNumber = total + '-' + fun(v) + '-' + fun(total - v);
+                            }
+                        }
+                    }
+                });
+                var form = zero.form('myForm1');
+                form.onRequest = function () { zero.UI.upSideBar('filterSideBar', false); };
+                //自定义提交方法
+                form.onCustomSubmit = myPage.searchFunc;
+            }
+        };
+        zero.ready(myPage.initFunc);
+    </script>
+</body>
+</html>
