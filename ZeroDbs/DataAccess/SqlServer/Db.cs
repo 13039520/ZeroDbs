@@ -50,6 +50,26 @@ namespace ZeroDbs.DataAccess.SqlServer
             cmd.Connection.Open();
             return new ZeroDbs.Interfaces.Common.DbCommand(DbConfigDatabaseInfo.dbKey, cmd, this.OnDbExecuteSqlEvent, this.DbSqlBuilder);
         }
+        public ZeroDbs.Interfaces.IDbCommand GetDbCommand(System.Data.Common.DbConnection dbConnection)
+        {
+            var cmd = new SqlCommand();
+            cmd.Connection = (SqlConnection)dbConnection;
+            if (cmd.Connection.State != System.Data.ConnectionState.Open)
+            {
+                cmd.Connection.Open();
+            }
+            return new ZeroDbs.Interfaces.Common.DbCommand(DbConfigDatabaseInfo.dbKey, cmd, this.OnDbExecuteSqlEvent, this.DbSqlBuilder);
+        }
+        public ZeroDbs.Interfaces.IDbCommand GetDbCommand(System.Data.Common.DbTransaction dbTransaction)
+        {
+            var cmd = new SqlCommand();
+            cmd.Connection = (SqlConnection)dbTransaction.Connection;
+            if (cmd.Connection.State != System.Data.ConnectionState.Open)
+            {
+                cmd.Connection.Open();
+            }
+            return new ZeroDbs.Interfaces.Common.DbCommand(DbConfigDatabaseInfo.dbKey, cmd, this.OnDbExecuteSqlEvent, this.DbSqlBuilder);
+        }
         public ZeroDbs.Interfaces.IDbTransactionScope GetDbTransactionScope(System.Data.IsolationLevel level, string identification="", string groupId="")
         {
             var conn = this.GetDbConnection();

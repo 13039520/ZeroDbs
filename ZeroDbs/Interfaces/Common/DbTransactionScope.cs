@@ -21,11 +21,13 @@ namespace ZeroDbs.Interfaces.Common
         public DbTransactionScope(IDb db, string identification="", string groupId="")
         {
             this.db = db;
-            this.dbCommand = db.GetDbCommand();
-
             var conn = db.GetDbConnection();
             conn.Open();
             this.dbTransaction = conn.BeginTransaction();
+            this.dbCommand = db.GetDbCommand(this.dbTransaction);
+
+
+
             if (!string.IsNullOrEmpty(identification))
             {
                 this._Identification = identification;
