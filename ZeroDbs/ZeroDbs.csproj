@@ -6,7 +6,7 @@
     <Description>Database access library of .net standard 2.0 .  Support SqlServer/MySql/Sqlite .</Description>
     <Version>2.1.0</Version>
     <Authors>ruzi</Authors>
-    <PackageIcon>favicon.ico</PackageIcon>
+    <PackageIcon>favicon.png</PackageIcon>
     <PackageReleaseNotes>Database access library of .net standard 2.0 .  Support SqlServer/MySql/Sqlite .</PackageReleaseNotes>
   </PropertyGroup>
 
@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="favicon.ico">
+    <None Include="favicon.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
