@@ -68,6 +68,7 @@ namespace ZeroDbs.DataAccess.Sqlite
             {
                 cmd.Connection.Open();
             }
+            cmd.Transaction = (SQLiteTransaction)dbTransaction;
             return new ZeroDbs.Interfaces.Common.DbCommand(DbConfigDatabaseInfo.dbKey, cmd, this.OnDbExecuteSqlEvent, this.DbSqlBuilder);
         }
         public ZeroDbs.Interfaces.IDbTransactionScope GetDbTransactionScope(System.Data.IsolationLevel level, string identification="", string groupId="")
