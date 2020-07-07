@@ -101,7 +101,7 @@ namespace ZeroDbs.DataAccess.SqlServer
             {
                 var dv = Common.DbMapping.GetDbConfigDataViewInfo<T>().Find(o => string.Equals(o.dbKey, DbConfigDatabaseInfo.dbKey, StringComparison.OrdinalIgnoreCase));
                 string getTableOrViewSql = "SELECT A.[id],A.[type],A.[name],"
-                    + "(SELECT TOP 1 ISNULL(C.[value], '') FROM sys.tables B LEFT JOIN sys.extended_properties C ON(B.object_id = C.major_id AND C.minor_id = 0) where B.[name]=A.[name])"
+                    + "(SELECT TOP 1 ISNULL(value, '') FROM sys.extended_properties AS E LEFT JOIN (SELECT object_id,name AS name2 FROM sys.views UNION SELECT object_id,name AS name2 FROM sys.tables) AS T1 ON T1.object_id=major_id WHERE E.minor_id=0 AND E.name='MS_Description' AND name2=A.[name])"
                     + "AS [description]"
                     + " FROM [sysobjects] AS A"
                     + " WHERE [name]='" + dv.tableName + "' AND ([type] = 'U' OR [type]= 'V')  ORDER BY [type],[name]";
@@ -203,7 +203,7 @@ namespace ZeroDbs.DataAccess.SqlServer
                 var dbName = cmd.DbConnection.Database;
                 List<string> sqlList = new List<string>();
                 string getAllTableAndViewSql = "SELECT A.[id],A.[type],A.[name],"
-                    + "(SELECT TOP 1 ISNULL(C.[value], '') FROM sys.tables B LEFT JOIN sys.extended_properties C ON(B.object_id = C.major_id AND C.minor_id = 0) where B.[name]=A.[name])"
+                    + "(SELECT TOP 1 ISNULL(value, '') FROM sys.extended_properties AS E LEFT JOIN (SELECT object_id,name AS name2 FROM sys.views UNION SELECT object_id,name AS name2 FROM sys.tables) AS T1 ON T1.object_id=major_id WHERE E.minor_id=0 AND E.name='MS_Description' AND name2=A.[name])"
                     + "AS [description]"
                     + " FROM[sysobjects] AS A"
                     + " WHERE([type] = 'U' OR [type]= 'V')  ORDER BY [type],[name]";
