@@ -288,7 +288,7 @@ namespace ZeroDbs.DataAccess.Sqlite
             var cmd = GetDbCommand();
             try
             {
-                var sql = DbSqlBuilder.BuildSqlSelectByKey<T>(key);
+                var sql = DbSqlBuilder.SelectByKey<T>(key);
 
                 cmd.CommandText = sql;
                 List<T> reval = cmd.ExecuteReader<T>();
@@ -311,7 +311,7 @@ namespace ZeroDbs.DataAccess.Sqlite
             var cmd = GetDbCommand();
             try
             {
-                var sql = DbSqlBuilder.BuildSqlSelect<T>(where, "");
+                var sql = DbSqlBuilder.Select<T>(where, "");
 
                 cmd.CommandText = sql;
                 List<T> reval = cmd.ExecuteReader<T>();
@@ -334,7 +334,7 @@ namespace ZeroDbs.DataAccess.Sqlite
             var cmd = GetDbCommand();
             try
             {
-                var sql = DbSqlBuilder.BuildSqlSelect<T>(where, orderby);
+                var sql = DbSqlBuilder.Select<T>(where, orderby);
 
                 cmd.CommandText = sql;
                 List<T> reval = cmd.ExecuteReader<T>();
@@ -357,7 +357,7 @@ namespace ZeroDbs.DataAccess.Sqlite
             var cmd = GetDbCommand();
             try
             {
-                var sql = DbSqlBuilder.BuildSqlSelect<T>(where, orderby, top);
+                var sql = DbSqlBuilder.Select<T>(where, orderby, top);
 
                 cmd.CommandText = sql;
                 List<T> reval = cmd.ExecuteReader<T>();
@@ -380,7 +380,7 @@ namespace ZeroDbs.DataAccess.Sqlite
             var cmd = GetDbCommand();
             try
             {
-                var sql = DbSqlBuilder.BuildSqlSelect<T>(where, orderby, top, threshold);
+                var sql = DbSqlBuilder.Select<T>(where, orderby, top, threshold);
 
                 cmd.CommandText = sql;
                 List<T> reval = cmd.ExecuteReader<T>();
@@ -403,7 +403,7 @@ namespace ZeroDbs.DataAccess.Sqlite
             var cmd = GetDbCommand();
             try
             {
-                var sql = DbSqlBuilder.BuildSqlSelect<T>(where, orderby, top, fieldNames);
+                var sql = DbSqlBuilder.Select<T>(where, orderby, top, fieldNames);
 
                 cmd.CommandText = sql;
                 List<T> reval = cmd.ExecuteReader<T>();
@@ -439,8 +439,8 @@ namespace ZeroDbs.DataAccess.Sqlite
             var cmd = this.GetDbCommand();
             try
             {
-                var countSql = this.DbSqlBuilder.BuildSqlCount<T>(where);
-                var sql = this.DbSqlBuilder.BuildSqlPage<T>(page, size, where, orderby, threshold, uniqueFieldName);
+                var countSql = this.DbSqlBuilder.Count<T>(where);
+                var sql = this.DbSqlBuilder.Page<T>(page, size, where, orderby, threshold, uniqueFieldName);
                 var key = System.Text.RegularExpressions.Regex.Replace((typeof(T).FullName + where), @"[^\w]", "");
                 long total = Common.ZeroDbPageCountCache.Get(key);
                 if (total < 0)
@@ -486,8 +486,8 @@ namespace ZeroDbs.DataAccess.Sqlite
             var cmd = this.GetDbCommand();
             try
             {
-                var countSql = this.DbSqlBuilder.BuildSqlCount<T>(where);
-                var sql = this.DbSqlBuilder.BuildSqlPage<T>(page, size, where, orderby, fieldNames, uniqueFieldName);
+                var countSql = this.DbSqlBuilder.Count<T>(where);
+                var sql = this.DbSqlBuilder.Page<T>(page, size, where, orderby, fieldNames, uniqueFieldName);
                 var key = System.Text.RegularExpressions.Regex.Replace((typeof(T).FullName + where), @"[^\w]", "");
                 long total = Common.ZeroDbPageCountCache.Get(key);
                 if (total < 0)
@@ -531,7 +531,7 @@ namespace ZeroDbs.DataAccess.Sqlite
             var cmd = this.GetDbCommand();
             try
             {
-                var sql = this.DbSqlBuilder.BuildSqlCount<T>(where);
+                var sql = this.DbSqlBuilder.Count<T>(where);
 
                 cmd.CommandText = sql;
                 var obj = cmd.ExecuteScalar();
@@ -555,7 +555,7 @@ namespace ZeroDbs.DataAccess.Sqlite
             var cmd = this.GetDbCommand();
             try
             {
-                var sql = this.DbSqlBuilder.BuildSqlInsert<T>(entity, new string[] { });
+                var sql = this.DbSqlBuilder.Insert<T>(entity, new string[] { });
 
                 cmd.CommandText = sql;
                 var reval = cmd.ExecuteNonQuery();
@@ -580,7 +580,7 @@ namespace ZeroDbs.DataAccess.Sqlite
             try
             {
                 int reval = 0;
-                var sqlList = this.DbSqlBuilder.BuildSqlInsert<T>(entityList, new string[] { });
+                var sqlList = this.DbSqlBuilder.Insert<T>(entityList, new string[] { });
                 ts.Execute((cmd) =>
                 {
                     foreach (var sql in sqlList)
@@ -607,7 +607,7 @@ namespace ZeroDbs.DataAccess.Sqlite
             var cmd = this.GetDbCommand();
             try
             {
-                var sql = this.DbSqlBuilder.BuildSqlInsert<T>(nvc);
+                var sql = this.DbSqlBuilder.Insert<T>(nvc);
 
                 cmd.CommandText = sql;
                 var reval = cmd.ExecuteNonQuery();
@@ -632,7 +632,7 @@ namespace ZeroDbs.DataAccess.Sqlite
             try
             {
                 int reval = 0;
-                var sqlList = this.DbSqlBuilder.BuildSqlInsert<T>(nvcList);
+                var sqlList = this.DbSqlBuilder.Insert<T>(nvcList);
                 ts.Execute((cmd) =>
                 {
                     foreach (var sql in sqlList)
@@ -660,7 +660,7 @@ namespace ZeroDbs.DataAccess.Sqlite
             var cmd = this.GetDbCommand();
             try
             {
-                var sql = this.DbSqlBuilder.BuildSqlUpdate<T>(entity, new string[] { }, new string[] { });
+                var sql = this.DbSqlBuilder.Update<T>(entity, new string[] { }, new string[] { });
 
                 cmd.CommandText = sql;
                 var reval = cmd.ExecuteNonQuery();
@@ -685,7 +685,7 @@ namespace ZeroDbs.DataAccess.Sqlite
             try
             {
                 int reval = 0;
-                var sqlList = this.DbSqlBuilder.BuildSqlUpdate<T>(entityList, new string[] { }, new string[] { });
+                var sqlList = this.DbSqlBuilder.Update<T>(entityList, new string[] { }, new string[] { });
                 ts.Execute((cmd) =>
                 {
                     foreach (var sql in sqlList)
@@ -712,7 +712,7 @@ namespace ZeroDbs.DataAccess.Sqlite
             var cmd = this.GetDbCommand();
             try
             {
-                var sql = this.DbSqlBuilder.BuildSqlUpdate<T>(nvc);
+                var sql = this.DbSqlBuilder.Update<T>(nvc);
 
                 cmd.CommandText = sql;
                 var reval = cmd.ExecuteNonQuery();
@@ -737,7 +737,7 @@ namespace ZeroDbs.DataAccess.Sqlite
             try
             {
                 int reval = 0;
-                var sqlList = this.DbSqlBuilder.BuildSqlUpdate<T>(nvcList);
+                var sqlList = this.DbSqlBuilder.Update<T>(nvcList);
                 ts.Execute((cmd) =>
                 {
                     foreach (var sql in sqlList)
@@ -765,7 +765,7 @@ namespace ZeroDbs.DataAccess.Sqlite
             var cmd = this.GetDbCommand();
             try
             {
-                var sql = this.DbSqlBuilder.BuildSqlDelete<T>(entity, new string[] { });
+                var sql = this.DbSqlBuilder.Delete<T>(entity, new string[] { });
 
                 cmd.CommandText = sql;
                 var reval = cmd.ExecuteNonQuery();
@@ -790,7 +790,7 @@ namespace ZeroDbs.DataAccess.Sqlite
             try
             {
                 int reval = 0;
-                var sqlList = this.DbSqlBuilder.BuildSqlDelete<T>(entityList, new string[] { });
+                var sqlList = this.DbSqlBuilder.Delete<T>(entityList, new string[] { });
                 ts.Execute((cmd) =>
                 {
                     foreach (var sql in sqlList)
@@ -817,7 +817,7 @@ namespace ZeroDbs.DataAccess.Sqlite
             var cmd = this.GetDbCommand();
             try
             {
-                var sql = this.DbSqlBuilder.BuildSqlDelete<T>(nvc);
+                var sql = this.DbSqlBuilder.Delete<T>(nvc);
 
                 cmd.CommandText = sql;
                 var reval = cmd.ExecuteNonQuery();
@@ -842,7 +842,7 @@ namespace ZeroDbs.DataAccess.Sqlite
             try
             {
                 int reval = 0;
-                var sqlList = this.DbSqlBuilder.BuildSqlDelete<T>(nvcList);
+                var sqlList = this.DbSqlBuilder.Delete<T>(nvcList);
                 ts.Execute((cmd) =>
                 {
                     foreach (var sql in sqlList)

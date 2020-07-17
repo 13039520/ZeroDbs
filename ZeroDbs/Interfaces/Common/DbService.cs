@@ -13,7 +13,7 @@ namespace ZeroDbs.Interfaces.Common
         ZeroDbs.Interfaces.IStrCommon _StrCommon = null;
         public ZeroDbs.Interfaces.ICache Cache { get { return _Cache; } }
         public ZeroDbs.Interfaces.ILog Log { get { return _Log; } }
-        public ZeroDbs.Interfaces.IDbOperator DataOperator { get { return _DataOperator;  } }
+        public ZeroDbs.Interfaces.IDbOperator DbOperator { get { return _DataOperator;  } }
         public ZeroDbs.Interfaces.IStrCommon StrCommon { get { return _StrCommon; } }
         public ZeroDbs.Interfaces.IDbSearcher DbSearcher { get { return _DbSearcher; } }
         public DbService(ZeroDbs.Interfaces.IDbSearcher dbSearcher, ZeroDbs.Interfaces.ILog log, ZeroDbs.Interfaces.ICache cache)
@@ -24,22 +24,30 @@ namespace ZeroDbs.Interfaces.Common
             _StrCommon = new Common.StrCommon();
             _DataOperator = new Common.DbOperator(this);
         }
-        public ZeroDbs.Interfaces.IDb DbGet<T>() where T: class, new()
+        public ZeroDbs.Interfaces.IDb GetDb<T>() where T: class, new()
         {
             return DbSearcher.GetDb<T>();
         }
-        public ZeroDbs.Interfaces.IDb DbGet(string entityFullName)
+        public ZeroDbs.Interfaces.IDb GetDb(string entityFullName)
         {
             return DbSearcher.GetDbByEntityFullName(entityFullName);
         }
+        public ZeroDbs.Interfaces.IDbCommand GetDbCommand<T>() where T : class, new()
+        {
+            return DbSearcher.GetDb<T>().GetDbCommand();
+        }
+        public ZeroDbs.Interfaces.IDbCommand GetDbCommand(string entityFullName)
+        {
+            return DbSearcher.GetDbByEntityFullName(entityFullName).GetDbCommand();
+        }
         public ZeroDbs.Interfaces.IDbTransactionScope GetDbTransactionScope<T>(System.Data.IsolationLevel level, string identification = "", string groupId = "") where T : class, new()
         {
-            var db = this.DbGet<T>();
+            var db = this.GetDb<T>();
             return db.GetDbTransactionScope(level, identification, groupId);
         }
         public ZeroDbs.Interfaces.IDbTransactionScope GetDbTransactionScope(string entityFullName, System.Data.IsolationLevel level, string identification = "", string groupId = "")
         {
-            var db = this.DbGet(entityFullName);
+            var db = this.GetDb(entityFullName);
             return db.GetDbTransactionScope(level, identification, groupId);
         }
         public ZeroDbs.Interfaces.IDbTransactionScopeCollection GetDbTransactionScopeCollection()

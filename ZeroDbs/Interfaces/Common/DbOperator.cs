@@ -13,7 +13,7 @@ namespace ZeroDbs.Interfaces.Common
         }
         ZeroDbs.Interfaces.IDb _GetZeroDb<T>() where T : class, new()
         {
-            var reval = _service.DbGet<T>();
+            var reval = _service.GetDb<T>();
             if (reval == null)
             {
                 throw new Exception("缺少数据库配置");

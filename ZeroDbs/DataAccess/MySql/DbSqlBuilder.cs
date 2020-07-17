@@ -29,7 +29,7 @@ namespace ZeroDbs.DataAccess.MySql
             }
             return "";
         }
-        public string BuildSqlPage<T>(long page, long size, string where, string orderby, string[] returnFieldNames, string uniqueFieldName = "") where T : class, new()
+        public string Page<T>(long page, long size, string where, string orderby, string[] returnFieldNames, string uniqueFieldName = "") where T : class, new()
         {
             var tableInfo = this.ZeroDb.GetDbDataTableInfo<T>();
 
@@ -60,7 +60,7 @@ namespace ZeroDbs.DataAccess.MySql
             {
                 uniqueFieldName = GetUniqueFieldName<T>(tableInfo);
             }
-            if (!string.IsNullOrEmpty(uniqueFieldName))//具有唯一性字段
+            if (!string.IsNullOrEmpty(uniqueFieldName))
             {
                 string SubSql = string.Format("SELECT {0} FROM {1}", uniqueFieldName, tableInfo.Name);
                 if (!string.IsNullOrEmpty(where))
@@ -95,28 +95,28 @@ namespace ZeroDbs.DataAccess.MySql
 
             return sql.ToString();
         }
-        public string BuildSqlPage<T>(long page, long size, string where, string orderby, int lengthThreshold, string uniqueFieldName = "") where T : class, new()
+        public string Page<T>(long page, long size, string where, string orderby, int lengthThreshold, string uniqueFieldName = "") where T : class, new()
         {
             var tableInfo = this.ZeroDb.GetDbDataTableInfo<T>();
             var dv = Common.DbMapping.GetDbConfigDataViewInfo<T>();
             List<string> names = tableInfo.Colunms.FindAll(o => o.MaxLength < lengthThreshold).Select(o => o.Name).ToList();
             string[] returnFieldNames = names.ToArray();
-            return BuildSqlPage<T>(page, size, where, orderby, returnFieldNames, uniqueFieldName);
+            return Page<T>(page, size, where, orderby, returnFieldNames, uniqueFieldName);
         }
 
-        public string BuildSqlInsert<T>(T sourceEntity, string[] skipFieldNames) where T : class, new()
+        public string Insert<T>(T sourceEntity, string[] skipFieldNames) where T : class, new()
         {
             List<T> li = new List<T>(1);
             li.Add(sourceEntity);
-            List<string> reval = BuildSqlInsert(li, skipFieldNames);
+            List<string> reval = Insert(li, skipFieldNames);
             return reval[0];
         }
-        public List<string> BuildSqlInsert<T>(List<T> sourceEntityList, string[] skipFieldNames) where T : class, new()
+        public List<string> Insert<T>(List<T> sourceEntityList, string[] skipFieldNames) where T : class, new()
         {
             var tableInfo = ZeroDb.GetDbDataTableInfo<T>();
             if (tableInfo.IsView)
             {
-                throw new Exception("不支持对视图做Insert操作");
+                throw new Exception("Does not support Insert operation on the view");
             }
             if (skipFieldNames == null || skipFieldNames.Length < 1)
             {
@@ -130,13 +130,13 @@ namespace ZeroDbs.DataAccess.MySql
             {
                 skipFieldNames = skipFieldNames.Distinct().ToArray();
             }
-            if (sourceEntityList == null || sourceEntityList.Count < 1) { throw new Exception("sourceEntityList为null或包含元素为0"); }
-            if (tableInfo == null) { throw new Exception("tableInfo不能为空"); }
+            if (sourceEntityList == null || sourceEntityList.Count < 1) { throw new Exception("sourceEntityList is null or contains 0 items"); }
+            if (tableInfo == null) { throw new Exception("tableInfo is null"); }
             if (skipFieldNames == null) { skipFieldNames = new string[] { }; }
-            if (sourceEntityList.Contains(null)) { throw new Exception("sourceEntityList包含null元素"); }
+            if (sourceEntityList.Contains(null)) { throw new Exception("sourceEntityList contains null items"); }
 
             System.Reflection.PropertyInfo[] pi = typeof(T).GetProperties();
-            if (pi.Length < 1) { throw new Exception("泛型参数缺少公开的属性"); }
+            if (pi.Length < 1) { throw new Exception("Generic parameters are missing public properties"); }
             Dictionary<string, System.Reflection.PropertyInfo> dic = new Dictionary<string, System.Reflection.PropertyInfo>(pi.Length);
             string keep = "";
             foreach (System.Reflection.PropertyInfo p in pi)
@@ -160,7 +160,7 @@ namespace ZeroDbs.DataAccess.MySql
             string[] keepFieldNames = keep.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
             if (keepFieldNames.Length < 1)
             {
-                throw new Exception("字段全部被跳过了");
+                throw new Exception("All fields are skipped");
             }
             List<string> sqlList = new List<string>(sourceEntityList.Count);
             foreach (T entity in sourceEntityList)
@@ -178,7 +178,7 @@ namespace ZeroDbs.DataAccess.MySql
                 }
                 if (columnNames.Length < 1)
                 {
-                    throw new Exception("生成的Insert命令不可用");
+                    throw new Exception("The generated Insert command is not available");
                 }
                 columnNames.Remove(columnNames.Length - 1, 1);
                 columnValues.Remove(columnValues.Length - 1, 1);
@@ -186,36 +186,36 @@ namespace ZeroDbs.DataAccess.MySql
             }
             return sqlList;
         }
-        public string BuildSqlInsert<T>(System.Collections.Specialized.NameValueCollection nvc) where T : class, new()
+        public string Insert<T>(System.Collections.Specialized.NameValueCollection nvc) where T : class, new()
         {
-            return BuildSqlInsert<T>(nvc, "");
+            return Insert<T>(nvc, "");
         }
-        public string BuildSqlInsert<T>(System.Collections.Specialized.NameValueCollection nvc, string appendWhere) where T : class, new()
+        public string Insert<T>(System.Collections.Specialized.NameValueCollection nvc, string appendWhere) where T : class, new()
         {
             List<System.Collections.Specialized.NameValueCollection> li = new List<System.Collections.Specialized.NameValueCollection>(1);
             li.Add(nvc);
-            List<string> reval = BuildSqlInsert<T>(li, appendWhere);
+            List<string> reval = Insert<T>(li, appendWhere);
             return reval[0];
         }
-        public List<string> BuildSqlInsert<T>(List<System.Collections.Specialized.NameValueCollection> nvcList) where T : class, new()
+        public List<string> Insert<T>(List<System.Collections.Specialized.NameValueCollection> nvcList) where T : class, new()
         {
             return null;
         }
-        public List<string> BuildSqlInsert<T>(List<System.Collections.Specialized.NameValueCollection> nvcList, string appendWhere) where T : class, new()
+        public List<string> Insert<T>(List<System.Collections.Specialized.NameValueCollection> nvcList, string appendWhere) where T : class, new()
         {
-            if (nvcList == null || nvcList.Count < 1) { throw new Exception("nvcList是null或长度为0"); }
+            if (nvcList == null || nvcList.Count < 1) { throw new Exception("nvcList is null or contains 0 items"); }
             if (nvcList.Count > 5000)
             {
-                throw new Exception("nvcList的长度不宜超过5000项");
+                throw new Exception("The length of nvcList should not exceed 5000 items");
             }
             if (nvcList.Contains(null))
             {
-                throw new Exception("nvcList存在null的项");
+                throw new Exception("nvcList contains null items");
             }
             var tableInfo = ZeroDb.GetDbDataTableInfo<T>();
             if (tableInfo.IsView)
             {
-                throw new Exception("不支持对视图做Insert操作");
+                throw new Exception("Does not support Insert operation on the view");
             }
 
             var identityKeys = tableInfo.Colunms.FindAll(o => o.IsIdentity);
@@ -273,19 +273,19 @@ namespace ZeroDbs.DataAccess.MySql
             return result;
         }
 
-        public string BuildSqlUpdate<T>(T sourceEntity, string[] setFieldNames, string[] whereFieldNames) where T : class, new()
+        public string Update<T>(T sourceEntity, string[] setFieldNames, string[] whereFieldNames) where T : class, new()
         {
             List<T> li = new List<T>(1);
             li.Add(sourceEntity);
-            List<string> reval = BuildSqlUpdate(li, setFieldNames, whereFieldNames);
+            List<string> reval = Update(li, setFieldNames, whereFieldNames);
             return reval[0];
         }
-        public List<string> BuildSqlUpdate<T>(List<T> sourceEntityList, string[] setFieldNames, string[] whereFieldNames) where T : class, new()
+        public List<string> Update<T>(List<T> sourceEntityList, string[] setFieldNames, string[] whereFieldNames) where T : class, new()
         {
             var tableInfo = ZeroDb.GetDbDataTableInfo<T>();
             if (tableInfo.IsView)
             {
-                throw new Exception("不支持对视图做Update操作");
+                throw new Exception("Does not support Update operation on the view");
             }
             string[] fieldArray = tableInfo.Colunms.Select(o => o.Name).ToArray();
             if (setFieldNames != null && setFieldNames.Length > 0)
@@ -309,12 +309,12 @@ namespace ZeroDbs.DataAccess.MySql
                 setFieldNames = temp.Distinct().ToArray();
                 if (setFieldNames.Length < 1)
                 {
-                    setFieldNames = fieldArray;
+                    setFieldNames = tableInfo.Colunms.FindAll(o => o.IsIdentity == false && o.IsPrimaryKey == false).Select(o => o.Name).ToArray();
                 }
             }
             else
             {
-                setFieldNames = fieldArray;
+                setFieldNames = tableInfo.Colunms.FindAll(o => o.IsIdentity == false && o.IsPrimaryKey == false).Select(o => o.Name).ToArray();
             }
             if (whereFieldNames != null && whereFieldNames.Length > 0)
             {
@@ -337,23 +337,23 @@ namespace ZeroDbs.DataAccess.MySql
                 whereFieldNames = temp.Distinct().ToArray();
                 if (whereFieldNames.Length < 1)
                 {
-                    whereFieldNames = fieldArray;
+                    setFieldNames = tableInfo.Colunms.FindAll(o => o.IsIdentity || o.IsPrimaryKey).Select(o => o.Name).ToArray();
                 }
             }
             else
             {
-                whereFieldNames = fieldArray;
+                setFieldNames = tableInfo.Colunms.FindAll(o => o.IsIdentity || o.IsPrimaryKey).Select(o => o.Name).ToArray();
             }
-            if (sourceEntityList == null || sourceEntityList.Count < 1) { throw new Exception("sourceEntityList为null或包含元素为0"); }
-            if (sourceEntityList.Contains(null)) { throw new Exception("sourceEntityList包含null元素"); }
-            if (setFieldNames == null || setFieldNames.Length < 1) { throw new Exception("setFieldNames为空或长度为0"); }
-            if (whereFieldNames == null || whereFieldNames.Length < 1) { throw new Exception("whereFieldNames为空或长度为0"); }
+            if (sourceEntityList == null || sourceEntityList.Count < 1) { throw new Exception("sourceEntityList is null or contains 0 items"); }
+            if (sourceEntityList.Contains(null)) { throw new Exception("sourceEntityList contains null items"); }
+            if (setFieldNames == null || setFieldNames.Length < 1) { throw new Exception("setFieldNames is null or contains 0 items"); }
+            if (whereFieldNames == null || whereFieldNames.Length < 1) { throw new Exception("whereFieldNames is null or contains 0 items"); }
             for (var i = 0; i < setFieldNames.Length; i++)
             {
                 setFieldNames[i] = setFieldNames[i].Trim();
                 if (string.IsNullOrEmpty(setFieldNames[i]))
                 {
-                    throw new Exception("setFieldNames存在空项");
+                    throw new Exception("setFieldNames contains empty items");
                 }
             }
             for (var i = 0; i < whereFieldNames.Length; i++)
@@ -361,7 +361,7 @@ namespace ZeroDbs.DataAccess.MySql
                 whereFieldNames[i] = whereFieldNames[i].Trim();
                 if (string.IsNullOrEmpty(whereFieldNames[i]))
                 {
-                    throw new Exception("whereFieldNames存在空项");
+                    throw new Exception("whereFieldNames contains empty items");
                 }
             }
             for (var i = 0; i < whereFieldNames.Length; i++)
@@ -382,11 +382,11 @@ namespace ZeroDbs.DataAccess.MySql
             setFieldNames = SetFieldNameStr.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
             if (setFieldNames.Length < 1)
             {
-                throw new Exception("setFieldNames被whereFieldNames全部排除");
+                throw new Exception("setFieldNames are all excluded");
             }
 
             System.Reflection.PropertyInfo[] pi = typeof(T).GetProperties();
-            if (pi.Length < 1) { throw new Exception("泛型参数缺少公开的属性"); }
+            if (pi.Length < 1) { throw new Exception("Generic parameters are missing public properties"); }
             Dictionary<string, System.Reflection.PropertyInfo> dic = new Dictionary<string, System.Reflection.PropertyInfo>(pi.Length);
             foreach (System.Reflection.PropertyInfo p in pi)
             {
@@ -409,7 +409,7 @@ namespace ZeroDbs.DataAccess.MySql
                 }
                 if (setColumnValue.Length < 1)
                 {
-                    throw new Exception("setFieldNames最后留存的字段与实体属性对应不上");
+                    throw new Exception("setFieldNames last remaining field does not correspond to the attribute of the entity");
                 }
                 setColumnValue.Remove(setColumnValue.Length - 1, 1);
                 System.Text.StringBuilder updateWhere = new System.Text.StringBuilder();
@@ -426,7 +426,7 @@ namespace ZeroDbs.DataAccess.MySql
                 }
                 if (updateWhere.Length < 1)
                 {
-                    throw new Exception("whereFieldNames没有一个字段与实体属性对应得上");
+                    throw new Exception("whereFieldNames None of the fields correspond to entity attributes");
                 }
                 updateWhere.Remove(updateWhere.Length - 5, 5);
 
@@ -434,36 +434,36 @@ namespace ZeroDbs.DataAccess.MySql
             }
             return sqlList;
         }
-        public string BuildSqlUpdate<T>(System.Collections.Specialized.NameValueCollection nvc) where T : class, new()
+        public string Update<T>(System.Collections.Specialized.NameValueCollection nvc) where T : class, new()
         {
-            return BuildSqlUpdate<T>(nvc, "");
+            return Update<T>(nvc, "");
         }
-        public string BuildSqlUpdate<T>(System.Collections.Specialized.NameValueCollection nvc, string appendWhere) where T : class, new()
+        public string Update<T>(System.Collections.Specialized.NameValueCollection nvc, string appendWhere) where T : class, new()
         {
             var li = new List<System.Collections.Specialized.NameValueCollection>();
             li.Add(nvc);
-            List<string> reval = BuildSqlUpdate<T>(li, appendWhere);
+            List<string> reval = Update<T>(li, appendWhere);
             return reval[0];
         }
-        public List<string> BuildSqlUpdate<T>(List<System.Collections.Specialized.NameValueCollection> nvcList) where T : class, new()
+        public List<string> Update<T>(List<System.Collections.Specialized.NameValueCollection> nvcList) where T : class, new()
         {
-            return BuildSqlUpdate<T>(nvcList, "");
+            return Update<T>(nvcList, "");
         }
-        public List<string> BuildSqlUpdate<T>(List<System.Collections.Specialized.NameValueCollection> nvcList, string appendWhere) where T : class, new()
+        public List<string> Update<T>(List<System.Collections.Specialized.NameValueCollection> nvcList, string appendWhere) where T : class, new()
         {
-            if (nvcList == null || nvcList.Count < 1) { throw new Exception("nvcList是null或长度为0"); }
+            if (nvcList == null || nvcList.Count < 1) { throw new Exception("nvcList is null or contains 0 items"); }
             if (nvcList.Count > 5000)
             {
-                throw new Exception("nvcList的长度不宜超过5000项");
+                throw new Exception("The length of nvcList should not exceed 5000 items");
             }
             if (nvcList.Contains(null))
             {
-                throw new Exception("nvcList存在null的项");
+                throw new Exception("nvcList contains null items");
             }
             var tableInfo = ZeroDb.GetDbDataTableInfo<T>();
             if (tableInfo.IsView)
             {
-                throw new Exception("不支持对视图做Update操作");
+                throw new Exception("Does not support Update operation on the view");
             }
             var primaryKeys = tableInfo.Colunms.FindAll(o => o.IsPrimaryKey);
             if (primaryKeys == null || primaryKeys.Count < 1)
@@ -471,12 +471,12 @@ namespace ZeroDbs.DataAccess.MySql
                 var uniqueFieldName = GetUniqueFieldName<T>(tableInfo);
                 if (string.IsNullOrEmpty(uniqueFieldName))
                 {
-                    throw new Exception("目标tableInfo缺少主键和唯一标识列");
+                    throw new Exception("The target is missing the primary key and the unique identity column");
                 }
                 var col = tableInfo.Colunms.Find(o => string.Equals(o.Name, uniqueFieldName, StringComparison.OrdinalIgnoreCase));
                 if (col == null)
                 {
-                    throw new Exception("目标tableInfo配置的唯一列" + uniqueFieldName + "不存在");
+                    throw new Exception("The unique identification column " + uniqueFieldName + " does not exist");
                 }
                 primaryKeys.Clear();
                 primaryKeys.Add(col);
@@ -508,7 +508,7 @@ namespace ZeroDbs.DataAccess.MySql
                     return string.Equals(t.Name, c.Name, StringComparison.OrdinalIgnoreCase);
                 }) == null)
                 {
-                    throw new Exception("实体缺少对字段" + c.Name + "的映射");
+                    throw new Exception("The entity lacks a mapping for the field " + c.Name);
                 }
             }
             int nvcListCount = nvcList.Count;
@@ -535,8 +535,8 @@ namespace ZeroDbs.DataAccess.MySql
                         nvcList[i].Remove(c.Name);
                     }
                 }
-                if (!nvcContainsKeyKeys) { throw new Exception("未传入主键"); }
-                if (nvcList[i].Count < 1) { throw new Exception("未传入任何键值"); }
+                if (!nvcContainsKeyKeys) { throw new Exception("No primary key passed in"); }
+                if (nvcList[i].Count < 1) { throw new Exception("No key value passed in"); }
 
                 if (isAppendWhere)
                 {
@@ -574,7 +574,7 @@ namespace ZeroDbs.DataAccess.MySql
             return reval;
         }
 
-        public string BuildSqlDelete<T>(string sqlWhere) where T : class, new()
+        public string Delete<T>(string sqlWhere) where T : class, new()
         {
             if (string.IsNullOrEmpty(sqlWhere))
             {
@@ -588,27 +588,27 @@ namespace ZeroDbs.DataAccess.MySql
             var tableInfo = ZeroDb.GetDbDataTableInfo<T>();
             if (tableInfo.IsView)
             {
-                throw new Exception("不支持对视图做Delete操作");
+                throw new Exception("Does not support Delete operation on the view");
             }
             return string.Format("DELETE {0} WHERE {1}", tableInfo.Name, sqlWhere);
         }
-        public string BuildSqlDelete<T>(T sourceEntity, string[] useFiled) where T : class, new()
+        public string Delete<T>(T sourceEntity, string[] useFiled) where T : class, new()
         {
             List<T> li = new List<T>(1);
             li.Add(sourceEntity);
-            List<string> reval = BuildSqlDelete(li, useFiled);
+            List<string> reval = Delete(li, useFiled);
             return reval[0];
         }
-        public List<string> BuildSqlDelete<T>(List<T> sourceEntityList, string[] useFiled) where T : class, new()
+        public List<string> Delete<T>(List<T> sourceEntityList, string[] useFiled) where T : class, new()
         {
-            if (sourceEntityList == null || sourceEntityList.Count < 1) { throw new Exception("sourceEntityList为null或包含元素为0"); }
+            if (sourceEntityList == null || sourceEntityList.Count < 1) { throw new Exception("sourceEntityList is null or contains 0 items"); }
 
-            if (sourceEntityList.Contains(null)) { throw new Exception("sourceEntityList包含null元素"); }
+            if (sourceEntityList.Contains(null)) { throw new Exception("sourceEntityList contains null items"); }
 
             var tableInfo = ZeroDb.GetDbDataTableInfo<T>();
             if (tableInfo.IsView)
             {
-                throw new Exception("不支持对视图做Delete操作");
+                throw new Exception("Does not support Delete operation on the view");
             }
 
             bool useFiledFlag = (useFiled != null && useFiled.Length > 0);
@@ -632,7 +632,7 @@ namespace ZeroDbs.DataAccess.MySql
             useFiledFlag = (useFiled != null && useFiled.Length > 0);
 
             System.Reflection.PropertyInfo[] pi = typeof(T).GetProperties();
-            if (pi.Length < 1) { throw new Exception("泛型参数缺少公开的属性"); }
+            if (pi.Length < 1) { throw new Exception("Generic parameters are missing public properties"); }
             Dictionary<string, System.Reflection.PropertyInfo> dic = new Dictionary<string, System.Reflection.PropertyInfo>(pi.Length);
             foreach (System.Reflection.PropertyInfo p in pi)
             {
@@ -666,40 +666,40 @@ namespace ZeroDbs.DataAccess.MySql
                 }
                 if (where.Length < 1)
                 {
-                    throw new Exception("生成的where条件不可用");
+                    throw new Exception("The generated where condition is not available");
                 }
                 where.Remove(where.Length - 5, 5);
                 reval.Add(string.Format("DELETE {0} WHERE {1}", tableInfo.Name, where));
             }
             return reval;
         }
-        public string BuildSqlDelete<T>(System.Collections.Specialized.NameValueCollection nvc) where T : class, new()
+        public string Delete<T>(System.Collections.Specialized.NameValueCollection nvc) where T : class, new()
         {
-            return BuildSqlDelete<T>(nvc, "");
+            return Delete<T>(nvc, "");
         }
-        public string BuildSqlDelete<T>(System.Collections.Specialized.NameValueCollection nvc, string appendWhere) where T : class, new()
+        public string Delete<T>(System.Collections.Specialized.NameValueCollection nvc, string appendWhere) where T : class, new()
         {
             var li = new List<System.Collections.Specialized.NameValueCollection>(1);
-            var reval = BuildSqlDelete<T>(li, appendWhere);
+            var reval = Delete<T>(li, appendWhere);
             return reval[0];
         }
-        public List<string> BuildSqlDelete<T>(List<System.Collections.Specialized.NameValueCollection> nvcList) where T : class, new()
+        public List<string> Delete<T>(List<System.Collections.Specialized.NameValueCollection> nvcList) where T : class, new()
         {
-            return BuildSqlDelete<T>(nvcList, "");
+            return Delete<T>(nvcList, "");
         }
-        public List<string> BuildSqlDelete<T>(List<System.Collections.Specialized.NameValueCollection> nvcList, string appendWhere) where T : class, new()
+        public List<string> Delete<T>(List<System.Collections.Specialized.NameValueCollection> nvcList, string appendWhere) where T : class, new()
         {
-            if (nvcList == null || nvcList.Count < 1) { throw new Exception("nvcList为null或包含元素为0"); }
+            if (nvcList == null || nvcList.Count < 1) { throw new Exception("nvcList is null or contains 0 items"); }
 
-            if (nvcList.Contains(null)) { throw new Exception("nvcList包含null元素"); }
+            if (nvcList.Contains(null)) { throw new Exception("nvcList contains null items"); }
             if (nvcList.Count > 5000)
             {
-                throw new Exception("nvcList的长度不宜超过5000项");
+                throw new Exception("The length of nvcList should not exceed 5000 items");
             }
             var tableInfo = ZeroDb.GetDbDataTableInfo<T>();
             if (tableInfo.IsView)
             {
-                throw new Exception("不支持对视图做Delete操作");
+                throw new Exception("Does not support Delete operation on the view");
             }
             var primaryKeys = tableInfo.Colunms.FindAll(o => o.IsPrimaryKey);
             if (primaryKeys == null || primaryKeys.Count < 1)
@@ -707,12 +707,12 @@ namespace ZeroDbs.DataAccess.MySql
                 var uniqueFieldName = GetUniqueFieldName<T>(tableInfo);
                 if (string.IsNullOrEmpty(uniqueFieldName))
                 {
-                    throw new Exception("目标tableInfo缺少主键和唯一标识列");
+                    throw new Exception("The target is missing the primary key and the unique identity column");
                 }
                 var col = tableInfo.Colunms.Find(o => string.Equals(o.Name, uniqueFieldName, StringComparison.OrdinalIgnoreCase));
                 if (col == null)
                 {
-                    throw new Exception("目标tableInfo配置的唯一列" + uniqueFieldName + "不存在");
+                    throw new Exception("The unique identification column " + uniqueFieldName + " does not exist");
                 }
                 primaryKeys.Clear();
                 primaryKeys.Add(col);
@@ -744,7 +744,7 @@ namespace ZeroDbs.DataAccess.MySql
                     return string.Equals(t.Name, c.Name, StringComparison.OrdinalIgnoreCase);
                 }) == null)
                 {
-                    throw new Exception("实体缺少对字段" + c.Name + "的映射");
+                    throw new Exception("The entity lacks a mapping for the field " + c.Name);
                 }
             }
             int nvcListCount = nvcList.Count;
@@ -829,7 +829,7 @@ namespace ZeroDbs.DataAccess.MySql
             return reval;
         }
 
-        public string BuildSqlSelect<T>(T sourceEntity, string[] whereField, string orderby) where T : class, new()
+        public string Select<T>(T sourceEntity, string[] whereField, string orderby) where T : class, new()
         {
             var tableInfo = ZeroDb.GetDbDataTableInfo<T>();
             if (whereField == null || whereField.Length < 1)
@@ -860,7 +860,7 @@ namespace ZeroDbs.DataAccess.MySql
             }
             if (field.Length < 1)
             {
-                throw new Exception("生成的返回字段无效");
+                throw new Exception("The resulting return field is invalid");
             }
             field.Remove(field.Length - 1, 1);
             StringBuilder where = new StringBuilder();
@@ -899,11 +899,11 @@ namespace ZeroDbs.DataAccess.MySql
                 return string.Format("SELECT {0} FROM {1} WHERE {2} ORDER BY {3}", field, tableInfo.Name, where, orderby);
             }
         }
-        public string BuildSqlSelect<T>(string where, string orderby) where T : class, new()
+        public string Select<T>(string where, string orderby) where T : class, new()
         {
-            return BuildSqlSelect<T>(where, orderby, new string[] { });
+            return Select<T>(where, orderby, new string[] { });
         }
-        public string BuildSqlSelect<T>(string where, string orderby, string[] returnFieldNames) where T : class, new()
+        public string Select<T>(string where, string orderby, string[] returnFieldNames) where T : class, new()
         {
             var tableInfo = ZeroDb.GetDbDataTableInfo<T>();
             string[] fieldArray = tableInfo.Colunms.Select(o => o.Name).ToArray();
@@ -938,7 +938,7 @@ namespace ZeroDbs.DataAccess.MySql
             }
             if (field.Length < 1)
             {
-                throw new Exception("生成的返回字段无效");
+                throw new Exception("The resulting return field is invalid");
             }
             field.Remove(field.Length - 1, 1);
             if (string.IsNullOrEmpty(where))
@@ -954,11 +954,11 @@ namespace ZeroDbs.DataAccess.MySql
                 return string.Format("SELECT {0} FROM {1} WHERE {2} ORDER BY {3}", field, tableInfo.Name, where, orderby);
             }
         }
-        public string BuildSqlSelect<T>(string where, string orderby, int top) where T : class, new()
+        public string Select<T>(string where, string orderby, int top) where T : class, new()
         {
-            return BuildSqlSelect<T>(where, orderby, top, new string[] { });
+            return Select<T>(where, orderby, top, new string[] { });
         }
-        public string BuildSqlSelect<T>(string where, string orderby, int top, string[] returnFieldNames) where T : class, new()
+        public string Select<T>(string where, string orderby, int top, string[] returnFieldNames) where T : class, new()
         {
             var tableInfo = ZeroDb.GetDbDataTableInfo<T>();
             string[] fieldArray = tableInfo.Colunms.Select(o => o.Name).ToArray();
@@ -993,7 +993,7 @@ namespace ZeroDbs.DataAccess.MySql
             }
             if (field.Length < 1)
             {
-                throw new Exception("生成的返回字段无效");
+                throw new Exception("The resulting return field is invalid");
             }
             field.Remove(field.Length - 1, 1);
             if (string.IsNullOrEmpty(where))
@@ -1023,13 +1023,13 @@ namespace ZeroDbs.DataAccess.MySql
                 }
             }
         }
-        public string BuildSqlSelect<T>(string where, string orderby, int top, int lengthThreshold) where T : class, new()
+        public string Select<T>(string where, string orderby, int top, int lengthThreshold) where T : class, new()
         {
             var tableInfo = ZeroDb.GetDbDataTableInfo<T>();
             var temp = tableInfo.Colunms.FindAll(o => o.MaxLength < lengthThreshold);
             if (temp == null || temp.Count < 1)
             {
-                throw new Exception("未能找到符合指定长度的返回字段");
+                throw new Exception("Could not find a return field that matches the specified length");
             }
             string[] fieldArray = temp.Select(o => o.Name).ToArray();
             StringBuilder field = new StringBuilder();
@@ -1065,26 +1065,26 @@ namespace ZeroDbs.DataAccess.MySql
                 }
             }
         }
-        public string BuildSqlSelect<T>(System.Collections.Specialized.NameValueCollection nvc) where T : class, new()
+        public string Select<T>(System.Collections.Specialized.NameValueCollection nvc) where T : class, new()
         {
-            return BuildSqlSelect<T>(nvc, "");
+            return Select<T>(nvc, "");
         }
-        public string BuildSqlSelect<T>(System.Collections.Specialized.NameValueCollection nvc, string appendWhere) where T : class, new()
+        public string Select<T>(System.Collections.Specialized.NameValueCollection nvc, string appendWhere) where T : class, new()
         {
             var nvcList = new List<System.Collections.Specialized.NameValueCollection>(1);
             nvcList.Add(nvc);
-            return BuildSqlSelect<T>(nvcList, appendWhere)[0];
+            return Select<T>(nvcList, appendWhere)[0];
         }
-        public List<string> BuildSqlSelect<T>(List<System.Collections.Specialized.NameValueCollection> nvcList) where T : class, new()
+        public List<string> Select<T>(List<System.Collections.Specialized.NameValueCollection> nvcList) where T : class, new()
         {
-            return BuildSqlSelect<T>(nvcList, "");
+            return Select<T>(nvcList, "");
         }
-        public List<string> BuildSqlSelect<T>(List<System.Collections.Specialized.NameValueCollection> nvcList, string appendWhere) where T : class, new()
+        public List<string> Select<T>(List<System.Collections.Specialized.NameValueCollection> nvcList, string appendWhere) where T : class, new()
         {
-            if (nvcList == null || nvcList.Count < 1) { throw new Exception("nvcList是null或长度为0"); }
+            if (nvcList == null || nvcList.Count < 1) { throw new Exception("nvcList is null or contains 0 items"); }
             if (nvcList.Contains(null))
             {
-                throw new Exception("nvcList存在null的项");
+                throw new Exception("nvcList contains null items");
             }
 
             var tableInfo = ZeroDb.GetDbDataTableInfo<T>();
@@ -1094,12 +1094,12 @@ namespace ZeroDbs.DataAccess.MySql
                 var uniqueFieldName = GetUniqueFieldName<T>(tableInfo);
                 if (string.IsNullOrEmpty(uniqueFieldName))
                 {
-                    throw new Exception("目标tableInfo缺少主键和唯一标识列");
+                    throw new Exception("The target is missing the primary key and the unique identity column");
                 }
                 var col = tableInfo.Colunms.Find(o => string.Equals(o.Name, uniqueFieldName, StringComparison.OrdinalIgnoreCase));
                 if (col == null)
                 {
-                    throw new Exception("目标tableInfo配置的唯一列" + uniqueFieldName + "不存在");
+                    throw new Exception("The unique identification column " + uniqueFieldName + " does not exist");
                 }
                 primaryKeys.Clear();
                 primaryKeys.Add(col);
@@ -1128,7 +1128,7 @@ namespace ZeroDbs.DataAccess.MySql
             {
                 if (propertyInfoList.Find(o => string.Equals(o.Name, c.Name, StringComparison.OrdinalIgnoreCase)) == null)
                 {
-                    throw new Exception("实体缺少对字段" + c.Name + "的映射");
+                    throw new Exception("The entity lacks a mapping for the field " + c.Name);
                 }
             }
             List<string> reval = new List<string>();
@@ -1175,16 +1175,16 @@ namespace ZeroDbs.DataAccess.MySql
             }
             if (reval == null || reval.Count < 1)
             {
-                throw new Exception("未能生成查询命令，可能目标tableInfo缺少主键或标识列或是NameValueCollection为空或未包含主键与标识列");
+                throw new Exception("Failed to generate query command, the target tableInfo may lack primary key or identity column or NameValueCollection is empty or does not contain primary key and identity column");
             }
             return reval;
         }
-        public string BuildSqlCount<T>(string where) where T : class, new()
+        public string Count<T>(string where) where T : class, new()
         {
             var tableInfo = this.ZeroDb.GetDbDataTableInfo<T>();
             return string.Format("SELECT COUNT(1) FROM {0} WHERE {1}", tableInfo.Name, string.IsNullOrEmpty(where) ? "1>0" : where);
         }
-        public string BuildSqlSelectByKey<T>(object key) where T : class, new()
+        public string SelectByKey<T>(object key) where T : class, new()
         {
             var tableInfo = ZeroDb.GetDbDataTableInfo<T>();
             ZeroDbs.Interfaces.Common.DbDataColumnInfo dbDataColumn = null;
@@ -1203,13 +1203,13 @@ namespace ZeroDbs.DataAccess.MySql
             }
             if (dbDataColumn == null)
             {
-                throw new Exception("缺少唯一标识列");
+                throw new Exception("Missing unique identification column");
             }
             System.Reflection.PropertyInfo[] pi = typeof(T).GetProperties();
             var p = pi.ToList().Find(o => string.Equals(dbDataColumn.Name, o.Name, StringComparison.OrdinalIgnoreCase));
             if (key.GetType() != p.PropertyType)
             {
-                throw new Exception("key类型错误");
+                throw new Exception("wrong key type");
             }
             var fieldNames = string.Join(",", tableInfo.Colunms.Select(o => o.Name).ToArray());
             var value = Common.ValueConvert.SqlValueStrByValue(key);

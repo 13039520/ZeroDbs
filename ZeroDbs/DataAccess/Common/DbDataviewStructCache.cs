@@ -11,7 +11,7 @@ namespace ZeroDbs.DataAccess.Common
             public DateTime CacheTime { get; set; }
             public long CacheData { get; set; }
         }
-        static readonly int CacheMinutes = 15;
+        static readonly int CacheMinutes = 2;
         static Dictionary<string, StructCache> CacheDic = new Dictionary<string, StructCache>();
         public static long Get(string key)
         {
