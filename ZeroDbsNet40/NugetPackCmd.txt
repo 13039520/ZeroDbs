@@ -1,0 +1,3 @@
+nuget pack D:\Work\ZeroDbs\ZeroDbsNet40\ZeroDbsNet40.csproj -properties Configuration=Release
+
+nuget pack ZeroDbsNet40.csproj -properties Configuration=Release

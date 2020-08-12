@@ -1,0 +1,146 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\EntityFramework.6.3.0\build\EntityFramework.props" Condition="Exists('..\packages\EntityFramework.6.3.0\build\EntityFramework.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{CD56AA79-53B6-4A0E-A3EE-946EB0BB8EB3}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ZeroDbs</RootNamespace>
+    <AssemblyName>ZeroDbsNet40</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <Description>Database access library of .net framework 4.0 .  Support SqlServer/MySql/Sqlite .</Description>
+    <Version>2.2.0</Version>
+    <Author>ruzi</Author>
+    <Icon>favicon.png</Icon>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.3.0\lib\net40\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.3.0\lib\net40\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="MySql.Data, Version=6.8.8.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <HintPath>..\packages\MySql.Data.6.8.8\lib\net40\MySql.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.SQLite, Version=1.0.113.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SQLite.Core.1.0.113.1\lib\net40\System.Data.SQLite.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data.SQLite.EF6, Version=1.0.113.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SQLite.EF6.1.0.113.0\lib\net40\System.Data.SQLite.EF6.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data.SQLite.Linq, Version=1.0.113.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SQLite.Linq.1.0.113.0\lib\net40\System.Data.SQLite.Linq.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.Caching" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Caches\Common\LocalMemCache.cs" />
+    <Compile Include="Caches\LocalMemCache.cs" />
+    <Compile Include="DataAccess\Common\DataReaderToEntity.cs" />
+    <Compile Include="DataAccess\Common\DbConfigReader.cs" />
+    <Compile Include="DataAccess\Common\DbDataviewStructCache.cs" />
+    <Compile Include="DataAccess\Common\DbFactory.cs" />
+    <Compile Include="DataAccess\Common\DbMapping.cs" />
+    <Compile Include="DataAccess\Common\DbPageCountCache.cs" />
+    <Compile Include="DataAccess\Common\ValueConvert.cs" />
+    <Compile Include="DataAccess\DbSearcher.cs" />
+    <Compile Include="DataAccess\MySql\Db.cs" />
+    <Compile Include="DataAccess\MySql\DbDataTypeMaping.cs" />
+    <Compile Include="DataAccess\MySql\DbSqlBuilder.cs" />
+    <Compile Include="DataAccess\Sqlite\Db.cs" />
+    <Compile Include="DataAccess\Sqlite\DbDataTypeMaping.cs" />
+    <Compile Include="DataAccess\Sqlite\DbSqlBuilder.cs" />
+    <Compile Include="DataAccess\SqlServer\Db.cs" />
+    <Compile Include="DataAccess\SqlServer\DbDataTypeMaping.cs" />
+    <Compile Include="DataAccess\SqlServer\DbSqlBuilder.cs" />
+    <Compile Include="Interfaces\Common\DbCommand.cs" />
+    <Compile Include="Interfaces\Common\DbConfigDatabaseInfo.cs" />
+    <Compile Include="Interfaces\Common\DbConfigDataviewInfo.cs" />
+    <Compile Include="Interfaces\Common\DbConfigInfo.cs" />
+    <Compile Include="Interfaces\Common\DbDataColumnInfo.cs" />
+    <Compile Include="Interfaces\Common\DbDataReaderToEntity.cs" />
+    <Compile Include="Interfaces\Common\DbDataTableInfo.cs" />
+    <Compile Include="Interfaces\Common\DbExecuteSqlEvent.cs" />
+    <Compile Include="Interfaces\Common\DbExecuteSqlEventArgs.cs" />
+    <Compile Include="Interfaces\Common\DbExecuteSqlType.cs" />
+    <Compile Include="Interfaces\Common\DbOperator.cs" />
+    <Compile Include="Interfaces\Common\DbService.cs" />
+    <Compile Include="Interfaces\Common\DbTransactionCommandDelegate.cs" />
+    <Compile Include="Interfaces\Common\DbTransactionScope.cs" />
+    <Compile Include="Interfaces\Common\DbTransactionScopeCollection.cs" />
+    <Compile Include="Interfaces\Common\PageData.cs" />
+    <Compile Include="Interfaces\Common\SqlCheck.cs" />
+    <Compile Include="Interfaces\Common\StrCommon.cs" />
+    <Compile Include="Interfaces\ICache.cs" />
+    <Compile Include="Interfaces\IDataTypeMaping.cs" />
+    <Compile Include="Interfaces\IDb.cs" />
+    <Compile Include="Interfaces\IDbCommand.cs" />
+    <Compile Include="Interfaces\IDbOperator.cs" />
+    <Compile Include="Interfaces\IDbSearcher.cs" />
+    <Compile Include="Interfaces\IDbService.cs" />
+    <Compile Include="Interfaces\IDbSqlBuilder.cs" />
+    <Compile Include="Interfaces\IDbTransactionCommand.cs" />
+    <Compile Include="Interfaces\IDbTransactionScope.cs" />
+    <Compile Include="Interfaces\IDbTransactionScopeCollection.cs" />
+    <Compile Include="Interfaces\ILog.cs" />
+    <Compile Include="Interfaces\ISerialization.cs" />
+    <Compile Include="Interfaces\IStrCommon.cs" />
+    <Compile Include="Logs\Factory.cs" />
+    <Compile Include="Logs\Logger.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tools\DataEntity.cs" />
+    <Compile Include="Tools\Des.cs" />
+    <Compile Include="Tools\EntityBuilder.cs" />
+    <Compile Include="Tools\Md5.cs" />
+    <Compile Include="Tools\SHA.cs" />
+    <Compile Include="Tools\TextFileReader.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>这台计算机上缺少此项目引用的 NuGet 程序包。使用“NuGet 程序包还原”可下载这些程序包。有关更多信息，请参见 http://go.microsoft.com/fwlink/?LinkID=322105。缺少的文件是 {0}。</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\EntityFramework.6.3.0\build\EntityFramework.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.3.0\build\EntityFramework.props'))" />
+    <Error Condition="!Exists('..\packages\EntityFramework.6.3.0\build\EntityFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.3.0\build\EntityFramework.targets'))" />
+    <Error Condition="!Exists('..\packages\System.Data.SQLite.Core.1.0.113.1\build\net40\System.Data.SQLite.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.Data.SQLite.Core.1.0.113.1\build\net40\System.Data.SQLite.Core.targets'))" />
+  </Target>
+  <Import Project="..\packages\EntityFramework.6.3.0\build\EntityFramework.targets" Condition="Exists('..\packages\EntityFramework.6.3.0\build\EntityFramework.targets')" />
+  <Import Project="..\packages\System.Data.SQLite.Core.1.0.113.1\build\net40\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.113.1\build\net40\System.Data.SQLite.Core.targets')" />
+</Project>
