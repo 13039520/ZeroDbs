@@ -7,6 +7,8 @@ namespace ZeroDbsNet40.Test
 {
     class Program
     {
+        static ZeroDbs.Interfaces.IDbService dbService = null;
+
         static void Main(string[] args)
         {
             /*Console.WriteLine("正在生成……");
@@ -22,10 +24,22 @@ namespace ZeroDbsNet40.Test
                 "Models");
             Console.WriteLine("生成成功！");*/
 
-            ZeroDbs.Interfaces.IDbService dbService = new ZeroDbs.Interfaces.Common.DbService(new ZeroDbs.DataAccess.DbSearcher(null), null, null);
+            dbService = new ZeroDbs.Interfaces.Common.DbService(
+                new ZeroDbs.DataAccess.DbSearcher(new ZeroDbs.Interfaces.Common.DbExecuteSqlEvent((sender, e) => {
+#if DEBUG
+                    dbService.Log.Writer("DbKey={0}&ExecuteType={1}&ExecuteSql=\r\n{2}\r\n&ExecuteResult={3}",
+                    e.DbKey,
+                    e.ExecuteType,
+                    e.ExecuteSql != null && e.ExecuteSql.Count > 0 ? string.Join("\r\n", e.ExecuteSql.ToArray()) : "no sql",
+                    e.Message);
+#endif
+                })),
+                ZeroDbs.Logs.Factory.GetLogger("sql", 7),
+                new ZeroDbs.Caches.LocalMemCache(null));
+
             long page = 1;
             long pageSize = 1000;
-            var pageData = dbService.DbOperator.Page<Models.Article.tArticleCategory>(page, pageSize, "");
+            var pageData = dbService.DbOperator.Page<Models.Article.tArticleCategory>(page, pageSize, "ID>0");
             if (pageData.Total > 0)
             {
                 foreach (Models.Article.tArticleCategory m in pageData.Items)
@@ -39,11 +53,7 @@ namespace ZeroDbsNet40.Test
                 Console.WriteLine("no data");
             }
 
-
-
-
         }
-
 
 
 
