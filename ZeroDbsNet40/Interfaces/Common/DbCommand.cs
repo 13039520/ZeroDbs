@@ -94,7 +94,7 @@ namespace ZeroDbs.Interfaces.Common
                 throw ex;
             }
         }
-        public List<T> ExecuteReader<T>() where T : class, new()
+        public List<T> ExecuteReader<T>(bool useEmit = true) where T : class, new()
         {
             List<string> sqlList = new List<string>();
             sqlList.Add(CommandText);
@@ -117,6 +117,10 @@ namespace ZeroDbs.Interfaces.Common
                     sqlList,
                     DbExecuteSqlType.QUERY,
                     "OK"));
+                if (useEmit)
+                {
+                    return DbDataReaderToEntity<T>.EntityListByEmit(dr);
+                }
                 return DbDataReaderToEntity<T>.EntityList(dr);
             }
             catch (Exception ex)

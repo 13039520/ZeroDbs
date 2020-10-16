@@ -1,14 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Description>Database access library of .net standard 2.0 .  Support SqlServer/MySql/Sqlite .</Description>
+    <Description>Database access library of .net standard 2.1 .  Support SqlServer/MySql/Sqlite .</Description>
     <Version>2.2.0</Version>
     <Authors>ruzi</Authors>
     <PackageIcon>favicon.png</PackageIcon>
-    <PackageReleaseNotes>Database access library of .net standard 2.0 .  Support SqlServer/MySql/Sqlite .</PackageReleaseNotes>
+    <PackageReleaseNotes>Database access library of .net standard 2.1 .  Support SqlServer/MySql/Sqlite .</PackageReleaseNotes>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="DataAccess\Common\DataReaderToEntity.cs" />
+    <Compile Remove="DataAccess\Common\EntityObjectProperty.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.SqlClient" Version="1.0.19249.1" />

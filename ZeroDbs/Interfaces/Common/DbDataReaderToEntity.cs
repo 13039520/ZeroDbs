@@ -118,6 +118,80 @@ namespace ZeroDbs.Interfaces.Common
             return Li;
         }
 
+        public static T EntityByEmit(System.Data.IDataReader DataReader)
+        {
+            Dictionary<string, string> FieldDic = new Dictionary<string, string>();
+            int i = 0;
+            while (i < DataReader.FieldCount)
+            {
+                string Name = DataReader.GetName(i);
+                if (!FieldDic.ContainsKey(Name.ToLower()))
+                {
+                    FieldDic.Add(Name.ToLower(), Name);
+                }
+                i++;
+            }
+            List<T> Li = new List<T>();
+            while (Li.Count < 1 && DataReader.Read())
+            {
+                T obj = new T();
+                EntityPropertyEmitSetter[] ps = EntityPropertyEmitSetter.GetProperties(typeof(T));
+                int j = 0;
+                while (j < ps.Length)
+                {
+                    string fieldName = ps[j].Info.Name;
+                    string name = fieldName.ToLower();
+                    if (FieldDic.ContainsKey(name))
+                    {
+                        ps[j].Setter(obj, DataReader[FieldDic[name]]);
+                    }
+                    j++;
+                }
+                Li.Add(obj);
+            }
+            DataReader.Close();
+            return Li.Count > 0 ? Li[0] : default(T);
+        }
+
+        public static List<T> EntityListByEmit(System.Data.IDataReader DataReader)
+        {
+            Dictionary<string, string> FieldDic = new Dictionary<string, string>();
+            int i = 0;
+            while (i < DataReader.FieldCount)
+            {
+                string Name = DataReader.GetName(i);
+                if (!FieldDic.ContainsKey(Name.ToLower()))
+                {
+                    FieldDic.Add(Name.ToLower(), Name);
+                }
+                i++;
+            }
+
+            List<T> Li = new List<T>();
+            EntityPropertyEmitSetter[] ps = EntityPropertyEmitSetter.GetProperties(typeof(T));
+            while (DataReader.Read())
+            {
+                T obj = new T();
+                int num = 0;
+                while (num < ps.Length)
+                {
+                    EntityPropertyEmitSetter p = ps[num];
+                    string fieldName = p.Info.Name;
+                    string name = fieldName.ToLower();
+                    if (!FieldDic.ContainsKey(name))
+                    {
+                        num++;
+                        continue;
+                    }
+                    p.Setter(obj, DataReader[FieldDic[name]]);
+                    num++;
+                }
+                Li.Add(obj);
+            }
+            DataReader.Close();
+            return Li;
+        }
+
         public static bool TargetTypeIsBool(Type TargetType)
         {
             bool TargetTypeIsBool = false;

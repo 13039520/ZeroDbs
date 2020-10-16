@@ -69,7 +69,6 @@
   <ItemGroup>
     <Compile Include="Caches\Common\LocalMemCache.cs" />
     <Compile Include="Caches\LocalMemCache.cs" />
-    <Compile Include="DataAccess\Common\DataReaderToEntity.cs" />
     <Compile Include="DataAccess\Common\DbConfigReader.cs" />
     <Compile Include="DataAccess\Common\DbDataviewStructCache.cs" />
     <Compile Include="DataAccess\Common\DbFactory.cs" />
@@ -101,6 +100,7 @@
     <Compile Include="Interfaces\Common\DbTransactionCommandDelegate.cs" />
     <Compile Include="Interfaces\Common\DbTransactionScope.cs" />
     <Compile Include="Interfaces\Common\DbTransactionScopeCollection.cs" />
+    <Compile Include="Interfaces\Common\EntityPropertyEmitSetter.cs" />
     <Compile Include="Interfaces\Common\PageData.cs" />
     <Compile Include="Interfaces\Common\SqlCheck.cs" />
     <Compile Include="Interfaces\Common\StrCommon.cs" />

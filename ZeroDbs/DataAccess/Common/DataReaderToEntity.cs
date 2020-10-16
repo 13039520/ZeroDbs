@@ -30,7 +30,6 @@ namespace ZeroDbs.DataAccess.Common
             {
                 T obj = (T)Activator.CreateInstance(typeof(T));
                 System.Reflection.PropertyInfo[] pis = obj.GetType().GetProperties();
-
                 int j = 0;
                 while (j < pis.Length)
                 {
@@ -47,7 +46,8 @@ namespace ZeroDbs.DataAccess.Common
                             object o = DataReader[FieldDic[name]];
                             if (Convert.IsDBNull(o))
                             {
-                                o = GetDefaultValue(pis[j].PropertyType);
+                                //o = GetDefaultValue(pis[j].PropertyType);
+                                continue;
                             }
                             pis[j].SetValue(obj, o, null);
                         }
@@ -101,12 +101,87 @@ namespace ZeroDbs.DataAccess.Common
                             object o = DataReader[FieldDic[name]];
                             if (Convert.IsDBNull(o))
                             {
-                                o = GetDefaultValue(pis[j].PropertyType);
+                                //o = GetDefaultValue(pis[j].PropertyType);
+                                continue;
                             }
                             pis[j].SetValue(obj, o, null);
                         }
                     }
                     j++;
+                }
+                Li.Add(obj);
+            }
+            DataReader.Close();
+            return Li;
+        }
+
+        public static T EntityByEmit(System.Data.IDataReader DataReader)
+        {
+            Dictionary<string, string> FieldDic = new Dictionary<string, string>();
+            int i = 0;
+            while (i < DataReader.FieldCount)
+            {
+                string Name = DataReader.GetName(i);
+                if (!FieldDic.ContainsKey(Name.ToLower()))
+                {
+                    FieldDic.Add(Name.ToLower(), Name);
+                }
+                i++;
+            }
+            List<T> Li = new List<T>();
+            while (Li.Count < 1 && DataReader.Read())
+            {
+                T obj = new T();
+                EntityObjectProperty[] ps = EntityObjectProperty.GetProperties(typeof(T));
+                int j = 0;
+                while (j < ps.Length)
+                {
+                    string fieldName = ps[j].Info.Name;
+                    string name = fieldName.ToLower();
+                    if (FieldDic.ContainsKey(name))
+                    {
+                        ps[j].Setter(obj, DataReader[FieldDic[name]]);
+                    }
+                    j++;
+                }
+                Li.Add(obj);
+            }
+            DataReader.Close();
+            return Li.Count > 0 ? Li[0] : default(T);
+        }
+
+        public static List<T> EntityListByEmit(System.Data.IDataReader DataReader)
+        {
+            Dictionary<string, string> FieldDic = new Dictionary<string, string>();
+            int i = 0;
+            while (i < DataReader.FieldCount)
+            {
+                string Name = DataReader.GetName(i);
+                if (!FieldDic.ContainsKey(Name.ToLower()))
+                {
+                    FieldDic.Add(Name.ToLower(), Name);
+                }
+                i++;
+            }
+
+            List<T> Li = new List<T>();
+            EntityObjectProperty[] ps = EntityObjectProperty.GetProperties(typeof(T));
+            while (DataReader.Read())
+            {
+                T obj = new T();
+                int num = 0;
+                while (num < ps.Length)
+                {
+                    EntityObjectProperty p = ps[num];
+                    string fieldName = p.Info.Name;
+                    string name = fieldName.ToLower();
+                    if (!FieldDic.ContainsKey(name))
+                    {
+                        num++;
+                        continue;
+                    }
+                    p.Setter(obj, DataReader[FieldDic[name]]);
+                    num++;
                 }
                 Li.Add(obj);
             }

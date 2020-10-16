@@ -17,7 +17,7 @@ namespace ZeroDbs.Interfaces
         System.Data.Common.DbParameter CreateParameter(string parameterName, object value);
         System.Data.Common.DbParameter CreateParameter(string parameterName, System.Data.DbType dbType, int size, object value);
         int ExecuteNonQuery();
-        List<T> ExecuteReader<T>() where T : class, new();
+        List<T> ExecuteReader<T>(bool useEmit = true) where T : class, new();
         System.Data.IDataReader ExecuteReader();
         object ExecuteScalar();
 

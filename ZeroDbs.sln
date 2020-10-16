@@ -7,6 +7,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZeroDbs", "ZeroDbs\ZeroDbs.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroDbsNet40", "ZeroDbsNet40\ZeroDbsNet40.csproj", "{CD56AA79-53B6-4A0E-A3EE-946EB0BB8EB3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroDbsNet40.Test", "ZeroDbsNet40.Test\ZeroDbsNet40.Test.csproj", "{FC2A339F-B797-4E15-899E-75FC361269D3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroDbs.Test", "ZeroDbs.Test\ZeroDbs.Test.csproj", "{F1896AFD-66B6-4D33-BF7A-5B51D7827CC5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{CD56AA79-53B6-4A0E-A3EE-946EB0BB8EB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CD56AA79-53B6-4A0E-A3EE-946EB0BB8EB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CD56AA79-53B6-4A0E-A3EE-946EB0BB8EB3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC2A339F-B797-4E15-899E-75FC361269D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC2A339F-B797-4E15-899E-75FC361269D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC2A339F-B797-4E15-899E-75FC361269D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC2A339F-B797-4E15-899E-75FC361269D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1896AFD-66B6-4D33-BF7A-5B51D7827CC5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1896AFD-66B6-4D33-BF7A-5B51D7827CC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1896AFD-66B6-4D33-BF7A-5B51D7827CC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1896AFD-66B6-4D33-BF7A-5B51D7827CC5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
