@@ -41,12 +41,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\BSA\tCase.cs" />
-    <Compile Include="Models\BSA\tCaseBankStatement.cs" />
-    <Compile Include="Models\BSA\tCaseBankStatementGroup.cs" />
-    <Compile Include="Models\BSA\tCaseContract.cs" />
-    <Compile Include="Models\BSA\tCaseFileInfo.cs" />
-    <Compile Include="Models\BSA\tCaseFilingPerson.cs" />
+    <Compile Include="Models\Article\tArticle.cs" />
+    <Compile Include="Models\Article\tArticleCategory.cs" />
+    <Compile Include="Models\Article\tArticleComment.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -58,9 +55,9 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <Content Include="ZeroDbConfig.xml">
+    <None Include="ZeroDbConfig.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

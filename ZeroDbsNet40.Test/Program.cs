@@ -13,30 +13,41 @@ namespace ZeroDbsNet40.Test
             ZeroDbs.Tools.EntityBuilder.Builder(
                 new ZeroDbs.Interfaces.Common.DbConfigDatabaseInfo
                 {
-                    dbConnectionString = "Data Source=.;Initial Catalog=BankStatementAnalysis;User ID=sa;Password=yangshaogao;",
-                    dbKey = "BSA",
+                    dbConnectionString = "Data Source=.;Initial Catalog=MyTestDb;User ID=sa;Password=yangshaogao;",
+                    dbKey = "Article",
                     dbType = "SqlServer"
                 },
-                @"D:\Work\ZeroDbs\ZeroDbsNet40.Test\Models",
-                @"D:\Work\ZeroDbs\ZeroDbsNet40.Test",
+                @"D:\Work\ZeroDbs\ZeroDbs.Test\Models",
+                @"D:\Work\ZeroDbs\ZeroDbs.Test",
                 "Models");
             Console.WriteLine("生成成功！");*/
 
             ZeroDbs.Interfaces.IDbService dbService = new ZeroDbs.Interfaces.Common.DbService(new ZeroDbs.DataAccess.DbSearcher(null), null, null);
-            var pageData = dbService.DbOperator.Page<Models.BSA.tCaseBankStatement>(1, 100, "");
+            long page = 1;
+            long pageSize = 1000;
+            var pageData = dbService.DbOperator.Page<Models.Article.tArticleCategory>(page, pageSize, "");
             if (pageData.Total > 0)
             {
-                foreach(Models.BSA.tCaseBankStatement m in pageData.Items)
+                foreach (Models.Article.tArticleCategory m in pageData.Items)
                 {
-                    Console.WriteLine("{0}\t{1}\t{2}\n",m.BSClientName,m.BSDealDirection,m.BSPartnerName);
+                    Console.WriteLine("{0}\t{1}\t{2}\n", m.ID, m.Name, m.IsDel);
                 }
-                Console.WriteLine("共有{0}条，当前返回{1}条数据！", pageData.Total, pageData.Items.Count);
+                Console.WriteLine("total={0}&page={1}&pageSize={2}&currentPageListCount={3}", pageData.Total, page, pageSize, pageData.Items.Count);
             }
             else
             {
-                Console.WriteLine("没有数据！");
+                Console.WriteLine("no data");
             }
 
+
+
+
         }
+
+
+
+
+
+
     }
 }

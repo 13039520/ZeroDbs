@@ -54,7 +54,7 @@ namespace ZeroDbs.Interfaces.Common
             if (property.PropertyType.IsValueType)
             {
                 // 如果是值类型，拆箱
-                il.Emit(OpCodes.Unbox, property.PropertyType);
+                il.Emit(OpCodes.Unbox_Any, property.PropertyType);
             }
             else
             {

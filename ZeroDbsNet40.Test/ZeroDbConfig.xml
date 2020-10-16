@@ -1,14 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <zero>
   <dbs>
-    <db dbKey="BSA" dbConnectionString="Data Source=.;Initial Catalog=BankStatementAnalysis;User ID=sa;Password=yangshaogao;" dbType="SqlServer" />
+    <db dbKey="Article" dbConnectionString="Data Source=.;Initial Catalog=MyTestDb;User ID=sa;Password=yangshaogao;" dbType="SqlServer" />
   </dbs>
   <dvs>
-    <dv dbKey="BSA" tableName="Case" entityKey="Models.BSA.tCase" />
-    <dv dbKey="BSA" tableName="CaseBankStatement" entityKey="Models.BSA.tCaseBankStatement" />
-    <dv dbKey="BSA" tableName="CaseBankStatementGroup" entityKey="Models.BSA.tCaseBankStatementGroup" />
-    <dv dbKey="BSA" tableName="CaseContract" entityKey="Models.BSA.tCaseContract" />
-    <dv dbKey="BSA" tableName="CaseFileInfo" entityKey="Models.BSA.tCaseFileInfo" />
-    <dv dbKey="BSA" tableName="CaseFilingPerson" entityKey="Models.BSA.tCaseFilingPerson" />
+    <dv dbKey="Article" tableName="T_Article" entityKey="Models.Article.tArticle" />
+    <dv dbKey="Article" tableName="T_ArticleCategory" entityKey="Models.Article.tArticleCategory" />
+    <dv dbKey="Article" tableName="T_ArticleComment" entityKey="Models.Article.tArticleComment" />
   </dvs>
 </zero>
