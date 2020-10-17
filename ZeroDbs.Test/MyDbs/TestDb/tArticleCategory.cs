@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-namespace Models.Article
+namespace MyDbs.TestDb
 {
     /// <summary>
     /// TABLE:T_ArticleCategory
@@ -28,7 +28,7 @@ namespace Models.Article
             get { return _Name; }
             set { _Name = value; }
         }
-        private bool _IsDel = false;
+        private bool _IsDel;
         /// <summary>
         /// IsDel
         /// </summary>

@@ -1,0 +1,226 @@
+﻿<#@ template debug="true" hostspecific="true" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="System.Xml" #>
+<#@ assembly name="EnvDTE" #>
+<#@ assembly name="$(TargetDir)\ZeroDbsNet40.dll"  #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.IO" #>
+<#@ output extension=".cs" #>
+/***************************************
+class list:
+<#
+
+EnvDTE.DTE dte = (EnvDTE.DTE)((IServiceProvider)this.Host).GetService(typeof(EnvDTE.DTE));
+string projectPath = Host.ResolveAssemblyReference("$(ProjectDir)");
+string[] dirs=projectPath.Split(new char[] { '\\' }, StringSplitOptions.RemoveEmptyEntries);
+string projectName=dirs[dirs.Length-1];
+EnvDTE.Project currentProject=null;
+foreach(EnvDTE.Project p in dte.Solution.Projects){
+    if(p.Name==projectName){
+      currentProject=p;
+      break;
+    }
+}
+
+
+
+ZeroDbs.Interfaces.Common.DbConfigDatabaseInfo dbInfo=new ZeroDbs.Interfaces.Common.DbConfigDatabaseInfo
+{
+    dbConnectionString = "Data Source=.;Initial Catalog=MyTestDb;User ID=sa;Password=123;",
+    dbKey = "TestDb",
+    dbType = "SqlServer"
+};
+string baseNamespace="MyDbs."+dbInfo.dbKey;
+string baseEntityFileDir="MyDbs";
+string xmlFileName="ZeroDbConfig.xml";
+
+
+
+baseEntityFileDir=System.IO.Path.Combine(projectPath,baseEntityFileDir);
+if (!System.IO.File.Exists(baseEntityFileDir)){
+    System.IO.Directory.CreateDirectory(baseEntityFileDir);
+}
+baseEntityFileDir=System.IO.Path.Combine(baseEntityFileDir,dbInfo.dbKey);
+if (!System.IO.File.Exists(baseEntityFileDir)){
+    System.IO.Directory.CreateDirectory(baseEntityFileDir);
+}
+string xmlFilePath=System.IO.Path.Combine(projectPath,xmlFileName);
+if (!System.IO.File.Exists(xmlFilePath))
+{
+    string s = "<?xml version=\"1.0\" encoding=\"utf-8\" ?>" + System.Environment.NewLine + "<zero>" + System.Environment.NewLine + "<dbs></dbs>" + System.Environment.NewLine + "<dvs></dvs>" + System.Environment.NewLine + "</zero>";
+    System.IO.File.AppendAllText(xmlFilePath, s, Encoding.UTF8);
+    currentProject.ProjectItems.AddFromFile(xmlFilePath);
+}
+System.Xml.XmlDocument doc = new System.Xml.XmlDocument();
+doc.Load(xmlFilePath);
+System.Xml.XmlNode zeroNode = doc.SelectSingleNode(@"/zero");
+System.Xml.XmlNode nodeDbs = doc.SelectSingleNode(@"/zero/dbs");
+bool hasNodeDbs = nodeDbs != null;
+if (!hasNodeDbs)
+{
+    nodeDbs = doc.CreateElement("dbs");
+}
+System.Xml.XmlNode nodeDvs = doc.SelectSingleNode(@"/zero/dvs");
+bool hasNodeDvs = nodeDvs != null;
+if (!hasNodeDvs)
+{
+    nodeDvs = doc.CreateElement("dvs");
+}
+System.Xml.XmlNode nodeDb = doc.SelectSingleNode(@"/zero/dbs/db[@dbKey='" + dbInfo.dbKey + "']");
+if (nodeDb == null)
+{
+    nodeDb = doc.CreateElement("db");
+    System.Xml.XmlAttribute attribute = doc.CreateAttribute("dbKey");
+    attribute.Value = dbInfo.dbKey;
+    nodeDb.Attributes.Append(attribute);
+    attribute = doc.CreateAttribute("dbConnectionString");
+    attribute.Value = dbInfo.dbConnectionString;
+    nodeDb.Attributes.Append(attribute);
+    attribute = doc.CreateAttribute("dbType");
+    attribute.Value = dbInfo.dbType;
+    nodeDb.Attributes.Append(attribute);
+    nodeDbs.AppendChild(nodeDb);
+}
+
+string entityTextTemplate = @"using System;
+
+namespace #NameSpace#
+{
+    /// <summary>
+    /// #TableOrViewDescription#
+    /// </summary>
+    [Serializable]
+    public partial class #TableOrViewClassName#
+    {
+        #region --标准字段--#ColumnsBegin#
+        private #ColumnDotNetType# _#ColumnName##ColumnDotNetDefaultValue#;
+        /// <summary>
+        /// #ColumnDescription#
+        /// </summary>
+        public #ColumnDotNetType# #ColumnName#
+        {
+            get { return _#ColumnName#; }
+            set { _#ColumnName# = value; }
+        }#ColumnsEnd#
+        #endregion
+
+        public static List<#TableOrViewClassName#> Select(string where,string orderby,int top){
+            ZeroDbs.
+        }
+
+    }
+}";
+var match = System.Text.RegularExpressions.Regex.Match(entityTextTemplate,@"#ColumnsBegin#(?<temp>[\s\S]+)#ColumnsEnd#",System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+string colTextTemplate = match.Groups["temp"].Value;
+
+
+
+ZeroDbs.Interfaces.IDb db = ZeroDbs.DataAccess.Common.DbFactory.Create(dbInfo);
+System.Collections.Generic.List<ZeroDbs.Interfaces.Common.DbDataTableInfo> tables = db.GetDbDataTableInfoAll();
+int tableNum=0;
+foreach(ZeroDbs.Interfaces.Common.DbDataTableInfo table in tables){
+   
+   tableNum++;
+
+   string className=table.Name;
+   string tDescription=table.Description;
+   if(tDescription.Length<1){
+     tDescription+=table.Name;
+     tDescription+=table.IsView?"[View]":"[Table]";
+   }
+
+   string entityText = entityTextTemplate;
+   entityText = entityText.Replace("#NameSpace#", baseNamespace);
+   entityText = entityText.Replace("#TableOrViewDescription#", tDescription);
+   entityText = entityText.Replace("#TableOrViewName#", table.Name);
+   entityText = entityText.Replace("#TableOrViewClassName#", className);
+   entityText = entityText.Replace("#DatabaseConnectionUseKey#", dbInfo.dbKey);
+
+   StringBuilder colText = new StringBuilder();
+   foreach(ZeroDbs.Interfaces.Common.DbDataColumnInfo col in table.Colunms){
+      string cDescription = col.Description;
+      string cValue = col.DefaultValue;
+      string cType = col.Type;
+      if(cDescription.Length<1){
+        cDescription+=col.Name;
+        if(col.IsPrimaryKey){ cDescription+="+[PrimaryKey]";}
+        if(col.IsIdentity){ cDescription+="+[Identity]";}
+      }
+      if (string.IsNullOrEmpty(cValue)) { cValue = ""; }
+      if (cValue.Length > 0) { cValue = " = " + cValue; }
+      if (col.IsNullable)
+      {
+         if (cType != "string" && cType != "byte[]" && cType != "object" && cType != "object*" && cType != "Xml")
+         {
+            cType = cType + "?";
+         }
+      }else{
+         if (cType == "string")
+         {
+             if (cValue.Length < 1)
+             {
+                cValue = " = \"\"";
+             }
+         }
+      }
+
+      string s = colTextTemplate;
+      s = s.Replace("#ColumnDotNetType#", cType);
+      s = s.Replace("#ColumnName#", col.Name);
+      s = s.Replace("#ColumnDotNetDefaultValue#", cValue);
+      s = s.Replace("#ColumnDescription#", cDescription);
+
+      colText.Append(s);
+
+   }
+
+   entityText = System.Text.RegularExpressions.Regex.Replace(entityText,@"#ColumnsBegin#(?<temp>[\s\S]+)#ColumnsEnd#",colText.ToString());
+   
+   string csFilePath = System.IO.Path.Combine(baseEntityFileDir, className + ".cs");
+   System.IO.FileStream fs = null;
+   bool notNewCsFile=System.IO.File.Exists(csFilePath);
+   if (notNewCsFile)
+   {
+      fs = new System.IO.FileStream(csFilePath, System.IO.FileMode.Truncate, System.IO.FileAccess.Write, System.IO.FileShare.ReadWrite);
+   }
+   else
+   {
+      fs = new System.IO.FileStream(csFilePath, System.IO.FileMode.Create, System.IO.FileAccess.Write, System.IO.FileShare.ReadWrite);
+   }
+   byte[] buffer = System.Text.Encoding.UTF8.GetBytes(entityText);
+   fs.Write(buffer, 0, buffer.Length);
+   fs.Flush();
+   fs.Close();
+   if(!notNewCsFile){
+      currentProject.ProjectItems.AddFromFile(csFilePath);
+   }
+
+
+
+   string xpath = @"/zero/dvs/dv[@entityKey='" + baseNamespace + "." + className + "' and @dbKey='" + dbInfo.dbKey + "']";
+   System.Xml.XmlNode nodeDv = doc.SelectSingleNode(xpath);
+   if (nodeDv == null)
+   {
+       nodeDv = doc.CreateElement("dv");
+       System.Xml.XmlAttribute attribute = doc.CreateAttribute("dbKey");
+       attribute.Value = dbInfo.dbKey;
+       nodeDv.Attributes.Append(attribute);
+       attribute = doc.CreateAttribute("tableName");
+       attribute.Value = table.Name;
+       nodeDv.Attributes.Append(attribute);
+       attribute = doc.CreateAttribute("entityKey");
+       attribute.Value = baseNamespace + "." + className;
+       nodeDv.Attributes.Append(attribute);
+       nodeDvs.AppendChild(nodeDv);
+   }
+#>
+[<#=tableNum #>] <#=baseNamespace + "." + className #>
+<#}
+
+
+doc.Save(xmlFilePath);
+
+#>
+***************************************/

@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <zero>
   <dbs>
-    <db dbKey="Article" dbConnectionString="Data Source=.;Initial Catalog=MyTestDb;User ID=sa;Password=yangshaogao;" dbType="SqlServer" />
+    <db dbKey="TestDb" dbConnectionString="Data Source=.;Initial Catalog=MyTestDb;User ID=sa;Password=123;" dbType="SqlServer" />
   </dbs>
   <dvs>
-    <dv dbKey="Article" tableName="T_Article" entityKey="Models.Article.tArticle" />
-    <dv dbKey="Article" tableName="T_ArticleCategory" entityKey="Models.Article.tArticleCategory" />
-    <dv dbKey="Article" tableName="T_ArticleComment" entityKey="Models.Article.tArticleComment" />
+    <dv dbKey="TestDb" tableName="T_Article" entityKey="MyDbs.TestDb.tArticle" />
+    <dv dbKey="TestDb" tableName="T_ArticleCategory" entityKey="MyDbs.TestDb.tArticleCategory" />
+    <dv dbKey="TestDb" tableName="T_ArticleComment" entityKey="MyDbs.TestDb.tArticleComment" />
   </dvs>
 </zero>

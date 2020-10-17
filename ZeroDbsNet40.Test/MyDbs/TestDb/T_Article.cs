@@ -1,18 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-namespace Models.Article
+using System;
+
+namespace MyDbs.TestDb
 {
     /// <summary>
     /// TABLE:T_Article
     /// </summary>
     [Serializable]
-    public partial class tArticle
+    public partial class T_Article
     {
         #region --标准字段--
         private long _ID;
         /// <summary>
-        /// [主键][自增]ID
+        /// ID+[PrimaryKey]+[Identity]
         /// </summary>
         public long ID
         {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-namespace Models.Article
+namespace MyDbs.TestDb
 {
     /// <summary>
     /// TABLE:T_Article

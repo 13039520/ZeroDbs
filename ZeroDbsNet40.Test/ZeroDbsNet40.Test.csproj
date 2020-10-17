@@ -41,11 +41,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\Article\tArticle.cs" />
-    <Compile Include="Models\Article\tArticleCategory.cs" />
-    <Compile Include="Models\Article\tArticleComment.cs" />
+    <Compile Include="MyDbs\TestDb\T_Article.cs" />
+    <Compile Include="MyDbs\TestDb\T_ArticleCategory.cs" />
+    <Compile Include="MyDbs\TestDb\T_ArticleComment.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ZeroCodeGenerator.cs">
+      <DependentUpon>ZeroCodeGenerator.tt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ZeroDbsNet40\ZeroDbsNet40.csproj">
@@ -53,11 +58,18 @@
       <Name>ZeroDbsNet40</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
-    <None Include="ZeroDbConfig.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <Content Include="ZeroCodeGenerator.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>ZeroCodeGenerator.cs</LastGenOutput>
+    </Content>
+    <Content Include="ZeroDbConfig.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

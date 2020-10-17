@@ -1,18 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-namespace Models.Article
+using System;
+
+namespace MyDbs.TestDb
 {
     /// <summary>
     /// TABLE:T_ArticleCategory
     /// </summary>
     [Serializable]
-    public partial class tArticleCategory
+    public partial class T_ArticleCategory
     {
         #region --标准字段--
         private long _ID;
         /// <summary>
-        /// [主键]ID
+        /// ID+[PrimaryKey]
         /// </summary>
         public long ID
         {
@@ -28,7 +27,7 @@ namespace Models.Article
             get { return _Name; }
             set { _Name = value; }
         }
-        private bool _IsDel = false;
+        private bool _IsDel;
         /// <summary>
         /// IsDel
         /// </summary>
