@@ -1,4 +1,4 @@
-﻿<#@ template debug="true" hostspecific="true" language="C#" #>
+﻿<#@ template visibility="internal" debug="true" hostspecific="true" language="C#" #>
 <#@ assembly name="System.Core" #>
 <#@ assembly name="System.Xml" #>
 <#@ assembly name="EnvDTE" #>
@@ -86,33 +86,33 @@ if (nodeDb == null)
 
 string entityTextTemplate = @"using System;
 
-namespace #NameSpace#
+namespace %NameSpace%
 {
     /// <summary>
-    /// #TableOrViewDescription#
+    /// %TableOrViewDescription%
     /// </summary>
     [Serializable]
-    public partial class #TableOrViewClassName#
+    public partial class %TableOrViewClassName%
     {
-        #region --标准字段--#ColumnsBegin#
-        private #ColumnDotNetType# _#ColumnName##ColumnDotNetDefaultValue#;
+        #region --标准字段--%ColumnsBegin%
+        private %ColumnDotNetType% _%ColumnName%%ColumnDotNetDefaultValue%;
         /// <summary>
-        /// #ColumnDescription#
+        /// %ColumnDescription%
         /// </summary>
-        public #ColumnDotNetType# #ColumnName#
+        public %ColumnDotNetType% %ColumnName%
         {
-            get { return _#ColumnName#; }
-            set { _#ColumnName# = value; }
-        }#ColumnsEnd#
+            get { return _%ColumnName%; }
+            set { _%ColumnName% = value; }
+        }%ColumnsEnd%
         #endregion
 
-        public static List<#TableOrViewClassName#> Select(string where,string orderby,int top){
+        public static List<%TableOrViewClassName%> Select(string where,string orderby,int top){
             ZeroDbs.
         }
 
     }
 }";
-var match = System.Text.RegularExpressions.Regex.Match(entityTextTemplate,@"#ColumnsBegin#(?<temp>[\s\S]+)#ColumnsEnd#",System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+var match = System.Text.RegularExpressions.Regex.Match(entityTextTemplate,@"%ColumnsBegin%(?<temp>[\s\S]+)%ColumnsEnd%",System.Text.RegularExpressions.RegexOptions.IgnoreCase);
 string colTextTemplate = match.Groups["temp"].Value;
 
 
@@ -132,11 +132,11 @@ foreach(ZeroDbs.Interfaces.Common.DbDataTableInfo table in tables){
    }
 
    string entityText = entityTextTemplate;
-   entityText = entityText.Replace("#NameSpace#", baseNamespace);
-   entityText = entityText.Replace("#TableOrViewDescription#", tDescription);
-   entityText = entityText.Replace("#TableOrViewName#", table.Name);
-   entityText = entityText.Replace("#TableOrViewClassName#", className);
-   entityText = entityText.Replace("#DatabaseConnectionUseKey#", dbInfo.dbKey);
+   entityText = entityText.Replace("%NameSpace%", baseNamespace);
+   entityText = entityText.Replace("%TableOrViewDescription%", tDescription);
+   entityText = entityText.Replace("%TableOrViewName%", table.Name);
+   entityText = entityText.Replace("%TableOrViewClassName%", className);
+   entityText = entityText.Replace("%DatabaseConnectionUseKey%", dbInfo.dbKey);
 
    StringBuilder colText = new StringBuilder();
    foreach(ZeroDbs.Interfaces.Common.DbDataColumnInfo col in table.Colunms){
@@ -167,16 +167,16 @@ foreach(ZeroDbs.Interfaces.Common.DbDataTableInfo table in tables){
       }
 
       string s = colTextTemplate;
-      s = s.Replace("#ColumnDotNetType#", cType);
-      s = s.Replace("#ColumnName#", col.Name);
-      s = s.Replace("#ColumnDotNetDefaultValue#", cValue);
-      s = s.Replace("#ColumnDescription#", cDescription);
+      s = s.Replace("%ColumnDotNetType%", cType);
+      s = s.Replace("%ColumnName%", col.Name);
+      s = s.Replace("%ColumnDotNetDefaultValue%", cValue);
+      s = s.Replace("%ColumnDescription%", cDescription);
 
       colText.Append(s);
 
    }
 
-   entityText = System.Text.RegularExpressions.Regex.Replace(entityText,@"#ColumnsBegin#(?<temp>[\s\S]+)#ColumnsEnd#",colText.ToString());
+   entityText = System.Text.RegularExpressions.Regex.Replace(entityText,@"%ColumnsBegin%(?<temp>[\s\S]+)%ColumnsEnd%",colText.ToString());
    
    string csFilePath = System.IO.Path.Combine(baseEntityFileDir, className + ".cs");
    System.IO.FileStream fs = null;
