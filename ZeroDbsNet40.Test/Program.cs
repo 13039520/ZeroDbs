@@ -19,21 +19,23 @@ namespace ZeroDbsNet40.Test
                     dbKey = "TestDb",
                     dbType = "SqlServer"
                 },
-                @"D:\Work\ZeroDbs\ZeroDbsNet40.Test\MyDbs",
-                @"D:\Work\ZeroDbs\ZeroDbsNet40.Test",
+                @"D:\Work\ZeroDbs\ZeroDbs.Test\MyDbs",
+                @"D:\Work\ZeroDbs\ZeroDbs.Test",
                 "MyDbs");
-            Console.WriteLine("生成成功！");*/
+            Console.WriteLine("生成成功！");
+            */
 
+            /**/
             dbService = new ZeroDbs.Interfaces.Common.DbService(
                 new ZeroDbs.DataAccess.DbSearcher(new ZeroDbs.Interfaces.Common.DbExecuteSqlEvent((sender, e) => {
 #if DEBUG
-                    dbService.Log.Writer("DbKey={0}&ExecuteType={1}&ExecuteSql=\r\n{2}\r\n&ExecuteResult={3}",
+                     dbService.Log.Writer("DbKey={0}&ExecuteType={1}&ExecuteSql=\r\n{2}\r\n&ExecuteResult={3}",
                     e.DbKey,
                     e.ExecuteType,
                     e.ExecuteSql != null && e.ExecuteSql.Count > 0 ? string.Join("\r\n", e.ExecuteSql.ToArray()) : "no sql",
                     e.Message);
 #endif
-                })),
+                 })),
                 ZeroDbs.Logs.Factory.GetLogger("sql", 7),
                 new ZeroDbs.Caches.LocalMemCache(null));
 
@@ -52,6 +54,7 @@ namespace ZeroDbsNet40.Test
             {
                 Console.WriteLine("no data");
             }
+
 
         }
 

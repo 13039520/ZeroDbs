@@ -11,8 +11,7 @@ namespace ZeroDbs.Test
 
         static void Main(string[] args)
         {
-           /*
-            Console.WriteLine("正在生成……");
+            /*Console.WriteLine("正在生成……");
             ZeroDbs.Tools.EntityBuilder.Builder(
                 new ZeroDbs.Interfaces.Common.DbConfigDatabaseInfo
                 {
@@ -24,12 +23,13 @@ namespace ZeroDbs.Test
                 @"D:\Work\ZeroDbs\ZeroDbs.Test",
                 "MyDbs");
             Console.WriteLine("生成成功！");
-           */
+            */
 
+            /**/
             dbService = new ZeroDbs.Interfaces.Common.DbService(
                 new ZeroDbs.DataAccess.DbSearcher(new ZeroDbs.Interfaces.Common.DbExecuteSqlEvent((sender, e) => {
 #if DEBUG
-                    dbService.Log.Writer("DbKey={0}&ExecuteType={1}&ExecuteSql=\r\n{2}\r\n&ExecuteResult={3}",
+                     dbService.Log.Writer("DbKey={0}&ExecuteType={1}&ExecuteSql=\r\n{2}\r\n&ExecuteResult={3}",
                     e.DbKey,
                     e.ExecuteType,
                     e.ExecuteSql != null && e.ExecuteSql.Count > 0 ? string.Join("\r\n", e.ExecuteSql.ToArray()) : "no sql",
@@ -54,6 +54,7 @@ namespace ZeroDbs.Test
             {
                 Console.WriteLine("no data");
             }
+
 
         }
 

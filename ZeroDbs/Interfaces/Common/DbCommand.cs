@@ -117,11 +117,7 @@ namespace ZeroDbs.Interfaces.Common
                     sqlList,
                     DbExecuteSqlType.QUERY,
                     "OK"));
-                if (useEmit)
-                {
-                    return DbDataReaderToEntity<T>.EntityListByEmit(dr);
-                }
-                return DbDataReaderToEntity<T>.EntityList(dr);
+                return useEmit ? DbDataReaderToEntity<T>.EntityListByEmit(dr) : DbDataReaderToEntity<T>.EntityList(dr);
             }
             catch (Exception ex)
             {
