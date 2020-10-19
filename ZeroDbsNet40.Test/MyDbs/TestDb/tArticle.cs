@@ -6,7 +6,7 @@ namespace MyDbs.TestDb
     /// TABLE:T_Article
     /// </summary>
     [Serializable]
-    public partial class T_Article
+    public partial class tArticle
     {
         #region --标准字段--
         private long _ID;
@@ -118,6 +118,7 @@ namespace MyDbs.TestDb
             set { _StatusChangeUserID = value; }
         }
         #endregion
+
 
     }
 }

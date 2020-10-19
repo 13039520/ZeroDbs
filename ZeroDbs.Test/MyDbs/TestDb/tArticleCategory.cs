@@ -12,7 +12,7 @@ namespace MyDbs.TestDb
         #region --标准字段--
         private long _ID;
         /// <summary>
-        /// [主键]ID
+        /// [PrimaryKey]ID
         /// </summary>
         public long ID
         {

@@ -121,9 +121,9 @@
     <Compile Include="Logs\Factory.cs" />
     <Compile Include="Logs\Logger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tools\CodeGenerator.cs" />
     <Compile Include="Tools\DataEntity.cs" />
     <Compile Include="Tools\Des.cs" />
-    <Compile Include="Tools\EntityBuilder.cs" />
     <Compile Include="Tools\Md5.cs" />
     <Compile Include="Tools\SHA.cs" />
     <Compile Include="Tools\TextFileReader.cs" />

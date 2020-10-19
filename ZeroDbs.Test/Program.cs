@@ -7,25 +7,47 @@ namespace ZeroDbs.Test
     /// </summary>
     class Program
     {
-        static ZeroDbs.Interfaces.IDbService dbService = null;
-
         static void Main(string[] args)
         {
-            /*Console.WriteLine("正在生成……");
-            ZeroDbs.Tools.EntityBuilder.Builder(
-                new ZeroDbs.Interfaces.Common.DbConfigDatabaseInfo
-                {
-                    dbConnectionString = "Data Source=.;Initial Catalog=MyTestDb;User ID=sa;Password=123;",
-                    dbKey = "TestDb",
-                    dbType = "SqlServer"
-                },
-                @"D:\Work\ZeroDbs\ZeroDbs.Test\MyDbs",
-                @"D:\Work\ZeroDbs\ZeroDbs.Test",
-                "MyDbs");
-            Console.WriteLine("生成成功！");
-            */
 
-            /**/
+            //CodeGenerator();
+
+            DataQuery();
+
+        }
+
+
+        static void CodeGenerator()
+        {
+            Console.WriteLine("正在生成……");
+
+            ZeroDbs.Tools.CodeGenerator generator = new Tools.CodeGenerator();
+            generator.Dbs.Add(new Interfaces.Common.DbConfigDatabaseInfo
+            {
+                dbConnectionString = "Data Source=.;Initial Catalog=MyTestDb;User ID=sa;Password=123;",
+                dbKey = "TestDb",
+                dbType = "SqlServer"
+            });
+            generator.GeneratorConfig = new Tools.CodeGenerator.Config
+            {
+                AppProjectDir = @"D:\Work\ZeroDbs\ZeroDbs.Test",
+                AppProjectName = "ZeroDbs.Test",
+                EntityDir = @"D:\Work\ZeroDbs\ZeroDbs.Test\MyDbs",
+                EntityNamespace = "MyDbs",
+                EntityProjectName = "ZeroDbs.Test"
+            };
+            generator.OnSingleTableGenerated += (e) => {
+                Console.WriteLine("[{0}/{1}]\t{2}\t{3}", e.tableNum, e.tableCount, e.table.Name, e.entityClassFullName);
+            };
+            generator.Run();
+
+            Console.WriteLine("生成成功！");
+        }
+
+
+        static ZeroDbs.Interfaces.IDbService dbService = null;
+        static void DataQuery()
+        {
             dbService = new ZeroDbs.Interfaces.Common.DbService(
                 new ZeroDbs.DataAccess.DbSearcher(new ZeroDbs.Interfaces.Common.DbExecuteSqlEvent((sender, e) => {
 #if DEBUG
@@ -54,11 +76,7 @@ namespace ZeroDbs.Test
             {
                 Console.WriteLine("no data");
             }
-
-
         }
-
-
 
 
     }

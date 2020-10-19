@@ -23,6 +23,15 @@ foreach(EnvDTE.Project p in dte.Solution.Projects){
       break;
     }
 }
+string FirstLetterToUpper(string str)
+{
+    if (string.IsNullOrEmpty(str)) { return str; }
+    if (char.IsLetter(str[0]))
+    {
+return str[0].ToString().ToUpper() + str.Substring(1);
+    }
+    return str;
+}
 
 
 
@@ -106,9 +115,6 @@ namespace %NameSpace%
         }%ColumnsEnd%
         #endregion
 
-        public static List<%TableOrViewClassName%> Select(string where,string orderby,int top){
-            ZeroDbs.
-        }
 
     }
 }";
@@ -124,7 +130,9 @@ foreach(ZeroDbs.Interfaces.Common.DbDataTableInfo table in tables){
    
    tableNum++;
 
-   string className=table.Name;
+   string className = System.Text.RegularExpressions.Regex.Replace(table.Name, @"^(t|v|tb|view)_", "", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+   className = FirstLetterToUpper(className);
+   className = (table.IsView ? "v" : "t") + className;
    string tDescription=table.Description;
    if(tDescription.Length<1){
      tDescription+=table.Name;

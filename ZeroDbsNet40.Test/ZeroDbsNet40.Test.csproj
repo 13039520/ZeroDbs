@@ -41,9 +41,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MyDbs\TestDb\T_Article.cs" />
-    <Compile Include="MyDbs\TestDb\T_ArticleCategory.cs" />
-    <Compile Include="MyDbs\TestDb\T_ArticleComment.cs" />
+    <Compile Include="MyDbs\TestDb\tArticle.cs" />
+    <Compile Include="MyDbs\TestDb\tArticleCategory.cs" />
+    <Compile Include="MyDbs\TestDb\tArticleComment.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ZeroCodeGenerator.cs">
@@ -64,7 +64,7 @@
       <LastGenOutput>ZeroCodeGenerator.cs</LastGenOutput>
     </Content>
     <Content Include="ZeroDbConfig.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>

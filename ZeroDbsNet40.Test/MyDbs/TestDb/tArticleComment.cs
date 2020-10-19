@@ -6,7 +6,7 @@ namespace MyDbs.TestDb
     /// TABLE:T_ArticleComment
     /// </summary>
     [Serializable]
-    public partial class T_ArticleComment
+    public partial class tArticleComment
     {
         #region --标准字段--
         private long _ID;
@@ -64,6 +64,7 @@ namespace MyDbs.TestDb
             set { _Status = value; }
         }
         #endregion
+
 
     }
 }

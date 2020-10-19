@@ -4,8 +4,8 @@
     <db dbKey="TestDb" dbConnectionString="Data Source=.;Initial Catalog=MyTestDb;User ID=sa;Password=123;" dbType="SqlServer" />
   </dbs>
   <dvs>
-    <dv dbKey="TestDb" tableName="T_Article" entityKey="MyDbs.TestDb.T_Article" />
-    <dv dbKey="TestDb" tableName="T_ArticleCategory" entityKey="MyDbs.TestDb.T_ArticleCategory" />
-    <dv dbKey="TestDb" tableName="T_ArticleComment" entityKey="MyDbs.TestDb.T_ArticleComment" />
+    <dv dbKey="TestDb" tableName="T_Article" entityKey="MyDbs.TestDb.tArticle" />
+    <dv dbKey="TestDb" tableName="T_ArticleCategory" entityKey="MyDbs.TestDb.tArticleCategory" />
+    <dv dbKey="TestDb" tableName="T_ArticleComment" entityKey="MyDbs.TestDb.tArticleComment" />
   </dvs>
 </zero>

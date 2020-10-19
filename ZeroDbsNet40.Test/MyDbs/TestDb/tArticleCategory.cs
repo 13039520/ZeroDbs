@@ -6,7 +6,7 @@ namespace MyDbs.TestDb
     /// TABLE:T_ArticleCategory
     /// </summary>
     [Serializable]
-    public partial class T_ArticleCategory
+    public partial class tArticleCategory
     {
         #region --标准字段--
         private long _ID;
@@ -37,6 +37,7 @@ namespace MyDbs.TestDb
             set { _IsDel = value; }
         }
         #endregion
+
 
     }
 }
