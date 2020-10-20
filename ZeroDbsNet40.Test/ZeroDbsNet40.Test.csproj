@@ -63,9 +63,9 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>ZeroCodeGenerator.cs</LastGenOutput>
     </Content>
-    <Content Include="ZeroDbConfig.xml">
+    <None Include="ZeroDbConfig.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />

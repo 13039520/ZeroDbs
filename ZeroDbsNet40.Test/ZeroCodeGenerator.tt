@@ -60,7 +60,8 @@ if (!System.IO.File.Exists(xmlFilePath))
 {
     string s = "<?xml version=\"1.0\" encoding=\"utf-8\" ?>" + System.Environment.NewLine + "<zero>" + System.Environment.NewLine + "<dbs></dbs>" + System.Environment.NewLine + "<dvs></dvs>" + System.Environment.NewLine + "</zero>";
     System.IO.File.AppendAllText(xmlFilePath, s, Encoding.UTF8);
-    currentProject.ProjectItems.AddFromFile(xmlFilePath);
+    var item = currentProject.ProjectItems.AddFromFile(xmlFilePath);
+    item.Properties.Item("CopyToOutputDirectory").Value = 2;//0=Never 1=Always 2=PreserveNewest
 }
 System.Xml.XmlDocument doc = new System.Xml.XmlDocument();
 doc.Load(xmlFilePath);
