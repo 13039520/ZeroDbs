@@ -10,9 +10,9 @@ namespace ZeroDbs.Test
         static void Main(string[] args)
         {
 
-            //CodeGenerator();
+            CodeGenerator();
 
-            DataQuery();
+            //DataQuery();
 
         }
 

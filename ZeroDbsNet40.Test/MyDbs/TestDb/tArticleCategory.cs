@@ -8,7 +8,7 @@ namespace MyDbs.TestDb
     [Serializable]
     public partial class tArticleCategory
     {
-        #region --标准字段--
+        
         private long _ID;
         /// <summary>
         /// ID+[PrimaryKey]
@@ -36,7 +36,6 @@ namespace MyDbs.TestDb
             get { return _IsDel; }
             set { _IsDel = value; }
         }
-        #endregion
 
 
     }

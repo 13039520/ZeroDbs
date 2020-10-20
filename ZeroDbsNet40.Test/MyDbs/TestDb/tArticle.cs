@@ -8,7 +8,7 @@ namespace MyDbs.TestDb
     [Serializable]
     public partial class tArticle
     {
-        #region --标准字段--
+        
         private long _ID;
         /// <summary>
         /// ID+[PrimaryKey]+[Identity]
@@ -117,7 +117,6 @@ namespace MyDbs.TestDb
             get { return _StatusChangeUserID; }
             set { _StatusChangeUserID = value; }
         }
-        #endregion
 
 
     }

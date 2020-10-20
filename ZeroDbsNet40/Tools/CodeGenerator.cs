@@ -17,7 +17,7 @@ namespace %NameSpace%
     [Serializable]
     public partial class %ClassName%
     {
-        #region --标准字段--%ColumnRepeatBegin%
+        %ColumnRepeatBegin%
         private %ColumnDotNetType% _%ColumnName%%ColumnDotNetDefaultValue%;
         /// <summary>
         /// %ColumnDescription%
@@ -27,7 +27,6 @@ namespace %NameSpace%
             get { return _%ColumnName%; }
             set { _%ColumnName% = value; }
         }%ColumnRepeatEnd%
-        #endregion
 
     }
 }";

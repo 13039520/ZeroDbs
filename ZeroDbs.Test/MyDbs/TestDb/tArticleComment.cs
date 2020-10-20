@@ -9,7 +9,7 @@ namespace MyDbs.TestDb
     [Serializable]
     public partial class tArticleComment
     {
-        #region --标准字段--
+        
         private long _ID;
         /// <summary>
         /// [Identity][PrimaryKey]ID
@@ -64,7 +64,6 @@ namespace MyDbs.TestDb
             get { return _Status; }
             set { _Status = value; }
         }
-        #endregion
 
     }
 }

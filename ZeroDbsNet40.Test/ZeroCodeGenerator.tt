@@ -104,7 +104,7 @@ namespace %NameSpace%
     [Serializable]
     public partial class %TableOrViewClassName%
     {
-        #region --标准字段--%ColumnsBegin%
+        %ColumnsBegin%
         private %ColumnDotNetType% _%ColumnName%%ColumnDotNetDefaultValue%;
         /// <summary>
         /// %ColumnDescription%
@@ -114,7 +114,6 @@ namespace %NameSpace%
             get { return _%ColumnName%; }
             set { _%ColumnName% = value; }
         }%ColumnsEnd%
-        #endregion
 
 
     }
