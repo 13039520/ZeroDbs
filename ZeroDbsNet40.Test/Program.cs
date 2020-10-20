@@ -30,11 +30,12 @@ namespace ZeroDbsNet40.Test
             });
             generator.GeneratorConfig = new ZeroDbs.Tools.CodeGenerator.Config
             {
-                AppProjectDir = @"D:\Work\ZeroDbs\ZeroDbs.Test",
-                AppProjectName = "ZeroDbs.Test",
-                EntityDir = @"D:\Work\ZeroDbs\ZeroDbs.Test\MyDbs",
+                AppProjectDir = @"D:\Work\ZeroDbs\ZeroDbs.Test40",
+                AppProjectNamespace = "ZeroDbs.Test40",
+                AppProjectName = "ZeroDbs.Test40",
+                EntityDir = @"D:\Work\ZeroDbs\ZeroDbs.Test40\MyDbs",
                 EntityNamespace = "MyDbs",
-                EntityProjectName = "ZeroDbs.Test"
+                EntityProjectName = "ZeroDbs.Test40"
             };
             generator.OnSingleTableGenerated += (e) => {
                 Console.WriteLine("[{0}/{1}]\t{2}\t{3}", e.tableNum, e.tableCount, e.table.Name, e.entityClassFullName);

@@ -56,6 +56,7 @@ namespace %NameSpace%
         public class Config
         {
             public string AppProjectName { get; set; }
+            public string AppProjectNamespace { get; set; }
             public string AppProjectDir { get; set; }
             public string EntityProjectName { get; set; }
             public string EntityNamespace { get; set; }

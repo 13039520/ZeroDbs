@@ -28,9 +28,10 @@ namespace ZeroDbs.Test
                 dbKey = "TestDb",
                 dbType = "SqlServer"
             });
-            generator.GeneratorConfig = new Tools.CodeGenerator.Config
+            generator.GeneratorConfig = new ZeroDbs.Tools.CodeGenerator.Config
             {
                 AppProjectDir = @"D:\Work\ZeroDbs\ZeroDbs.Test",
+                AppProjectNamespace = "ZeroDbs.Test",
                 AppProjectName = "ZeroDbs.Test",
                 EntityDir = @"D:\Work\ZeroDbs\ZeroDbs.Test\MyDbs",
                 EntityNamespace = "MyDbs",
