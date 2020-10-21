@@ -35,7 +35,7 @@ return str[0].ToString().ToUpper() + str.Substring(1);
 
 
 
-ZeroDbs.Interfaces.Common.DbConfigDatabaseInfo dbInfo=new ZeroDbs.Interfaces.Common.DbConfigDatabaseInfo
+ZeroDbs.Common.DbConfigDatabaseInfo dbInfo=new ZeroDbs.Common.DbConfigDatabaseInfo
 {
     dbConnectionString = "Data Source=.;Initial Catalog=MyTestDb;User ID=sa;Password=123;",
     dbKey = "TestDb",
@@ -123,10 +123,10 @@ string colTextTemplate = match.Groups["temp"].Value;
 
 
 
-ZeroDbs.Interfaces.IDb db = ZeroDbs.DataAccess.Common.DbFactory.Create(dbInfo);
-System.Collections.Generic.List<ZeroDbs.Interfaces.Common.DbDataTableInfo> tables = db.GetDbDataTableInfoAll();
+ZeroDbs.IDb db = ZeroDbs.Common.DbFactory.Create(dbInfo);
+System.Collections.Generic.List<ZeroDbs.Common.DbDataTableInfo> tables = db.GetDbDataTableInfoAll();
 int tableNum=0;
-foreach(ZeroDbs.Interfaces.Common.DbDataTableInfo table in tables){
+foreach(ZeroDbs.Common.DbDataTableInfo table in tables){
    
    tableNum++;
 
@@ -147,7 +147,7 @@ foreach(ZeroDbs.Interfaces.Common.DbDataTableInfo table in tables){
    entityText = entityText.Replace("%DatabaseConnectionUseKey%", dbInfo.dbKey);
 
    StringBuilder colText = new StringBuilder();
-   foreach(ZeroDbs.Interfaces.Common.DbDataColumnInfo col in table.Colunms){
+   foreach(ZeroDbs.Common.DbDataColumnInfo col in table.Colunms){
       string cDescription = col.Description;
       string cValue = col.DefaultValue;
       string cType = col.Type;

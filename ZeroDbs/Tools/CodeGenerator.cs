@@ -32,15 +32,15 @@ namespace %NameSpace%
 }";
         public class SingleTableGeneratedEventArgs : EventArgs
         {
-            public ZeroDbs.Interfaces.Common.DbConfigDatabaseInfo db { get; }
-            public ZeroDbs.Interfaces.Common.DbDataTableInfo table { get; }
+            public Common.DbConfigDatabaseInfo db { get; }
+            public Common.DbDataTableInfo table { get; }
             public string entityClassFullName { get; } 
             public string entityClassPath { get; }
             public int tableCount { get; }
             public int tableNum { get; }
             public Config generatorConfig { get; }
 
-            public SingleTableGeneratedEventArgs(ZeroDbs.Interfaces.Common.DbConfigDatabaseInfo db, ZeroDbs.Interfaces.Common.DbDataTableInfo table, Config generatorConfig, string entityClassFullName, string entityClassPath, int tableCount, int tableNum)
+            public SingleTableGeneratedEventArgs(Common.DbConfigDatabaseInfo db, Common.DbDataTableInfo table, Config generatorConfig, string entityClassFullName, string entityClassPath, int tableCount, int tableNum)
             {
                 this.db = db;
                 this.table = table;
@@ -67,11 +67,11 @@ namespace %NameSpace%
 
         public event SingleTableGeneratedHandler OnSingleTableGenerated;
         public Config GeneratorConfig { get; set; }
-        private List<ZeroDbs.Interfaces.Common.DbConfigDatabaseInfo> _Dbs;
-        public List<ZeroDbs.Interfaces.Common.DbConfigDatabaseInfo> Dbs { get { return _Dbs; } }
+        private List<Common.DbConfigDatabaseInfo> _Dbs;
+        public List<Common.DbConfigDatabaseInfo> Dbs { get { return _Dbs; } }
 
         public CodeGenerator() {
-            _Dbs = new List<Interfaces.Common.DbConfigDatabaseInfo>();
+            _Dbs = new List<Common.DbConfigDatabaseInfo>();
         }
 
         public void Run()
@@ -115,9 +115,9 @@ namespace %NameSpace%
 
         }
 
-        private void Builder(List<ZeroDbs.Interfaces.Common.DbConfigDatabaseInfo> dbsList, Config generatorConfig)
+        private void Builder(List<Common.DbConfigDatabaseInfo> dbsList, Config generatorConfig)
         {
-            var dbs = new DataAccess.DbSearcher(null).GetDbs(dbsList);
+            var dbs = new Common.DbSearcher(null).GetDbs(dbsList);
             foreach (var key in dbs.Keys)
             {
                 var db = dbs[key];
@@ -125,7 +125,7 @@ namespace %NameSpace%
                 Builder(db.DbConfigDatabaseInfo, tables, db.DbConfigDatabaseInfo, generatorConfig.EntityDir, generatorConfig.AppProjectDir, generatorConfig.EntityNamespace, generatorConfig.EntityTemplate);
             }
         }
-        private void Builder(ZeroDbs.Interfaces.Common.DbConfigDatabaseInfo db, List<ZeroDbs.Interfaces.Common.DbDataTableInfo> tables, ZeroDbs.Interfaces.Common.DbConfigDatabaseInfo dbInfo, string entityProjectRootDir, string targetProjectRootDir, string nameSpace, string entityTemplate = "")
+        private void Builder(Common.DbConfigDatabaseInfo db, List<Common.DbDataTableInfo> tables, Common.DbConfigDatabaseInfo dbInfo, string entityProjectRootDir, string targetProjectRootDir, string nameSpace, string entityTemplate = "")
         {
 
             string entityFileSaveDir = System.IO.Path.Combine(entityProjectRootDir, dbInfo.dbKey);

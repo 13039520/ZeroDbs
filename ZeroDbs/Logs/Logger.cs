@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ZeroDbs.Logs
 {
-    class Logger: Interfaces.ILog
+    class Logger: ILog
     {
         private System.Text.StringBuilder logSource = null;
         private string logFilePre = string.Empty;

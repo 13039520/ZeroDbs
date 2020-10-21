@@ -53,12 +53,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ZeroDbsNet40\ZeroDbsNet40.csproj">
-      <Project>{cd56aa79-53b6-4a0e-a3ee-946eb0bb8eb3}</Project>
-      <Name>ZeroDbsNet40</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="ZeroCodeGenerator.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>ZeroCodeGenerator.cs</LastGenOutput>
@@ -70,6 +64,11 @@
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\ZeroDbsNet40\ZeroDbsNet40.csproj">
+      <Project>{cd56aa79-53b6-4a0e-a3ee-946eb0bb8eb3}</Project>
+      <Name>ZeroDbsNet40</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

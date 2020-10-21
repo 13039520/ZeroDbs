@@ -27,7 +27,7 @@ namespace ZeroDbs.Tools
                 if (MyHashtable.Contains(PropertyName.ToLower()))
                 {
                     HasPropertyCount++;
-                    Properties[j].SetValue(Result, DataAccess.Common.ValueConvert.StrToTargetType(MyHashtable[PropertyName.ToLower()].ToString(), Properties[j].PropertyType), null);
+                    Properties[j].SetValue(Result, Common.ValueConvert.StrToTargetType(MyHashtable[PropertyName.ToLower()].ToString(), Properties[j].PropertyType), null);
                 }
             }
             if (HasPropertyCount < 1)
@@ -57,7 +57,7 @@ namespace ZeroDbs.Tools
                 string PropertyName = Properties[j].Name;
                 if (MyHashtable.Contains(PropertyName.ToLower()))
                 {
-                    Properties[j].SetValue(Result, DataAccess.Common.ValueConvert.StrToTargetType(MyHashtable[PropertyName.ToLower()].ToString(), Properties[j].PropertyType), null);
+                    Properties[j].SetValue(Result, Common.ValueConvert.StrToTargetType(MyHashtable[PropertyName.ToLower()].ToString(), Properties[j].PropertyType), null);
                 }
                 else
                 {

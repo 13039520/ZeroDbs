@@ -9,7 +9,7 @@ namespace ZeroDbs.Logs
         private static object setFileThreadCreateLockObj = new object();
         private static object loggerCreateLockObj = new object();
         public static readonly string logsDirPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs");
-        internal static readonly System.Collections.Generic.Dictionary<string, Interfaces.ILog> loggerDic = new System.Collections.Generic.Dictionary<string, Interfaces.ILog>();
+        internal static readonly System.Collections.Generic.Dictionary<string, ILog> loggerDic = new System.Collections.Generic.Dictionary<string, ILog>();
         internal static System.Threading.Thread setFileThread = null;
         internal static void SetFileThreadStartFunc(object obj)
         {
@@ -42,15 +42,15 @@ namespace ZeroDbs.Logs
                 }
             }
         }
-        public static Interfaces.ILog GetLogger()
+        public static ILog GetLogger()
         {
             return GetLogger("Trace");
         }
-        public static Interfaces.ILog GetLogger(string logFilePre)
+        public static ILog GetLogger(string logFilePre)
         {
             return GetLogger(logFilePre, 90);
         }
-        public static Interfaces.ILog GetLogger(string logFilePre, int logFileRetentionDays)
+        public static ILog GetLogger(string logFilePre, int logFileRetentionDays)
         {
             logFilePre = GetLogFilePre(logFilePre);
             if (loggerDic.ContainsKey(logFilePre))
@@ -67,7 +67,7 @@ namespace ZeroDbs.Logs
                     }
                     else
                     {
-                        Interfaces.ILog _logger = new Logger(logFilePre, logFileRetentionDays);
+                        ILog _logger = new Logger(logFilePre, logFileRetentionDays);
                         loggerDic.Add(logFilePre, _logger);
                         return _logger;
                     }

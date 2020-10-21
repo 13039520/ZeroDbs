@@ -11,11 +11,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="DataAccess\Common\DataReaderToEntity.cs" />
-    <Compile Remove="DataAccess\Common\EntityObjectProperty.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.Data.SqlClient" Version="1.0.19249.1" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="2.0.0" />
     <PackageReference Include="MySql.Data" Version="6.10.9" />

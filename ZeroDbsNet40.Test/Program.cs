@@ -22,7 +22,7 @@ namespace ZeroDbsNet40.Test
             Console.WriteLine("正在生成……");
 
             ZeroDbs.Tools.CodeGenerator generator = new ZeroDbs.Tools.CodeGenerator();
-            generator.Dbs.Add(new ZeroDbs.Interfaces.Common.DbConfigDatabaseInfo
+            generator.Dbs.Add(new ZeroDbs.Common.DbConfigDatabaseInfo
             {
                 dbConnectionString = "Data Source=.;Initial Catalog=MyTestDb;User ID=sa;Password=123;",
                 dbKey = "TestDb",
@@ -46,11 +46,11 @@ namespace ZeroDbsNet40.Test
         }
 
 
-        static ZeroDbs.Interfaces.IDbService dbService = null;
+        static ZeroDbs.IDbService dbService = null;
         static void DataQuery()
         {
-            dbService = new ZeroDbs.Interfaces.Common.DbService(
-                new ZeroDbs.DataAccess.DbSearcher(new ZeroDbs.Interfaces.Common.DbExecuteSqlEvent((sender, e) => {
+            dbService = new ZeroDbs.Common.DbService(
+                new ZeroDbs.Common.DbSearcher(new ZeroDbs.Common.DbExecuteSqlEvent((sender, e) => {
 #if DEBUG
                      dbService.Log.Writer("DbKey={0}&ExecuteType={1}&ExecuteSql=\r\n{2}\r\n&ExecuteResult={3}",
                     e.DbKey,
@@ -60,7 +60,7 @@ namespace ZeroDbsNet40.Test
 #endif
                 })),
                 ZeroDbs.Logs.Factory.GetLogger("sql", 7),
-                new ZeroDbs.Caches.LocalMemCache(null));
+                new ZeroDbs.Common.LocalMemCache(null));
 
             long page = 1;
             long pageSize = 1000;
