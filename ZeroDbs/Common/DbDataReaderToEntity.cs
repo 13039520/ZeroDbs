@@ -31,27 +31,17 @@ namespace ZeroDbs.Common
                     {
                         DataReaderInfo info = FieldDic[name];
                         string key = info.Name;
-                        int index = info.Index;
+                        object o = DataReader[key];
                         if (TargetTypeIsBool(pis[j].PropertyType))
                         {
-                            pis[j].SetValue(obj, ConverToBool(DataReader[key]), null);
+                            pis[j].SetValue(obj, ConverToBool(o), null);
                         }
                         else
                         {
-                            object o;
-                            try
+                            if (DBNull.Value != o)
                             {
-                                o = DataReader.GetValue(index);
+                                pis[j].SetValue(obj, o, null);
                             }
-                            catch
-                            {
-                                o = DBNull.Value;
-                            }
-                            if (DBNull.Equals(DBNull.Value, o))
-                            {
-                                o = GetDefaultValue(pis[j].PropertyType);
-                            }
-                            pis[j].SetValue(obj, o, null);
                         }
                     }
                     j++;
@@ -87,27 +77,18 @@ namespace ZeroDbs.Common
                     {
                         DataReaderInfo info = FieldDic[name];
                         string key = info.Name;
-                        int index = info.Index;
+                        object o = DataReader[key];
                         if (TargetTypeIsBool(pis[j].PropertyType))
                         {
-                            pis[j].SetValue(obj, ConverToBool(DataReader[key]), null);
+                            pis[j].SetValue(obj, ConverToBool(o), null);
                         }
                         else
                         {
-                            object o;
-                            try
+                            
+                            if (DBNull.Value != o)
                             {
-                                o = DataReader.GetValue(index);
+                                pis[j].SetValue(obj, o, null);
                             }
-                            catch
-                            {
-                                o = DBNull.Value;
-                            }
-                            if (DBNull.Equals(DBNull.Value, o))
-                            {
-                                o = GetDefaultValue(pis[j].PropertyType);
-                            }
-                            pis[j].SetValue(obj, o, null);
                         }
                     }
                     j++;
@@ -141,9 +122,10 @@ namespace ZeroDbs.Common
                 {
                     string fieldName = ps[j].Info.Name;
                     string name = fieldName.ToLower();
-                    if (FieldDic.ContainsKey(name))
+                    object val = DataReader[FieldDic[name]];
+                    if (FieldDic.ContainsKey(name)&&val!=DBNull.Value)
                     {
-                        ps[j].Setter(obj, DataReader[FieldDic[name]]);
+                        ps[j].Setter(obj, val);
                     }
                     j++;
                 }
@@ -175,15 +157,13 @@ namespace ZeroDbs.Common
                 int num = 0;
                 while (num < ps.Length)
                 {
-                    EntityPropertyEmitSetter p = ps[num];
-                    string fieldName = p.Info.Name;
+                    string fieldName = ps[num].Info.Name;
                     string name = fieldName.ToLower();
-                    if (!FieldDic.ContainsKey(name))
+                    object val = DataReader[FieldDic[name]];
+                    if (FieldDic.ContainsKey(name)&&val!=DBNull.Value)
                     {
-                        num++;
-                        continue;
+                        ps[num].Setter(obj, val);
                     }
-                    p.Setter(obj, DataReader[FieldDic[name]]);
                     num++;
                 }
                 Li.Add(obj);
