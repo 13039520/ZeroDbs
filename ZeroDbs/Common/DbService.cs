@@ -32,6 +32,10 @@ namespace ZeroDbs.Common
         {
             return DbSearcher.GetDbByEntityFullName(entityFullName);
         }
+        public IDb GetDbByDbKey(string dbKey)
+        {
+            return DbSearcher.GetDb(dbKey);
+        }
         public IDbCommand GetDbCommand<T>() where T : class, new()
         {
             return DbSearcher.GetDb<T>().GetDbCommand();
@@ -39,6 +43,10 @@ namespace ZeroDbs.Common
         public IDbCommand GetDbCommand(string entityFullName)
         {
             return DbSearcher.GetDbByEntityFullName(entityFullName).GetDbCommand();
+        }
+        public IDbCommand GetDbCommandByDbKey(string dbKey)
+        {
+            return DbSearcher.GetDb(dbKey).GetDbCommand();
         }
         public IDbTransactionScope GetDbTransactionScope<T>(System.Data.IsolationLevel level, string identification = "", string groupId = "") where T : class, new()
         {
@@ -48,6 +56,11 @@ namespace ZeroDbs.Common
         public IDbTransactionScope GetDbTransactionScope(string entityFullName, System.Data.IsolationLevel level, string identification = "", string groupId = "")
         {
             var db = this.GetDb(entityFullName);
+            return db.GetDbTransactionScope(level, identification, groupId);
+        }
+        public IDbTransactionScope GetDbTransactionScopeByDbKey(string dbKey, System.Data.IsolationLevel level, string identification = "", string groupId = "")
+        {
+            var db = DbSearcher.GetDb(dbKey);
             return db.GetDbTransactionScope(level, identification, groupId);
         }
         public IDbTransactionScopeCollection GetDbTransactionScopeCollection()
