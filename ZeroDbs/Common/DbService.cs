@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ZeroDbs.Common
 {
-    public class DbService:IDbService
+    public class DbService : IDbService
     {
         ICache _Cache = null;
         ILog _Log = null;
@@ -13,16 +13,26 @@ namespace ZeroDbs.Common
         IStrCommon _StrCommon = null;
         public ICache Cache { get { return _Cache; } }
         public ILog Log { get { return _Log; } }
-        public IDbOperator DbOperator { get { return _DataOperator;  } }
+        public IDbOperator DbOperator { get { return _DataOperator; } }
         public IStrCommon StrCommon { get { return _StrCommon; } }
         public IDbSearcher DbSearcher { get { return _DbSearcher; } }
         public DbService(IDbSearcher dbSearcher, ILog log, ICache cache)
         {
-            _DbSearcher = dbSearcher;
-            _Cache = cache;
-            _Log = log;
+            _DbSearcher = dbSearcher != null ? dbSearcher : new DbSearcher(new DbExecuteSqlEvent(_DbExecuteSql));
+            _Cache = cache != null ? cache : new LocalMemCache(null);
+            _Log = log != null ? log : Logs.Factory.GetLogger("Sql", 7);
             _StrCommon = new Common.StrCommon();
             _DataOperator = new Common.DbOperator(this);
+        }
+        private void _DbExecuteSql(object sender, DbExecuteSqlEventArgs e)
+        {
+#if DEBUG
+            this.Log.Writer("DbKey={0}&ExecuteType={1}&ExecuteSql=\r\n{2}\r\n&ExecuteResult={3}",
+                    e.DbKey,
+                    e.ExecuteType,
+                    e.ExecuteSql != null && e.ExecuteSql.Count > 0 ? string.Join("\r\n", e.ExecuteSql.ToArray()) : "no sql",
+                    e.Message);
+#endif
         }
         public IDb GetDb<T>() where T: class, new()
         {

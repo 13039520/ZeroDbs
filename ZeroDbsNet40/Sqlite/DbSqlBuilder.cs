@@ -28,6 +28,19 @@ namespace ZeroDbs.Sqlite
             }
             return "";
         }
+        private string GetTableName(ZeroDbs.Common.DbDataTableInfo tableInfo)
+        {
+            return tableInfo.Name;
+        }
+        public string GetTableName<T>() where T : class, new()
+        {
+            var tableInfo = GetDbDataTableInfo<T>();
+            return tableInfo != null ? GetTableName(tableInfo) : string.Empty;
+        }
+        public Common.DbDataTableInfo GetDbDataTableInfo<T>() where T : class, new()
+        {
+            return this.db.GetDbDataTableInfo<T>();
+        }
         public string Page<T>(long page, long size, string where, string orderby, string[] returnFieldNames, string uniqueFieldName = "") where T : class, new()
         {
             var tableInfo = this.ZeroDb.GetDbDataTableInfo<T>();
@@ -1215,11 +1228,6 @@ namespace ZeroDbs.Sqlite
             var where = string.Format("{0}={1}", dbDataColumn.Name, value);
 
             return string.Format("SELECT {0} FROM {1} WHERE {2}", fieldNames, GetTableName(tableInfo), where);
-        }
-
-
-        private string GetTableName(ZeroDbs.Common.DbDataTableInfo tableInfo) {
-            return tableInfo.Name;
         }
 
 

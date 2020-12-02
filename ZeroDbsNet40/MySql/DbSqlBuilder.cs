@@ -29,6 +29,19 @@ namespace ZeroDbs.MySql
             }
             return "";
         }
+        private string GetTableName(ZeroDbs.Common.DbDataTableInfo tableInfo)
+        {
+            return tableInfo.Name;
+        }
+        public string GetTableName<T>() where T : class, new()
+        {
+            var tableInfo = GetDbDataTableInfo<T>();
+            return tableInfo != null ? GetTableName(tableInfo) : string.Empty;
+        }
+        public Common.DbDataTableInfo GetDbDataTableInfo<T>() where T : class, new()
+        {
+            return this.db.GetDbDataTableInfo<T>();
+        }
         public string Page<T>(long page, long size, string where, string orderby, string[] returnFieldNames, string uniqueFieldName = "") where T : class, new()
         {
             var tableInfo = this.ZeroDb.GetDbDataTableInfo<T>();
@@ -199,7 +212,7 @@ namespace ZeroDbs.MySql
         }
         public List<string> Insert<T>(List<System.Collections.Specialized.NameValueCollection> nvcList) where T : class, new()
         {
-            return null;
+            return Insert<T>(nvcList, "");
         }
         public List<string> Insert<T>(List<System.Collections.Specialized.NameValueCollection> nvcList, string appendWhere) where T : class, new()
         {

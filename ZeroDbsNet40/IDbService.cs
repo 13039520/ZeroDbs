@@ -11,12 +11,15 @@ namespace ZeroDbs
         IDbSearcher DbSearcher { get; }
         IDb GetDb<T>() where T : class, new();
         IDb GetDb(string entityFullName);
+        IDb GetDbByDbKey(string dbKey);
         IDbOperator DbOperator { get; }
         IStrCommon StrCommon { get;}
         IDbCommand GetDbCommand<T>() where T : class, new();
         IDbCommand GetDbCommand(string entityFullName);
+        IDbCommand GetDbCommandByDbKey(string dbKey);
         IDbTransactionScope GetDbTransactionScope<T>(System.Data.IsolationLevel level, string identification = "", string groupId = "") where T : class, new();
         IDbTransactionScope GetDbTransactionScope(string entityFullName, System.Data.IsolationLevel level, string identification = "", string groupId = "");
+        IDbTransactionScope GetDbTransactionScopeByDbKey(string dbKey, System.Data.IsolationLevel level, string identification = "", string groupId = "");
         IDbTransactionScopeCollection GetDbTransactionScopeCollection();
     }
 }

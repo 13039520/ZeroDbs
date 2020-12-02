@@ -214,7 +214,7 @@ namespace ZeroDbs.MySql
         }
         public List<string> Insert<T>(List<System.Collections.Specialized.NameValueCollection> nvcList) where T : class, new()
         {
-            return null;
+            return Insert<T>(nvcList, "");
         }
         public List<string> Insert<T>(List<System.Collections.Specialized.NameValueCollection> nvcList, string appendWhere) where T : class, new()
         {
