@@ -19,7 +19,7 @@ namespace ZeroDbs.Logs
 
         }
         public Logger(string logFilePre, int logFileRetentionDays)
-            : this(logFilePre, 90, true)
+            : this(logFilePre, logFileRetentionDays, true)
         {
 
         }
@@ -31,6 +31,7 @@ namespace ZeroDbs.Logs
             {
                 logFileRetentionDays = 1;
             }
+            logFileScanLastTime = DateTime.Now.AddMinutes(-5);
             this.logFileRetentionDays = logFileRetentionDays;
             this.LogPerDateTime = logPerDateTime;
             Factory.SetFileThreadStart();

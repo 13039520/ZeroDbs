@@ -14,6 +14,10 @@ namespace ZeroDbsNet40.Test
 
             DataQuery();
 
+            while (true)
+            {
+                System.Threading.Thread.Sleep(1000);
+            }
         }
 
 
@@ -49,6 +53,7 @@ namespace ZeroDbsNet40.Test
         static ZeroDbs.IDbService dbService = null;
         static void DataQuery()
         {
+            ZeroDbs.ILog log = ZeroDbs.Logs.Factory.GetLogger("sql", 7);
             dbService = new ZeroDbs.Common.DbService(
                 new ZeroDbs.Common.DbSearcher(new ZeroDbs.Common.DbExecuteSqlEvent((sender, e) => {
 #if DEBUG
@@ -59,7 +64,7 @@ namespace ZeroDbsNet40.Test
                     e.Message);
 #endif
                 })),
-                ZeroDbs.Logs.Factory.GetLogger("sql", 7),
+                log,
                 new ZeroDbs.Common.LocalMemCache(null));
 
             long page = 1;
