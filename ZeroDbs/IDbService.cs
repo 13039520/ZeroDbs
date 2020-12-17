@@ -4,16 +4,15 @@ using System.Text;
 
 namespace ZeroDbs
 {
-    public interface IDbService
+    public interface IDbService: IDbOperator
     {
         ICache Cache { get; }
-        ILog Log { get; }
-        IDbSearcher DbSearcher { get; }
+        Dictionary<string, IDb> GetDbs();
+        Dictionary<string, IDb> GetDbs(List<Common.DbConfigDatabaseInfo> dbConfigList);
         IDb GetDb<T>() where T : class, new();
         IDb GetDb(string entityFullName);
         IDb GetDbByDbKey(string dbKey);
-        IDbOperator DbOperator { get; }
-        IStrCommon StrCommon { get;}
+        IStrCommon StrCommon { get; }
         IDbCommand GetDbCommand<T>() where T : class, new();
         IDbCommand GetDbCommand(string entityFullName);
         IDbCommand GetDbCommandByDbKey(string dbKey);
@@ -21,5 +20,10 @@ namespace ZeroDbs
         IDbTransactionScope GetDbTransactionScope(string entityFullName, System.Data.IsolationLevel level, string identification = "", string groupId = "");
         IDbTransactionScope GetDbTransactionScopeByDbKey(string dbKey, System.Data.IsolationLevel level, string identification = "", string groupId = "");
         IDbTransactionScopeCollection GetDbTransactionScopeCollection();
+
+
+        bool AddZeroDbMapping<T>(string dbKey, string tableName) where T : class;
+        bool AddZeroDbMapping(string entityFullName, string dbKey, string tableName);
+
     }
 }

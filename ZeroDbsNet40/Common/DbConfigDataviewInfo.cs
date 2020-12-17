@@ -9,5 +9,6 @@ namespace ZeroDbs.Common
         public string dbKey { get; set; }
         public string tableName { get; set; }
         public string entityKey { get; set; }
+        public bool isStandardMapping { get; set; }
     }
 }

@@ -55,21 +55,20 @@ namespace ZeroDbsNet40.Test
         {
             ZeroDbs.ILog log = ZeroDbs.Logs.Factory.GetLogger("sql", 7);
             dbService = new ZeroDbs.Common.DbService(
-                new ZeroDbs.Common.DbSearcher(new ZeroDbs.Common.DbExecuteSqlEvent((sender, e) => {
+                new ZeroDbs.Common.DbExecuteSqlEvent((sender, e) => {
 #if DEBUG
-                     dbService.Log.Writer("DbKey={0}&ExecuteType={1}&ExecuteSql=\r\n{2}\r\n&ExecuteResult={3}",
+                    log.Writer("DbKey={0}&ExecuteType={1}&ExecuteSql=\r\n{2}\r\n&ExecuteResult={3}",
                     e.DbKey,
                     e.ExecuteType,
                     e.ExecuteSql != null && e.ExecuteSql.Count > 0 ? string.Join("\r\n", e.ExecuteSql.ToArray()) : "no sql",
                     e.Message);
 #endif
-                })),
-                log,
+                }),
                 new ZeroDbs.Common.LocalMemCache(null));
 
             long page = 1;
             long pageSize = 1000;
-            var pageData = dbService.DbOperator.Page<MyDbs.TestDb.tArticleCategory>(page, pageSize, "ID>0");
+            var pageData = dbService.Page<MyDbs.TestDb.tArticleCategory>(page, pageSize, "ID>0");
             if (pageData.Total > 0)
             {
                 foreach (MyDbs.TestDb.tArticleCategory m in pageData.Items)

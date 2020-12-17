@@ -50,7 +50,7 @@ namespace ZeroDbs.Test
         static void DataQuery()
         {
             dbService = new ZeroDbs.Common.DbService(
-                new ZeroDbs.Common.DbSearcher(new ZeroDbs.Common.DbExecuteSqlEvent((sender, e) => {
+                new ZeroDbs.Common.DbExecuteSqlEvent((sender, e) => {
 #if DEBUG
                      dbService.Log.Writer("DbKey={0}&ExecuteType={1}&ExecuteSql=\r\n{2}\r\n&ExecuteResult={3}",
                     e.DbKey,
@@ -58,18 +58,18 @@ namespace ZeroDbs.Test
                     e.ExecuteSql != null && e.ExecuteSql.Count > 0 ? string.Join("\r\n", e.ExecuteSql.ToArray()) : "no sql",
                     e.Message);
 #endif
-                })),
-                ZeroDbs.Logs.Factory.GetLogger("sql", 7),
+                }),
                 new ZeroDbs.Common.LocalMemCache(null));
 
             long page = 1;
             long pageSize = 1000;
-            var pageData = dbService.DbOperator.Page<MyDbs.TestDb.tArticleCategory>(page, pageSize, "ID>0");
+            dbService.AddZeroDbMapping<MyCategory>("TestDb", "T_ArticleCategory");
+            var pageData = dbService.Page<MyCategory>(page, pageSize, "ID>0");
             if (pageData.Total > 0)
             {
-                foreach (MyDbs.TestDb.tArticleCategory m in pageData.Items)
+                foreach (MyCategory m in pageData.Items)
                 {
-                    Console.WriteLine("{0}\t{1}\t{2}\n", m.ID, m.Name, m.IsDel);
+                    Console.WriteLine("{0}\t{1}\t{2}\n", m.ID, m.Name, false);
                 }
                 Console.WriteLine("total={0}&page={1}&pageSize={2}&currentPageListCount={3}", pageData.Total, page, pageSize, pageData.Items.Count);
             }
@@ -78,7 +78,11 @@ namespace ZeroDbs.Test
                 Console.WriteLine("no data");
             }
         }
-
+        class MyCategory
+        {
+            public long ID { get; set; }
+            public string Name { get; set; }
+        }
 
     }
 }

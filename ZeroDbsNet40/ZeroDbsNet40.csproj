@@ -81,9 +81,7 @@
     <Compile Include="Common\DbExecuteSqlType.cs" />
     <Compile Include="Common\DbFactory.cs" />
     <Compile Include="Common\DbMapping.cs" />
-    <Compile Include="Common\DbOperator.cs" />
     <Compile Include="Common\DbPageCountCache.cs" />
-    <Compile Include="Common\DbSearcher.cs" />
     <Compile Include="Common\DbService.cs" />
     <Compile Include="Common\DbTransactionCommandDelegate.cs" />
     <Compile Include="Common\DbTransactionScope.cs" />
@@ -99,7 +97,6 @@
     <Compile Include="IDb.cs" />
     <Compile Include="IDbCommand.cs" />
     <Compile Include="IDbOperator.cs" />
-    <Compile Include="IDbSearcher.cs" />
     <Compile Include="IDbService.cs" />
     <Compile Include="IDbSqlBuilder.cs" />
     <Compile Include="IDbTransactionCommand.cs" />

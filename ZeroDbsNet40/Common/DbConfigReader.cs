@@ -7,8 +7,6 @@ namespace ZeroDbs.Common
     public class DbConfigReader
     {
         private static Common.DbConfigInfo zeroConfigInfo = null;
-        private static DateTime lastReadTime = DateTime.Now;
-        private static readonly int minutes = 5;
         private static readonly string fileName = "ZeroDbConfig.xml";
         private static string filePath = string.Empty;
         public static Common.DbConfigInfo GetZeroDbConfigInfo()
@@ -16,33 +14,33 @@ namespace ZeroDbs.Common
             return Read();
         }
         private static object _lock = new object();
+        public static bool AddZeroDbMapping(string entityFullName, string dbKey, string tableName)
+        {
+            if (string.IsNullOrEmpty(entityFullName) || string.IsNullOrEmpty(dbKey) || string.IsNullOrEmpty(tableName))
+            {
+                return false;
+            }
+            var config = GetZeroDbConfigInfo();
+            lock (_lock)
+            {
+                if (config.Dbs.Find(o => o.dbKey == dbKey) == null) { return false; }
+                if (config.Dvs.Find(o => o.tableName == tableName) == null) { return false; }
+                config.Dvs.Add(new DbConfigDataviewInfo { dbKey = dbKey, entityKey = entityFullName, tableName = tableName, isStandardMapping = false });
+            }
+            return true;
+        }
         private static Common.DbConfigInfo Read()
         {
-            if ((DateTime.Now - lastReadTime).TotalMinutes > minutes)
+            if (zeroConfigInfo == null)
             {
-                Common.DbConfigInfo temp = null;
                 lock (_lock)
                 {
-                    temp = ReadFile();
-                }
-                if (temp != null)
-                {
-                    zeroConfigInfo = temp;
-                }
-            }
-            else
-            {
-                if (zeroConfigInfo == null)
-                {
-                    lock (_lock)
+                    if (zeroConfigInfo == null)
                     {
-                        if (zeroConfigInfo == null)
+                        Common.DbConfigInfo temp = ReadFile();
+                        if (temp != null)
                         {
-                            Common.DbConfigInfo temp = ReadFile();
-                            if (temp != null)
-                            {
-                                zeroConfigInfo = temp;
-                            }
+                            zeroConfigInfo = temp;
                         }
                     }
                 }
@@ -51,6 +49,7 @@ namespace ZeroDbs.Common
         }
         private static Common.DbConfigInfo ReadFile()
         {
+            Common.DbConfigInfo temp = new Common.DbConfigInfo();
             if (string.IsNullOrEmpty(filePath))
             {
                 var dir = AppDomain.CurrentDomain.BaseDirectory;
@@ -58,27 +57,29 @@ namespace ZeroDbs.Common
                 System.IO.FileInfo[] files = directoryInfo.GetFiles(fileName, System.IO.SearchOption.AllDirectories);
                 if (files == null || files.Length < 1)
                 {
-                    throw new Exception("缺少配置文件ZeroDbConfig.xml");
+                    //throw new Exception("缺少配置文件ZeroDbConfig.xml");
+                    return temp;
                 }
                 filePath = files[0].FullName;
             }
             System.IO.FileInfo fileInfo = new System.IO.FileInfo(filePath);
             if (!fileInfo.Exists)
             {
-                throw new Exception("配置文件ZeroDbConfig.xml不存在");
+                //throw new Exception("配置文件ZeroDbConfig.xml不存在");
+                return temp;
             }
-            Common.DbConfigInfo temp = new Common.DbConfigInfo();
+
             try
             {
                 System.Xml.XmlDocument xmlDocument = new System.Xml.XmlDocument();
                 xmlDocument.Load(filePath);
                 System.Xml.XmlNodeList xmlNodeList = xmlDocument.SelectNodes(@"/zero/dbs/db");//GetElementsByTagName("db");
-                if(xmlNodeList == null|| xmlNodeList.Count < 1)
+                if (xmlNodeList == null || xmlNodeList.Count < 1)
                 {
                     throw new Exception("缺少db配置");
                 }
                 temp.Dbs = new List<Common.DbConfigDatabaseInfo>();
-                foreach(System.Xml.XmlNode node in xmlNodeList)
+                foreach (System.Xml.XmlNode node in xmlNodeList)
                 {
                     System.Xml.XmlAttribute dbKey = node.Attributes["dbKey"];
                     System.Xml.XmlAttribute dbConnectionString = node.Attributes["dbConnectionString"];
@@ -93,10 +94,10 @@ namespace ZeroDbs.Common
                     if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(conn) || string.IsNullOrEmpty(type))
                     {
                         continue;
-                        
+
                     }
                     type = type.Trim();
-                    if(string.Equals(type, "SqlServer", StringComparison.OrdinalIgnoreCase))
+                    if (string.Equals(type, "SqlServer", StringComparison.OrdinalIgnoreCase))
                     {
                         type = "SqlServer";
                     }
@@ -145,8 +146,8 @@ namespace ZeroDbs.Common
                         continue;
                     }
                     string key = dbKey.Value;
-                    string name= tableName.Value;
-                    string entity= entityKey.Value;
+                    string name = tableName.Value;
+                    string entity = entityKey.Value;
 
                     if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(name) || string.IsNullOrEmpty(entity))
                     {
@@ -169,11 +170,13 @@ namespace ZeroDbs.Common
                     {
                         dbKey = key,
                         tableName = name,
-                        entityKey = entity
+                        entityKey = entity,
+                        isStandardMapping = true
                     });
                 }
             }
-            catch {
+            catch
+            {
                 temp = null;
             }
 

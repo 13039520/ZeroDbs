@@ -6,10 +6,6 @@ namespace ZeroDbs
 {
     public interface IDbOperator
     {
-        IDbCommand GetDbCommand<T>() where T : class, new();
-        IDbTransactionScope GetDbTransactionScope<T>(System.Data.IsolationLevel level, string identification = "", string groupId = "") where T : class, new();
-        IDbTransactionScopeCollection GetDbTransactionScopeCollection();
-
         T Get<T>(object key) where T : class, new();
         List<T> Select<T>(string where) where T : class, new();
         List<T> Select<T>(string where, string orderby) where T : class, new();

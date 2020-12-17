@@ -117,7 +117,7 @@ namespace %NameSpace%
 
         private void Builder(List<Common.DbConfigDatabaseInfo> dbsList, Config generatorConfig)
         {
-            var dbs = new Common.DbSearcher(null).GetDbs(dbsList);
+            var dbs = new Common.DbService().GetDbs(dbsList);
             foreach (var key in dbs.Keys)
             {
                 var db = dbs[key];
