@@ -8,7 +8,7 @@ namespace ZeroDbs
     {
         IDb ZeroDb { get; }
         string GetTableName<T>() where T : class, new();
-        Common.DbDataTableInfo GetDbDataTableInfo<T>() where T : class, new();
+        Common.DbDataTableInfo GetTable<T>() where T : class, new();
         string Page<T>(long page, long size, string where, string orderby, string[] returnFieldNames, string uniqueFieldName = "") where T : class, new();
         string Page<T>(long page, long size, string where, string orderby, int lengthThreshold, string uniqueFieldName = "") where T : class, new();
         string Insert<T>(T sourceEntity, string[] skipFieldNames) where T : class, new();

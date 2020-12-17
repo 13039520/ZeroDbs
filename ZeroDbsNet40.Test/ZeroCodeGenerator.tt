@@ -124,7 +124,7 @@ string colTextTemplate = match.Groups["temp"].Value;
 
 
 ZeroDbs.IDb db = ZeroDbs.Common.DbFactory.Create(dbInfo);
-System.Collections.Generic.List<ZeroDbs.Common.DbDataTableInfo> tables = db.GetDbDataTableInfoAll();
+System.Collections.Generic.List<ZeroDbs.Common.DbDataTableInfo> tables = db.GetTables();
 int tableNum=0;
 foreach(ZeroDbs.Common.DbDataTableInfo table in tables){
    

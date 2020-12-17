@@ -82,7 +82,7 @@ namespace ZeroDbs.Sqlite
         {
             return new ZeroDbs.Common.DbTransactionScopeCollection();
         }
-        public ZeroDbs.Common.DbDataTableInfo GetDbDataTableInfo<T>() where T : class, new()
+        public ZeroDbs.Common.DbDataTableInfo GetTable<T>() where T : class, new()
         {
             if (!IsMappingToDbKey<T>())
             {
@@ -171,7 +171,7 @@ namespace ZeroDbs.Sqlite
                 throw ex;
             }
         }
-        public List<ZeroDbs.Common.DbDataTableInfo> GetDbDataTableInfoAll()
+        public List<ZeroDbs.Common.DbDataTableInfo> GetTables()
         {
             var cmd = this.GetDbCommand();
             try

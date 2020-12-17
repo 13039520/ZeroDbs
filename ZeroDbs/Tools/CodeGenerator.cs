@@ -121,7 +121,7 @@ namespace %NameSpace%
             foreach (var key in dbs.Keys)
             {
                 var db = dbs[key];
-                var tables = db.GetDbDataTableInfoAll();
+                var tables = db.GetTables();
                 Builder(db.DbConfigDatabaseInfo, tables, db.DbConfigDatabaseInfo, generatorConfig.EntityDir, generatorConfig.AppProjectDir, generatorConfig.EntityNamespace, generatorConfig.EntityTemplate);
             }
         }

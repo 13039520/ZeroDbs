@@ -36,17 +36,17 @@ namespace ZeroDbs.MySql
 
         public string GetTableName<T>() where T : class, new()
         {
-            var tableInfo = GetDbDataTableInfo<T>();
+            var tableInfo = GetTable<T>();
             return tableInfo != null ? GetTableName(tableInfo) : string.Empty;
         }
-        public Common.DbDataTableInfo GetDbDataTableInfo<T>() where T : class, new()
+        public Common.DbDataTableInfo GetTable<T>() where T : class, new()
         {
-            return this.db.GetDbDataTableInfo<T>();
+            return this.db.GetTable<T>();
         }
 
         public string Page<T>(long page, long size, string where, string orderby, string[] returnFieldNames, string uniqueFieldName = "") where T : class, new()
         {
-            var tableInfo = this.ZeroDb.GetDbDataTableInfo<T>();
+            var tableInfo = this.ZeroDb.GetTable<T>();
 
             page = page < 0 ? 0 : page;
             page = page > 0 ? page - 1 : page;
@@ -112,7 +112,7 @@ namespace ZeroDbs.MySql
         }
         public string Page<T>(long page, long size, string where, string orderby, int lengthThreshold, string uniqueFieldName = "") where T : class, new()
         {
-            var tableInfo = this.ZeroDb.GetDbDataTableInfo<T>();
+            var tableInfo = this.ZeroDb.GetTable<T>();
             var dv = Common.DbMapping.GetDbConfigDataViewInfo<T>();
             List<string> names = tableInfo.Colunms.FindAll(o => o.MaxLength < lengthThreshold).Select(o => o.Name).ToList();
             string[] returnFieldNames = names.ToArray();
@@ -128,7 +128,7 @@ namespace ZeroDbs.MySql
         }
         public List<string> Insert<T>(List<T> sourceEntityList, string[] skipFieldNames) where T : class, new()
         {
-            var tableInfo = ZeroDb.GetDbDataTableInfo<T>();
+            var tableInfo = ZeroDb.GetTable<T>();
             if (tableInfo.IsView)
             {
                 throw new Exception("Does not support Insert operation on the view");
@@ -227,7 +227,7 @@ namespace ZeroDbs.MySql
             {
                 throw new Exception("nvcList contains null items");
             }
-            var tableInfo = ZeroDb.GetDbDataTableInfo<T>();
+            var tableInfo = ZeroDb.GetTable<T>();
             if (tableInfo.IsView)
             {
                 throw new Exception("Does not support Insert operation on the view");
@@ -297,7 +297,7 @@ namespace ZeroDbs.MySql
         }
         public List<string> Update<T>(List<T> sourceEntityList, string[] setFieldNames, string[] whereFieldNames) where T : class, new()
         {
-            var tableInfo = ZeroDb.GetDbDataTableInfo<T>();
+            var tableInfo = ZeroDb.GetTable<T>();
             if (tableInfo.IsView)
             {
                 throw new Exception("Does not support Update operation on the view");
@@ -475,7 +475,7 @@ namespace ZeroDbs.MySql
             {
                 throw new Exception("nvcList contains null items");
             }
-            var tableInfo = ZeroDb.GetDbDataTableInfo<T>();
+            var tableInfo = ZeroDb.GetTable<T>();
             if (tableInfo.IsView)
             {
                 throw new Exception("Does not support Update operation on the view");
@@ -600,7 +600,7 @@ namespace ZeroDbs.MySql
             {
                 sqlWhere = sqlWhere.Remove(0, 5);
             }
-            var tableInfo = ZeroDb.GetDbDataTableInfo<T>();
+            var tableInfo = ZeroDb.GetTable<T>();
             if (tableInfo.IsView)
             {
                 throw new Exception("Does not support Delete operation on the view");
@@ -620,7 +620,7 @@ namespace ZeroDbs.MySql
 
             if (sourceEntityList.Contains(null)) { throw new Exception("sourceEntityList contains null items"); }
 
-            var tableInfo = ZeroDb.GetDbDataTableInfo<T>();
+            var tableInfo = ZeroDb.GetTable<T>();
             if (tableInfo.IsView)
             {
                 throw new Exception("Does not support Delete operation on the view");
@@ -711,7 +711,7 @@ namespace ZeroDbs.MySql
             {
                 throw new Exception("The length of nvcList should not exceed 5000 items");
             }
-            var tableInfo = ZeroDb.GetDbDataTableInfo<T>();
+            var tableInfo = ZeroDb.GetTable<T>();
             if (tableInfo.IsView)
             {
                 throw new Exception("Does not support Delete operation on the view");
@@ -846,7 +846,7 @@ namespace ZeroDbs.MySql
 
         public string Select<T>(T sourceEntity, string[] whereField, string orderby) where T : class, new()
         {
-            var tableInfo = ZeroDb.GetDbDataTableInfo<T>();
+            var tableInfo = ZeroDb.GetTable<T>();
             if (whereField == null || whereField.Length < 1)
             {
                 var temp = tableInfo.Colunms.FindAll(o => o.IsPrimaryKey);
@@ -920,7 +920,7 @@ namespace ZeroDbs.MySql
         }
         public string Select<T>(string where, string orderby, string[] returnFieldNames) where T : class, new()
         {
-            var tableInfo = ZeroDb.GetDbDataTableInfo<T>();
+            var tableInfo = ZeroDb.GetTable<T>();
             string[] fieldArray = tableInfo.Colunms.Select(o => o.Name).ToArray();
             if (returnFieldNames != null && returnFieldNames.Length > 0)
             {
@@ -975,7 +975,7 @@ namespace ZeroDbs.MySql
         }
         public string Select<T>(string where, string orderby, int top, string[] returnFieldNames) where T : class, new()
         {
-            var tableInfo = ZeroDb.GetDbDataTableInfo<T>();
+            var tableInfo = ZeroDb.GetTable<T>();
             string[] fieldArray = tableInfo.Colunms.Select(o => o.Name).ToArray();
             if (returnFieldNames != null && returnFieldNames.Length > 0)
             {
@@ -1040,7 +1040,7 @@ namespace ZeroDbs.MySql
         }
         public string Select<T>(string where, string orderby, int top, int lengthThreshold) where T : class, new()
         {
-            var tableInfo = ZeroDb.GetDbDataTableInfo<T>();
+            var tableInfo = ZeroDb.GetTable<T>();
             var temp = tableInfo.Colunms.FindAll(o => o.MaxLength < lengthThreshold);
             if (temp == null || temp.Count < 1)
             {
@@ -1102,7 +1102,7 @@ namespace ZeroDbs.MySql
                 throw new Exception("nvcList contains null items");
             }
 
-            var tableInfo = ZeroDb.GetDbDataTableInfo<T>();
+            var tableInfo = ZeroDb.GetTable<T>();
             var primaryKeys = tableInfo.Colunms.FindAll(o => o.IsPrimaryKey);
             if (primaryKeys == null || primaryKeys.Count < 1)
             {
@@ -1196,12 +1196,12 @@ namespace ZeroDbs.MySql
         }
         public string Count<T>(string where) where T : class, new()
         {
-            var tableInfo = this.ZeroDb.GetDbDataTableInfo<T>();
+            var tableInfo = this.ZeroDb.GetTable<T>();
             return string.Format("SELECT COUNT(1) FROM {0} WHERE {1}", tableInfo.Name, string.IsNullOrEmpty(where) ? "1>0" : where);
         }
         public string SelectByKey<T>(object key) where T : class, new()
         {
-            var tableInfo = ZeroDb.GetDbDataTableInfo<T>();
+            var tableInfo = ZeroDb.GetTable<T>();
             ZeroDbs.Common.DbDataColumnInfo dbDataColumn = null;
             var temp = tableInfo.Colunms.FindAll(o => o.IsPrimaryKey);
             if (temp != null && temp.Count == 1)
