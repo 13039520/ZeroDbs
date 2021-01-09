@@ -53,13 +53,24 @@ namespace ZeroDbs.Common
             {
                 var entityKey = typeof(T).FullName;
                 var info1 = zeroConfigInfo.Dvs.FindAll(o => string.Equals(o.entityKey, entityKey, StringComparison.OrdinalIgnoreCase));
-                if (info1 == null)
-                {
-                    return null;
-                }
                 return info1;
             }
             return null;
+        }
+        public static bool IsStandardMapping<T>()
+        {
+            var zeroConfigInfo = DbConfigReader.GetZeroDbConfigInfo();
+            if (zeroConfigInfo != null && zeroConfigInfo.Dbs != null && zeroConfigInfo.Dvs.Count > 0)
+            {
+                var entityKey = typeof(T).FullName;
+                var info1 = zeroConfigInfo.Dvs.Find(o => string.Equals(o.entityKey, entityKey, StringComparison.OrdinalIgnoreCase));
+                if (info1 == null)
+                {
+                    return false;
+                }
+                return info1.isStandardMapping;
+            }
+            return false;
         }
 
 

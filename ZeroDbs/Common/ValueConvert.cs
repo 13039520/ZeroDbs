@@ -47,16 +47,6 @@ namespace ZeroDbs.Common
                     {
                         s = "'" + Value.ToString() + "'";
                     }
-                    else if (nt.IndexOf("System.Byte") > 0)
-                    {
-                        byte[] tt = new byte[100];
-                        tt.ToString();
-                        s = "NULL";
-                    }
-                    else if (nt.IndexOf("System.SByte") > 0)
-                    {
-                        s = "NULL";
-                    }
                     else if (nt.IndexOf("System.Char") > 0)
                     {
                         s = "'" + Value.ToString() + "'";
@@ -83,12 +73,6 @@ namespace ZeroDbs.Common
                         break;
                     case "Char":
                         s = "'" + (Value.ToString()) + "'";
-                        break;
-                    case "Byte":
-                        s = "NULL";
-                        break;
-                    case "SByte":
-                        s = "NULL";
                         break;
                     case "DateTime":
                         s = "'" + Value.ToString() + "'";
