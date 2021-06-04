@@ -240,6 +240,37 @@ namespace ZeroDbs.Common
                 throw ex;
             }
         }
+        public void LoadParameters(object entity)
+        {
+            Parameters.Clear();
+            if (entity == null) { return; }
+            System.Reflection.PropertyInfo[] ps = entity.GetType().GetProperties();
+            foreach (System.Reflection.PropertyInfo p in ps)
+            {
+                object value = p.GetValue(entity, null);
+                if (value == null)
+                {
+                    value = DBNull.Value;
+                }
+                Parameters.Add(CreateParameter("@" + p.Name, value));
+            }
+        }
+        public ISqlInsertBuilder Insert(string tableName)
+        {
+            return new SqlInsertBuilder(tableName);
+        }
+        public ISqlDeleteBuilder Delete(string tableName)
+        {
+            return new SqlDeleteBuilder(tableName);
+        }
+        public ISqlUpdateBuilder Update(string tableName)
+        {
+            return new SqlUpdateBuilder(tableName);
+        }
+        public ISqlSelectBuilder Select(string tableName)
+        {
+            return new SqlSelectBuilder(tableName);
+        }
 
         bool _disposed;
         public void Dispose()

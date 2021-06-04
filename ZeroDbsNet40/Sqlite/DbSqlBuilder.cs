@@ -602,7 +602,7 @@ namespace ZeroDbs.Sqlite
             {
                 throw new Exception("Does not support Delete operation on the view");
             }
-            return string.Format("DELETE {0} WHERE {1}", tableInfo.Name, sqlWhere);
+            return string.Format("DELETE FROM {0} WHERE {1}", tableInfo.Name, sqlWhere);
         }
         public string Delete<T>(T sourceEntity, string[] useFiled) where T : class, new()
         {
@@ -681,7 +681,7 @@ namespace ZeroDbs.Sqlite
                     throw new Exception("The generated where condition is not available");
                 }
                 where.Remove(where.Length - 5, 5);
-                reval.Add(string.Format("DELETE {0} WHERE {1}", GetTableName(tableInfo), where));
+                reval.Add(string.Format("DELETE FROM {0} WHERE {1}", GetTableName(tableInfo), where));
             }
             return reval;
         }
@@ -792,7 +792,7 @@ namespace ZeroDbs.Sqlite
                         sqlWhere.Remove(sqlWhere.Length - 5, 5);
                     }
 
-                    string sql = string.Format("DELETE {0} WHERE {1}", GetTableName(tableInfo), sqlWhere);
+                    string sql = string.Format("DELETE FROM {0} WHERE {1}", GetTableName(tableInfo), sqlWhere);
                     if (!reval.Contains(sql))
                     {
                         reval.Add(sql);
@@ -826,7 +826,7 @@ namespace ZeroDbs.Sqlite
                     else
                     {
                         keys.Remove(keys.Length - 1, 1);
-                        reval.Add(string.Format("DELETE {0} WHERE {1} IN({2}){3}", GetTableName(tableInfo), primaryKeyName, keys, isAppendWhere ? " WHERE " + appendWhere : ""));
+                        reval.Add(string.Format("DELETE FROM {0} WHERE {1} IN({2}){3}", GetTableName(tableInfo), primaryKeyName, keys, isAppendWhere ? " WHERE " + appendWhere : ""));
                         keys.Clear();
                         keys.AppendFormat("{0},", valueString);
                         groupIndex = 1;
@@ -835,7 +835,7 @@ namespace ZeroDbs.Sqlite
                 if (keys.Length > 0)
                 {
                     keys.Remove(keys.Length - 1, 1);
-                    reval.Add(string.Format("DELETE {0} WHERE {1} IN({2}){3}", GetTableName(tableInfo), primaryKeyName, keys, isAppendWhere ? " WHERE " + appendWhere : ""));
+                    reval.Add(string.Format("DELETE FROM {0} WHERE {1} IN({2}){3}", GetTableName(tableInfo), primaryKeyName, keys, isAppendWhere ? " WHERE " + appendWhere : ""));
                 }
             }
             return reval;
@@ -1027,11 +1027,11 @@ namespace ZeroDbs.Sqlite
             {
                 if (string.IsNullOrEmpty(orderby))
                 {
-                    return string.Format("SELECT TOP {0} {1} FROM {2} WHERE {3}", top, field, GetTableName(tableInfo), where);
+                    return string.Format("SELECT {1} FROM {2} WHERE {3} LIMIT {0}", top, field, GetTableName(tableInfo), where);
                 }
                 else
                 {
-                    return string.Format("SELECT TOP {0} {1} FROM {2} WHERE {3} ORDER BY {4}", top, field, GetTableName(tableInfo), where, orderby);
+                    return string.Format("SELECT {1} FROM {2} WHERE {3} ORDER BY {4} LIMIT {0}", top, field, GetTableName(tableInfo), where, orderby);
                 }
             }
         }
@@ -1069,11 +1069,11 @@ namespace ZeroDbs.Sqlite
             {
                 if (string.IsNullOrEmpty(orderby))
                 {
-                    return string.Format("SELECT TOP {0} {1} FROM {2} WHERE {3}", top, field, GetTableName(tableInfo), where);
+                    return string.Format("SELECT {1} FROM {2} WHERE {3} LIMIT {0}", top, field, GetTableName(tableInfo), where);
                 }
                 else
                 {
-                    return string.Format("SELECT TOP {0} {1} FROM {2} WHERE {3} ORDER BY {4}", top, field, GetTableName(tableInfo), where, orderby);
+                    return string.Format("SELECT {1} FROM {2} WHERE {3} ORDER BY {4} LIMIT {0}", top, field, GetTableName(tableInfo), where, orderby);
                 }
             }
         }

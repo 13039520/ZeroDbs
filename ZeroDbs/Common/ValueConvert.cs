@@ -6,7 +6,7 @@ namespace ZeroDbs.Common
 {
     internal static class ValueConvert
     {
-        public static string SqlValueStrByValue(object Value)
+        public static string SqlValueStrByValue(object Value, string datetimeFormat = "")
         {
             if (Value is null)
             {
@@ -32,7 +32,14 @@ namespace ZeroDbs.Common
                     }
                     else if (nt.IndexOf("System.DateTime") > 0)
                     {
-                        s = "'" + Value.ToString() + "'";
+                        if (string.IsNullOrEmpty(datetimeFormat))
+                        {
+                            s = "'" + Value.ToString() + "'";
+                        }
+                        else
+                        {
+                            s = "'" + Convert.ToDateTime(Value).ToString(datetimeFormat) + "'";
+                        }
                     }
                     else if (nt.IndexOf("System.TimeSpan") > 0)
                     {

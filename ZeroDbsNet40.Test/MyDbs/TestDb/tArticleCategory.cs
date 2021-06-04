@@ -1,5 +1,6 @@
-using System;
-
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
 namespace MyDbs.TestDb
 {
     /// <summary>
@@ -11,7 +12,7 @@ namespace MyDbs.TestDb
         
         private long _ID;
         /// <summary>
-        /// ID+[PrimaryKey]
+        /// [PrimaryKey]ID
         /// </summary>
         public long ID
         {
@@ -36,7 +37,6 @@ namespace MyDbs.TestDb
             get { return _IsDel; }
             set { _IsDel = value; }
         }
-
 
     }
 }

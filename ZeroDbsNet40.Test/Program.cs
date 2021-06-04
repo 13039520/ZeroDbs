@@ -7,22 +7,14 @@ namespace ZeroDbsNet40.Test
 {
     class Program
     {
+        static ZeroDbs.IDbService dbService = null;
         static void Main(string[] args)
         {
-
+            dbService = new ZeroDbs.Common.DbService();
             //CodeGenerator();
-
-            DataQuery();
-
-            //DataQuery2();
-
-            while (true)
-            {
-                System.Threading.Thread.Sleep(1000);
-            }
+            //InsertTest();
+            //DataQuery();
         }
-
-
         static void CodeGenerator()
         {
             Console.WriteLine("正在生成……");
@@ -30,18 +22,18 @@ namespace ZeroDbsNet40.Test
             ZeroDbs.Tools.CodeGenerator generator = new ZeroDbs.Tools.CodeGenerator();
             generator.Dbs.Add(new ZeroDbs.Common.DbConfigDatabaseInfo
             {
-                dbConnectionString = "Data Source=.;Initial Catalog=MyTestDb;User ID=sa;Password=123;",
+                dbConnectionString = "Data Source=.;Initial Catalog=MyTestDb;User ID=sa;Password=yangshaogao;",
                 dbKey = "TestDb",
                 dbType = "SqlServer"
             });
             generator.GeneratorConfig = new ZeroDbs.Tools.CodeGenerator.Config
             {
-                AppProjectDir = @"D:\Work\ZeroDbs\ZeroDbs.Test40",
-                AppProjectNamespace = "ZeroDbs.Test40",
-                AppProjectName = "ZeroDbs.Test40",
-                EntityDir = @"D:\Work\ZeroDbs\ZeroDbs.Test40\MyDbs",
+                AppProjectDir = @"D:\Work\ZeroDbs\ZeroDbsNet40.Test",
+                AppProjectNamespace = "ZeroDbsNet40.Test",
+                AppProjectName = "ZeroDbsNet40.Test",
+                EntityDir = @"D:\Work\ZeroDbs\ZeroDbsNet40.Test\MyDbs",
                 EntityNamespace = "MyDbs",
-                EntityProjectName = "ZeroDbs.Test40"
+                EntityProjectName = "ZeroDbsNet40.Test"
             };
             generator.OnSingleTableGenerated += (e) => {
                 Console.WriteLine("[{0}/{1}]\t{2}\t{3}", e.tableNum, e.tableCount, e.table.Name, e.entityClassFullName);
@@ -50,115 +42,40 @@ namespace ZeroDbsNet40.Test
 
             Console.WriteLine("生成成功！");
         }
-        private static void CodeGenerator2()
-        {
-            ZeroDbs.Tools.CodeGenerator generator = new ZeroDbs.Tools.CodeGenerator();
-            string path = @"D:\Work\WanYangProjects\HualianLIS\HualianLIS.DeviceTerminalApp\Files.db3";
-            generator.Dbs.Add(new ZeroDbs.Common.DbConfigDatabaseInfo
-            {
-                dbConnectionString = "Data Source=" + path + ";Version=3;",
-                dbKey = "LocalFiles",
-                dbType = "Sqlite"
-            });
-            generator.GeneratorConfig = new ZeroDbs.Tools.CodeGenerator.Config
-            {
-                AppProjectDir = @"D:\Work\WanYangProjects\HualianLIS\HualianLIS.DeviceTerminalApp",
-                AppProjectNamespace = "HualianLIS.DeviceTerminalApp",
-                AppProjectName = "HualianLIS.DeviceTerminalApp",
-                EntityDir = @"D:\Work\WanYangProjects\HualianLIS\HualianLIS.DeviceTerminalApp\MyDbs",
-                EntityNamespace = "MyDbs",
-                EntityProjectName = "HualianLIS.DeviceTerminalApp"
-            };
-            generator.OnSingleTableGenerated += (ex) =>
-            {
-                Console.WriteLine(string.Format("[{0}/{1}]\t{2}\t{3}", ex.tableNum, ex.tableCount, ex.table.Name, ex.entityClassFullName));
-            };
-            generator.Run();
-
-            Console.WriteLine("生成成功！");
-        }
-
-
-        static ZeroDbs.IDbService dbService = null;
         static void DataQuery()
         {
-            ZeroDbs.ILog log = ZeroDbs.Logs.Factory.GetLogger("sql", 7);
-            dbService = new ZeroDbs.Common.DbService(
-                new ZeroDbs.Common.DbExecuteSqlEvent((sender, e) => {
-#if DEBUG
-                    log.Writer("DbKey={0}&ExecuteType={1}&ExecuteSql=\r\n{2}\r\n&ExecuteResult={3}",
-                    e.DbKey,
-                    e.ExecuteType,
-                    e.ExecuteSql != null && e.ExecuteSql.Count > 0 ? string.Join("\r\n", e.ExecuteSql.ToArray()) : "no sql",
-                    e.Message);
-#endif
-                }),
-                new ZeroDbs.Common.LocalMemCache(null));
-
-            /*long page = 1;
+            long page = 1;
             long pageSize = 1000;
-            var pageData = dbService.Page<MyDbs.TestDb.tArticleCategory>(page, pageSize, "ID>0");
+            dbService.AddZeroDbMapping<MyCategory>("TestDb", "T_ArticleCategory");
+            var pageData = dbService.Page<MyCategory>(page, pageSize, "IsDel=0");
             if (pageData.Total > 0)
             {
-                foreach (MyDbs.TestDb.tArticleCategory m in pageData.Items)
+                foreach (MyCategory m in pageData.Items)
                 {
-                    Console.WriteLine("{0}\t{1}\t{2}\n", m.ID, m.Name, m.IsDel);
+                    Console.WriteLine("{0}\t{1}\t{2}\n", m.ID, m.Name, false);
                 }
                 Console.WriteLine("total={0}&page={1}&pageSize={2}&currentPageListCount={3}", pageData.Total, page, pageSize, pageData.Items.Count);
             }
             else
             {
                 Console.WriteLine("no data");
-            }*/
-            using(var cmd = dbService.GetDbCommand<MyDbs.TestDb.tArticleCategory>())
-            {
-                cmd.CommandText = "SELECT * FROM T_ArticleCategory";
-                cmd.ExecuteReader<MyDbs.TestDb.tArticleCategory>((result) => {
-                    Console.WriteLine("[{3}]{0}\t{1}\t{2}\n", result.RowData.ID, result.RowData.Name, result.RowData.IsDel, result.RowNum);
-                    //result.Next = false;
-                }, true);
             }
-            Console.WriteLine("读取结束！");
         }
-        static void DataQuery2()
+        static void InsertTest()
         {
-            ZeroDbs.ILog log = ZeroDbs.Logs.Factory.GetLogger("sql", 7);
-            dbService = new ZeroDbs.Common.DbService(
-                new ZeroDbs.Common.DbExecuteSqlEvent((sender, e) => {
-#if DEBUG
-                    log.Writer("DbKey={0}&ExecuteType={1}&ExecuteSql=\r\n{2}\r\n&ExecuteResult={3}",
-                    e.DbKey,
-                    e.ExecuteType,
-                    e.ExecuteSql != null && e.ExecuteSql.Count > 0 ? string.Join("\r\n", e.ExecuteSql.ToArray()) : "no sql",
-                    e.Message);
-#endif
-                }),
-                new ZeroDbs.Common.LocalMemCache(null));
-
-            /*List<MyDbs.LocalFiles.tUploadRecord> fileRecords = new List<MyDbs.LocalFiles.tUploadRecord>();
-            for (var i=0;i<5; i++)
+            using (var cmd = dbService.GetDbCommand<MyDbs.TestDb.tArticleCategory>())
             {
-                fileRecords.Add(new MyDbs.LocalFiles.tUploadRecord
-                {
-                    ID = 0,
-                    FilePath = "D:\\works\\a"+i+".txt",
-                    FileCreationTime = DateTime.Now,
-                    FileLastWriteTime = DateTime.Now,
-                    FileUploadTime = DateTime.Now,
-                    FileUploadStatus = 0,
-                    FileUploadStatusRemark = "待上传(新加入)"
-                });
+                cmd.CommandText = "INSERT INTO T_ArticleCategory(ID,IsDel,Name) VALUES(@ID,@IsDel,@Name)";
+                cmd.LoadParameters(new MyDbs.TestDb.tArticleCategory { ID = 14, IsDel = false, Name = "Test888" });
+                cmd.ExecuteNonQuery();
             }
-            dbService.Insert(fileRecords);*/
-            var records = dbService.Select<MyDbs.LocalFiles.tUploadRecord>("");
-            foreach(var m in records)
-            {
-                Console.WriteLine("{0}\t{1}", m.ID, m.FilePath);
-            }
-            dbService.Update(records);
-
         }
-
+        class MyCategory
+        {
+            public long ID { get; set; }
+            public string Name { get; set; }
+        }
+        
 
     }
 }

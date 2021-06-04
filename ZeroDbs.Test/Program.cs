@@ -7,11 +7,12 @@ namespace ZeroDbs.Test
     /// </summary>
     class Program
     {
+        static ZeroDbs.IDbService dbService = null;
         static void Main(string[] args)
         {
-
+            dbService = new ZeroDbs.Common.DbService();
             //CodeGenerator();
-
+            InsertTest();
             DataQuery();
 
         }
@@ -45,26 +46,16 @@ namespace ZeroDbs.Test
             Console.WriteLine("生成成功！");
         }
 
-
-        static ZeroDbs.IDbService dbService = null;
         static void DataQuery()
         {
-            dbService = new ZeroDbs.Common.DbService(
-                new ZeroDbs.Common.DbExecuteSqlEvent((sender, e) => {
-#if DEBUG
-                     dbService.Log.Writer("DbKey={0}&ExecuteType={1}&ExecuteSql=\r\n{2}\r\n&ExecuteResult={3}",
-                    e.DbKey,
-                    e.ExecuteType,
-                    e.ExecuteSql != null && e.ExecuteSql.Count > 0 ? string.Join("\r\n", e.ExecuteSql.ToArray()) : "no sql",
-                    e.Message);
-#endif
-                }),
-                new ZeroDbs.Common.LocalMemCache(null));
-
+            using(var cmd = dbService.GetDbCommand(""))
+            {
+                cmd.SqlDeleteBuilder("a").ToString();
+            }
             long page = 1;
             long pageSize = 1000;
             dbService.AddZeroDbMapping<MyCategory>("TestDb", "T_ArticleCategory");
-            var pageData = dbService.Page<MyCategory>(page, pageSize, "ID>0");
+            var pageData = dbService.Page<MyCategory>(page, pageSize, "IsDel=0");
             if (pageData.Total > 0)
             {
                 foreach (MyCategory m in pageData.Items)
@@ -76,6 +67,15 @@ namespace ZeroDbs.Test
             else
             {
                 Console.WriteLine("no data");
+            }
+        }
+        static void InsertTest()
+        {
+            using(var cmd = dbService.GetDbCommand<MyDbs.TestDb.tArticleCategory>())
+            {
+                cmd.CommandText = "INSERT INTO T_ArticleCategory(ID,IsDel,Name) VALUES(@ID,@IsDel,@Name)";
+                cmd.LoadParameters(new MyDbs.TestDb.tArticleCategory { ID = 13, IsDel = false, Name = "Test777" });
+                cmd.ExecuteNonQuery();
             }
         }
         class MyCategory

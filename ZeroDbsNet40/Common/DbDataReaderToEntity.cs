@@ -178,10 +178,13 @@ namespace ZeroDbs.Common
                 {
                     string fieldName = ps[j].Info.Name;
                     string name = fieldName.ToLower();
-                    object val = DataReader[FieldDic[name]];
-                    if (FieldDic.ContainsKey(name)&& val != DBNull.Value)
+                    if (FieldDic.ContainsKey(name))
                     {
-                        ps[j].Setter(obj, val);
+                        object val = DataReader[FieldDic[name]];
+                        if (val != DBNull.Value)
+                        {
+                            ps[j].Setter(obj, val);
+                        }
                     }
                     j++;
                 }
@@ -215,10 +218,13 @@ namespace ZeroDbs.Common
                 {
                     string fieldName = ps[num].Info.Name;
                     string name = fieldName.ToLower();
-                    object val = DataReader[FieldDic[name]];
-                    if (FieldDic.ContainsKey(name)&&val!=DBNull.Value)
+                    if (FieldDic.ContainsKey(name))
                     {
-                        ps[num].Setter(obj, val);
+                        object val = DataReader[FieldDic[name]];
+                        if (val != DBNull.Value)
+                        {
+                            ps[num].Setter(obj, val);
+                        }
                     }
                     num++;
                 }
@@ -251,10 +257,13 @@ namespace ZeroDbs.Common
                 {
                     string fieldName = ps[num].Info.Name;
                     string name = fieldName.ToLower();
-                    object val = DataReader[FieldDic[name]];
-                    if (FieldDic.ContainsKey(name) && val != DBNull.Value)
+                    if (FieldDic.ContainsKey(name))
                     {
-                        ps[num].Setter(obj, val);
+                        object val = DataReader[FieldDic[name]];
+                        if (val != DBNull.Value)
+                        {
+                            ps[num].Setter(obj, val);
+                        }
                     }
                     num++;
                 }

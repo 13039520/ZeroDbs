@@ -6,7 +6,6 @@ namespace ZeroDbs
 {
     public interface IDbService : IDbOperator
     {
-        ICache Cache { get; }
         Dictionary<string, IDb> GetDbs();
         Dictionary<string, IDb> GetDbs(List<Common.DbConfigDatabaseInfo> dbConfigList);
         IDb GetDb<T>() where T : class, new();

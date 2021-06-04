@@ -1,5 +1,6 @@
-using System;
-
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
 namespace MyDbs.TestDb
 {
     /// <summary>
@@ -11,7 +12,7 @@ namespace MyDbs.TestDb
         
         private long _ID;
         /// <summary>
-        /// ID+[PrimaryKey]+[Identity]
+        /// [Identity][PrimaryKey]ID
         /// </summary>
         public long ID
         {
@@ -117,7 +118,6 @@ namespace MyDbs.TestDb
             get { return _StatusChangeUserID; }
             set { _StatusChangeUserID = value; }
         }
-
 
     }
 }

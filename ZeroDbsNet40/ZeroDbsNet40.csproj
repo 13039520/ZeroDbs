@@ -14,7 +14,7 @@
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <Description>Database access library of .net framework 4.0 .  Support SqlServer/MySql/Sqlite .</Description>
-    <Version>2.2.0</Version>
+    <Version>3.8.0.0</Version>
     <Author>ruzi</Author>
     <Icon>favicon.png</Icon>
     <NuGetPackageImportStamp>
@@ -67,6 +67,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\DatabaseType.cs" />
     <Compile Include="Common\DbCommand.cs" />
     <Compile Include="Common\DbConfigDatabaseInfo.cs" />
     <Compile Include="Common\DbConfigDataviewInfo.cs" />
@@ -88,12 +89,14 @@
     <Compile Include="Common\DbTransactionScope.cs" />
     <Compile Include="Common\DbTransactionScopeCollection.cs" />
     <Compile Include="Common\EntityPropertyEmitSetter.cs" />
-    <Compile Include="Common\LocalMemCache.cs" />
     <Compile Include="Common\PageData.cs" />
     <Compile Include="Common\SqlCheck.cs" />
+    <Compile Include="Common\SqlDeleteBuilder.cs" />
+    <Compile Include="Common\SqlInsertBuilder.cs" />
+    <Compile Include="Common\SqlUpdateBuilder.cs" />
+    <Compile Include="Common\SqlSelectBuilder.cs" />
     <Compile Include="Common\StrCommon.cs" />
     <Compile Include="Common\ValueConvert.cs" />
-    <Compile Include="ICache.cs" />
     <Compile Include="IDataTypeMaping.cs" />
     <Compile Include="IDb.cs" />
     <Compile Include="IDbCommand.cs" />
@@ -103,8 +106,11 @@
     <Compile Include="IDbTransactionCommand.cs" />
     <Compile Include="IDbTransactionScope.cs" />
     <Compile Include="IDbTransactionScopeCollection.cs" />
+    <Compile Include="ISqlInsertBuilder.cs" />
+    <Compile Include="ISqlDeleteBuilder.cs" />
+    <Compile Include="ISqlUpdateBuilder.cs" />
+    <Compile Include="ISqlSelectBuilder.cs" />
     <Compile Include="ILog.cs" />
-    <Compile Include="ISerialization.cs" />
     <Compile Include="IStrCommon.cs" />
     <Compile Include="Logs\Factory.cs" />
     <Compile Include="Logs\Logger.cs" />

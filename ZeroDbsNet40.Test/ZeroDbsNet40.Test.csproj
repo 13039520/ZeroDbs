@@ -45,6 +45,25 @@
     <Compile Include="MyDbs\TestDb\tArticle.cs" />
     <Compile Include="MyDbs\TestDb\tArticleCategory.cs" />
     <Compile Include="MyDbs\TestDb\tArticleComment.cs" />
+    <Compile Include="MyDbs\TestDb\tBT_WEIGHTTYPE.cs" />
+    <Compile Include="MyDbs\TestDb\tDT_CARWEIGHT_WEIGHT.cs" />
+    <Compile Include="MyDbs\TestDb\tE_Configuration.cs" />
+    <Compile Include="MyDbs\TestDb\tE_ConfigurationDetails.cs" />
+    <Compile Include="MyDbs\TestDb\tE_RawValues.cs" />
+    <Compile Include="MyDbs\TestDb\tE_TagInfo.cs" />
+    <Compile Include="MyDbs\TestDb\tIT_MATERIAL.cs" />
+    <Compile Include="MyDbs\TestDb\tIT_MATERIAL_BIG.cs" />
+    <Compile Include="MyDbs\TestDb\tIT_MATERIAL_SMALL.cs" />
+    <Compile Include="MyDbs\TestDb\tIT_STORE.cs" />
+    <Compile Include="MyDbs\TestDb\tIT_SUPPLIER.cs" />
+    <Compile Include="MyDbs\TestDb\tIT_TRANS.cs" />
+    <Compile Include="MyDbs\TestDb\tM_Alumina.cs" />
+    <Compile Include="MyDbs\TestDb\tM_AluminaDetail.cs" />
+    <Compile Include="MyDbs\TestDb\tM_AluminaRawValue.cs" />
+    <Compile Include="MyDbs\TestDb\tM_Approval.cs" />
+    <Compile Include="MyDbs\TestDb\tM_JudgePart.cs" />
+    <Compile Include="MyDbs\TestDb\tQ_CARWEIGHT120T.cs" />
+    <Compile Include="MyDbs\TestDb\tQ_ProductType.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ZeroCodeGenerator.cs">
@@ -71,5 +90,6 @@
       <Name>ZeroDbsNet40</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

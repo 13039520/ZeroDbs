@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Description>Database access library of .net standard 2.1 .  Support SqlServer/MySql/Sqlite .</Description>
-    <Version>3.6.0</Version>
+    <Version>3.8.0</Version>
     <Authors>ruzi</Authors>
     <PackageIcon>favicon.png</PackageIcon>
     <PackageReleaseNotes>Database access library of .net standard 2.1 .  Support SqlServer/MySql/Sqlite .</PackageReleaseNotes>

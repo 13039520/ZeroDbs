@@ -27,9 +27,11 @@ namespace ZeroDbs
         void ExecuteReader<T>(Common.DbExecuteReadOnebyOneAction<T> action, bool useEmit = true) where T : class, new();
         System.Data.IDataReader ExecuteReader();
         object ExecuteScalar();
-
-
-
+        void LoadParameters(object entity);
+        ISqlInsertBuilder Insert(string tableName);
+        ISqlDeleteBuilder Delete(string tableName);
+        ISqlUpdateBuilder Update(string tableName);
+        ISqlSelectBuilder Select(string tableName);
 
     }
 }

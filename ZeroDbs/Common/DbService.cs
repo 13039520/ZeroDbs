@@ -6,37 +6,22 @@ namespace ZeroDbs.Common
 {
     public class DbService : IDbService
     {
-        ICache _Cache = null;
         IStrCommon _StrCommon = null;
         DbExecuteSqlEvent _dbExecuteSqlEvent = null;
         static Dictionary<string, IDb> _dbInstanceDic = new Dictionary<string, IDb>();
         static object _lock = new object();
 
-        public ICache Cache { get { return _Cache; } }
         public IStrCommon StrCommon { get { return _StrCommon; } }
 
 
         public DbService()
         {
-            _dbExecuteSqlEvent = new DbExecuteSqlEvent(_DbExecuteSql);
-            _Cache = new LocalMemCache(null);
             _StrCommon = new Common.StrCommon();
         }
-        public DbService(DbExecuteSqlEvent dbExecuteSqlEvent, ICache cache)
+        public DbService(DbExecuteSqlEvent dbExecuteSqlEvent)
         {
-            _dbExecuteSqlEvent = dbExecuteSqlEvent != null ? dbExecuteSqlEvent : new DbExecuteSqlEvent(_DbExecuteSql);
-            _Cache = cache != null ? cache : new LocalMemCache(null);
+            _dbExecuteSqlEvent = dbExecuteSqlEvent != null ? dbExecuteSqlEvent : null;
             _StrCommon = new Common.StrCommon();
-        }
-        private void _DbExecuteSql(object sender, DbExecuteSqlEventArgs e)
-        {
-#if DEBUG
-            /*this.Log.Writer("DbKey={0}&ExecuteType={1}&ExecuteSql=\r\n{2}\r\n&ExecuteResult={3}",
-                    e.DbKey,
-                    e.ExecuteType,
-                    e.ExecuteSql != null && e.ExecuteSql.Count > 0 ? string.Join("\r\n", e.ExecuteSql.ToArray()) : "no sql",
-                    e.Message);*/
-#endif
         }
         private IDb GetDbByEntityFullName(string entityFullName)
         {

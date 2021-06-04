@@ -4,16 +4,16 @@ using System.Text;
 
 namespace ZeroDbs.Common
 {
-    internal static class DbDataviewStructCache
+    internal static class ZeroDbPageCountCache
     {
         class StructCache
         {
             public DateTime CacheTime { get; set; }
-            public Common.DbDataTableInfo CacheData { get; set; }
+            public long CacheData { get; set; }
         }
-        static readonly int CacheMinutes = 60 * 24;
+        static readonly int CacheMinutes = 2;
         static Dictionary<string, StructCache> CacheDic = new Dictionary<string, StructCache>();
-        public static Common.DbDataTableInfo Get(string key)
+        public static long Get(string key)
         {
             if (string.IsNullOrEmpty(key))
             {
@@ -30,9 +30,9 @@ namespace ZeroDbs.Common
                 CacheDic.Remove(key);
                 return obj.CacheData;
             }
-            return null;
+            return -9999;
         }
-        public static void Set(string key, Common.DbDataTableInfo value)
+        public static void Set(string key, long value)
         {
             if (string.IsNullOrEmpty(key))
             {
