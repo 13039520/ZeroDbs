@@ -76,6 +76,7 @@
     <Compile Include="Common\DbDataReaderToEntity.cs" />
     <Compile Include="Common\DbDataTableInfo.cs" />
     <Compile Include="Common\DbDataviewStructCache.cs" />
+    <Compile Include="Common\DbExecuteReadOnebyOneAction.cs" />
     <Compile Include="Common\DbExecuteSqlEvent.cs" />
     <Compile Include="Common\DbExecuteSqlEventArgs.cs" />
     <Compile Include="Common\DbExecuteSqlType.cs" />

@@ -97,6 +97,63 @@ namespace ZeroDbs.Common
             DataReader.Close();
             return Li;
         }
+        public static void EntityList(System.Data.IDataReader DataReader, DbExecuteReadOnebyOneAction<T> callback)
+        {
+            Dictionary<string, DataReaderInfo> FieldDic = new Dictionary<string, DataReaderInfo>();
+            int i = 0;
+            while (i < DataReader.FieldCount)
+            {
+                string Name = DataReader.GetName(i);
+                FieldDic.Add(Name.ToLower(), new DataReaderInfo { Index = i, Name = Name, FieldType = DataReader.GetFieldType(i) });
+                i++;
+            }
+
+            long rowNum = 0;
+            while (DataReader.Read())
+            {
+                T obj = (T)Activator.CreateInstance(typeof(T));
+                System.Reflection.PropertyInfo[] pis = obj.GetType().GetProperties();
+                int j = 0;
+                while (j < pis.Length)
+                {
+                    string fieldName = pis[j].Name;
+                    string name = fieldName.ToLower();
+                    if (FieldDic.ContainsKey(name))
+                    {
+                        DataReaderInfo info = FieldDic[name];
+                        string key = info.Name;
+                        object o = DataReader[key];
+                        if (TargetTypeIsBool(pis[j].PropertyType))
+                        {
+                            pis[j].SetValue(obj, ConverToBool(o), null);
+                        }
+                        else
+                        {
+                            if (DBNull.Value != o)
+                            {
+                                pis[j].SetValue(obj, o, null);
+                            }
+                        }
+                    }
+                    j++;
+                }
+                rowNum++;
+                DbExecuteReadOnebyOneResult<T> result = new DbExecuteReadOnebyOneResult<T>(rowNum, obj);
+                try
+                {
+                    callback(result);
+                }
+                catch
+                {
+                    break;
+                }
+                if (!result.Next)
+                {
+                    break;
+                }
+            }
+            DataReader.Close();
+        }
 
         public static T EntityByEmit(System.Data.IDataReader DataReader)
         {
@@ -169,6 +226,54 @@ namespace ZeroDbs.Common
             }
             DataReader.Close();
             return Li;
+        }
+        public static void EntityListByEmit(System.Data.IDataReader DataReader, DbExecuteReadOnebyOneAction<T> callback)
+        {
+            Dictionary<string, string> FieldDic = new Dictionary<string, string>();
+            int i = 0;
+            while (i < DataReader.FieldCount)
+            {
+                string Name = DataReader.GetName(i);
+                if (!FieldDic.ContainsKey(Name.ToLower()))
+                {
+                    FieldDic.Add(Name.ToLower(), Name);
+                }
+                i++;
+            }
+
+            EntityPropertyEmitSetter[] ps = EntityPropertyEmitSetter.GetProperties(typeof(T));
+            long rowNum = 0;
+            while (DataReader.Read())
+            {
+                T obj = new T();
+                int num = 0;
+                while (num < ps.Length)
+                {
+                    string fieldName = ps[num].Info.Name;
+                    string name = fieldName.ToLower();
+                    object val = DataReader[FieldDic[name]];
+                    if (FieldDic.ContainsKey(name) && val != DBNull.Value)
+                    {
+                        ps[num].Setter(obj, val);
+                    }
+                    num++;
+                }
+                rowNum++;
+                DbExecuteReadOnebyOneResult<T> result = new DbExecuteReadOnebyOneResult<T>(rowNum, obj);
+                try
+                {
+                    callback(result);
+                }
+                catch
+                {
+                    break;
+                }
+                if (!result.Next)
+                {
+                    break;
+                }
+            }
+            DataReader.Close();
         }
 
         public static bool TargetTypeIsBool(Type TargetType)

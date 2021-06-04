@@ -129,6 +129,48 @@ namespace ZeroDbs.Common
                 throw ex;
             }
         }
+        public void ExecuteReader<T>(Common.DbExecuteReadOnebyOneAction<T> action, bool useEmit = true) where T : class, new()
+        {
+            List<string> sqlList = new List<string>();
+            sqlList.Add(CommandText);
+            try
+            {
+                if (IsCheckCommandText && CommandType == System.Data.CommandType.Text)
+                {
+                    string msg = "";
+                    if (!Common.SqlCheck.IsSelectSql(CommandText, ref msg))
+                    {
+                        throw new Exception(msg);
+                    }
+                }
+                dbCommand.CommandText = CommandText;
+                dbCommand.CommandTimeout = CommandTimeout;
+                dbCommand.CommandType = CommandType;
+                System.Data.Common.DbDataReader dr = dbCommand.ExecuteReader();
+                FireExecuteSql(new DbExecuteSqlEventArgs(
+                    DbKey,
+                    sqlList,
+                    DbExecuteSqlType.QUERY,
+                    "OK"));
+                if (useEmit)
+                {
+                    DbDataReaderToEntity<T>.EntityListByEmit(dr, action);
+                }
+                else
+                {
+                    DbDataReaderToEntity<T>.EntityList(dr, action);
+                }
+            }
+            catch (Exception ex)
+            {
+                FireExecuteSql(new DbExecuteSqlEventArgs(
+                    DbKey,
+                    sqlList,
+                    DbExecuteSqlType.QUERY,
+                    ex.Message));
+                throw ex;
+            }
+        }
         public System.Data.IDataReader ExecuteReader()
         {
             List<string> sqlList = new List<string>();

@@ -12,9 +12,9 @@ namespace ZeroDbsNet40.Test
 
             //CodeGenerator();
 
-            //DataQuery();
+            DataQuery();
 
-            DataQuery2();
+            //DataQuery2();
 
             while (true)
             {
@@ -95,7 +95,7 @@ namespace ZeroDbsNet40.Test
                 }),
                 new ZeroDbs.Common.LocalMemCache(null));
 
-            long page = 1;
+            /*long page = 1;
             long pageSize = 1000;
             var pageData = dbService.Page<MyDbs.TestDb.tArticleCategory>(page, pageSize, "ID>0");
             if (pageData.Total > 0)
@@ -109,7 +109,16 @@ namespace ZeroDbsNet40.Test
             else
             {
                 Console.WriteLine("no data");
+            }*/
+            using(var cmd = dbService.GetDbCommand<MyDbs.TestDb.tArticleCategory>())
+            {
+                cmd.CommandText = "SELECT * FROM T_ArticleCategory";
+                cmd.ExecuteReader<MyDbs.TestDb.tArticleCategory>((result) => {
+                    Console.WriteLine("[{3}]{0}\t{1}\t{2}\n", result.RowData.ID, result.RowData.Name, result.RowData.IsDel, result.RowNum);
+                    //result.Next = false;
+                }, true);
             }
+            Console.WriteLine("读取结束！");
         }
         static void DataQuery2()
         {

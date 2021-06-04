@@ -18,6 +18,13 @@ namespace ZeroDbs
         System.Data.Common.DbParameter CreateParameter(string parameterName, System.Data.DbType dbType, int size, object value);
         int ExecuteNonQuery();
         List<T> ExecuteReader<T>(bool useEmit = true) where T : class, new();
+        /// <summary>
+        /// Used for reading large quantities of data
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="action"></param>
+        /// <param name="useEmit"></param>
+        void ExecuteReader<T>(Common.DbExecuteReadOnebyOneAction<T> action, bool useEmit = true) where T : class, new();
         System.Data.IDataReader ExecuteReader();
         object ExecuteScalar();
 

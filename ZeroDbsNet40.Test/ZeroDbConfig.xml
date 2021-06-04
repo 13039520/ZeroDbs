@@ -2,7 +2,7 @@
 <zero>
   <dbs>
     <db dbKey="TestDb" dbConnectionString="Data Source=.;Initial Catalog=MyTestDb;User ID=sa;Password=123;" dbType="SqlServer" />
-    <db dbKey="LocalFiles" dbConnectionString="Data Source=D:\Work\WanYangProjects\HualianLIS\HualianLIS.DeviceTerminalApp\Files.db3;Version=3;" dbType="Sqlite" />
+    <db dbKey="LocalFiles" dbConnectionString="Data Source=D:\Work\Files.db3;Version=3;" dbType="Sqlite" />
   </dbs>
   <dvs>
     <dv dbKey="LocalFiles" tableName="UploadRecord" entityKey="MyDbs.LocalFiles.tUploadRecord" />
