@@ -185,7 +185,7 @@ namespace ZeroDbs.Sqlite
                     if (columnName.Length > 0 && dic.ContainsKey(columnName))
                     {
                         columnNames.AppendFormat("{0},", dic[columnName].Name);
-                        columnValues.AppendFormat("{0},", Common.ValueConvert.SqlValueStrByValue(dic[columnName].GetValue(entity, null)));
+                        columnValues.AppendFormat("{0},", Common.ValueConvert.SqlValueStrByValue(dic[columnName].GetValue(entity, null),"s"));
                     }
                 }
                 if (columnNames.Length < 1)
@@ -266,7 +266,7 @@ namespace ZeroDbs.Sqlite
                         {
                             sqlInsertFields.AppendFormat("{0},", p.Name);
                             object TargetValue = Common.ValueConvert.StrToTargetType(nvcList[i][key], p.PropertyType);
-                            string ValueString = Common.ValueConvert.SqlValueStrByValue(TargetValue);
+                            string ValueString = Common.ValueConvert.SqlValueStrByValue(TargetValue,"s");
                             sqlInsertValues.AppendFormat("{0},", ValueString);
                         }
                     }
@@ -349,17 +349,17 @@ namespace ZeroDbs.Sqlite
                 whereFieldNames = temp.Distinct().ToArray();
                 if (whereFieldNames.Length < 1)
                 {
-                    setFieldNames = tableInfo.Colunms.FindAll(o => o.IsIdentity || o.IsPrimaryKey).Select(o => o.Name).ToArray();
+                    whereFieldNames = tableInfo.Colunms.FindAll(o => o.IsIdentity || o.IsPrimaryKey).Select(o => o.Name).ToArray();
                 }
             }
             else
             {
-                setFieldNames = tableInfo.Colunms.FindAll(o => o.IsIdentity || o.IsPrimaryKey).Select(o => o.Name).ToArray();
+                whereFieldNames = tableInfo.Colunms.FindAll(o => o.IsIdentity || o.IsPrimaryKey).Select(o => o.Name).ToArray();
             }
             if (sourceEntityList == null || sourceEntityList.Count < 1) { throw new Exception("sourceEntityList is null or contains 0 items"); }
             if (sourceEntityList.Contains(null)) { throw new Exception("sourceEntityList contains null items"); }
             if (setFieldNames == null || setFieldNames.Length < 1) { throw new Exception("setFieldNames is null or contains 0 items"); }
-            if (whereFieldNames == null || whereFieldNames.Length < 1) { throw new Exception("whereFieldNames is null or contains 0 items"); }
+            if (whereFieldNames == null || whereFieldNames.Length < 1) {throw new Exception("whereFieldNames is null or contains 0 items"); }
             for (var i = 0; i < setFieldNames.Length; i++)
             {
                 setFieldNames[i] = setFieldNames[i].Trim();
@@ -416,7 +416,7 @@ namespace ZeroDbs.Sqlite
                         setColumnValue.AppendFormat(
                             "{0}={1},",
                             dic[columnName].Name,
-                            Common.ValueConvert.SqlValueStrByValue(dic[columnName].GetValue(entity, null)));
+                            Common.ValueConvert.SqlValueStrByValue(dic[columnName].GetValue(entity, null),"s"));
                     }
                 }
                 if (setColumnValue.Length < 1)
@@ -433,7 +433,7 @@ namespace ZeroDbs.Sqlite
                         updateWhere.AppendFormat(
                             "{0}={1} AND ",
                             dic[ColumnName].Name,
-                            Common.ValueConvert.SqlValueStrByValue(dic[ColumnName].GetValue(entity, null)));
+                            Common.ValueConvert.SqlValueStrByValue(dic[ColumnName].GetValue(entity, null),"s"));
                     }
                 }
                 if (updateWhere.Length < 1)
@@ -542,7 +542,7 @@ namespace ZeroDbs.Sqlite
                             return string.Equals(t.Name, c.Name, StringComparison.OrdinalIgnoreCase);
                         });
                         object targetValue = Common.ValueConvert.StrToTargetType(nvcList[i][c.Name], p.PropertyType);
-                        string valueString = Common.ValueConvert.SqlValueStrByValue(targetValue);
+                        string valueString = Common.ValueConvert.SqlValueStrByValue(targetValue,"s");
                         sqlWhere.AppendFormat("{0}={1} AND ", c.Name, valueString);
                         nvcList[i].Remove(c.Name);
                     }
@@ -569,7 +569,7 @@ namespace ZeroDbs.Sqlite
                             if (tableInfo.Colunms.Find(o=> string.Equals(o.Name, p.Name, StringComparison.OrdinalIgnoreCase)) != null)
                             {
                                 object targetValue = Common.ValueConvert.StrToTargetType(nvcList[i][key], p.PropertyType);
-                                string valueString = Common.ValueConvert.SqlValueStrByValue(targetValue);
+                                string valueString = Common.ValueConvert.SqlValueStrByValue(targetValue,"s");
                                 sqlSet.AppendFormat("{0}={1},", p.Name, valueString);
                             }
                         }
@@ -662,7 +662,7 @@ namespace ZeroDbs.Sqlite
                         string fieldName = s.ToLower();
                         if (dic.ContainsKey(fieldName))
                         {
-                            where.AppendFormat("{0}={1} AND ", dic[fieldName].Name, Common.ValueConvert.SqlValueStrByValue(dic[fieldName].GetValue(entity, null)));
+                            where.AppendFormat("{0}={1} AND ", dic[fieldName].Name, Common.ValueConvert.SqlValueStrByValue(dic[fieldName].GetValue(entity, null),"s"));
                         }
                     }
                 }
@@ -672,7 +672,7 @@ namespace ZeroDbs.Sqlite
                     {
                         if (dic.ContainsKey(fieldName))
                         {
-                            where.AppendFormat("{0}={1} AND ", dic[fieldName].Name, Common.ValueConvert.SqlValueStrByValue(dic[fieldName].GetValue(entity, null)));
+                            where.AppendFormat("{0}={1} AND ", dic[fieldName].Name, Common.ValueConvert.SqlValueStrByValue(dic[fieldName].GetValue(entity, null),"s"));
                         }
                     }
                 }
@@ -777,7 +777,7 @@ namespace ZeroDbs.Sqlite
                         {
                             System.Reflection.PropertyInfo p = propertyInfoList.Find(o=> string.Equals(o.Name, c.Name, StringComparison.OrdinalIgnoreCase));
                             object TargetValue = Common.ValueConvert.StrToTargetType(nvcList[i][c.Name], p.PropertyType);
-                            string ValueString = Common.ValueConvert.SqlValueStrByValue(TargetValue);
+                            string ValueString = Common.ValueConvert.SqlValueStrByValue(TargetValue,"s");
                             sqlWhere.AppendFormat("{0}={1} AND ", c.Name, ValueString);
                             nvcList[i].Remove(c.Name);
                         }
@@ -811,7 +811,7 @@ namespace ZeroDbs.Sqlite
                 for (int i = 0; i < nvcListCount; i++)
                 {
                     object targetValue = Common.ValueConvert.StrToTargetType(nvcList[i][primaryKeyName], p.PropertyType);
-                    string valueString = Common.ValueConvert.SqlValueStrByValue(targetValue);
+                    string valueString = Common.ValueConvert.SqlValueStrByValue(targetValue,"s");
                     if (primaryKeyList.Contains(valueString))
                     {
                         continue;
@@ -885,7 +885,7 @@ namespace ZeroDbs.Sqlite
                     if (dic.ContainsKey(key))
                     {
                         string Name = dic[key].Name;
-                        where.AppendFormat("{0}={1} AND ", dic[key].Name, Common.ValueConvert.SqlValueStrByValue(dic[key].GetValue(sourceEntity, null)));
+                        where.AppendFormat("{0}={1} AND ", dic[key].Name, Common.ValueConvert.SqlValueStrByValue(dic[key].GetValue(sourceEntity, null),"s"));
                     }
                     i++;
                 }
@@ -1167,7 +1167,7 @@ namespace ZeroDbs.Sqlite
                             return string.Equals(t.Name, c.Name, StringComparison.OrdinalIgnoreCase);
                         });
                         object targetValue = Common.ValueConvert.StrToTargetType(nvcList[i][c.Name], p.PropertyType);
-                        string valueString = Common.ValueConvert.SqlValueStrByValue(targetValue);
+                        string valueString = Common.ValueConvert.SqlValueStrByValue(targetValue,"s");
                         sqlWhere.AppendFormat("{0}={1} AND ", c.Name, valueString);
                     }
                 }
@@ -1224,7 +1224,7 @@ namespace ZeroDbs.Sqlite
                 throw new Exception("wrong key type");
             }
             var fieldNames = string.Join(",", tableInfo.Colunms.Select(o => o.Name).ToArray());
-            var value = Common.ValueConvert.SqlValueStrByValue(key);
+            var value = Common.ValueConvert.SqlValueStrByValue(key,"s");
             var where = string.Format("{0}={1}", dbDataColumn.Name, value);
 
             return string.Format("SELECT {0} FROM {1} WHERE {2}", fieldNames, GetTableName(tableInfo), where);

@@ -31,11 +31,11 @@ namespace ZeroDbs.Common
         private void _DbExecuteSql(object sender, DbExecuteSqlEventArgs e)
         {
 #if DEBUG
-            this.Log.Writer("DbKey={0}&ExecuteType={1}&ExecuteSql=\r\n{2}\r\n&ExecuteResult={3}",
+            /*this.Log.Writer("DbKey={0}&ExecuteType={1}&ExecuteSql=\r\n{2}\r\n&ExecuteResult={3}",
                     e.DbKey,
                     e.ExecuteType,
                     e.ExecuteSql != null && e.ExecuteSql.Count > 0 ? string.Join("\r\n", e.ExecuteSql.ToArray()) : "no sql",
-                    e.Message);
+                    e.Message);*/
 #endif
         }
         private IDb GetDbByEntityFullName(string entityFullName)

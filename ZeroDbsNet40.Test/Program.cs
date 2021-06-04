@@ -12,7 +12,9 @@ namespace ZeroDbsNet40.Test
 
             //CodeGenerator();
 
-            DataQuery();
+            //DataQuery();
+
+            DataQuery2();
 
             while (true)
             {
@@ -43,6 +45,33 @@ namespace ZeroDbsNet40.Test
             };
             generator.OnSingleTableGenerated += (e) => {
                 Console.WriteLine("[{0}/{1}]\t{2}\t{3}", e.tableNum, e.tableCount, e.table.Name, e.entityClassFullName);
+            };
+            generator.Run();
+
+            Console.WriteLine("生成成功！");
+        }
+        private static void CodeGenerator2()
+        {
+            ZeroDbs.Tools.CodeGenerator generator = new ZeroDbs.Tools.CodeGenerator();
+            string path = @"D:\Work\WanYangProjects\HualianLIS\HualianLIS.DeviceTerminalApp\Files.db3";
+            generator.Dbs.Add(new ZeroDbs.Common.DbConfigDatabaseInfo
+            {
+                dbConnectionString = "Data Source=" + path + ";Version=3;",
+                dbKey = "LocalFiles",
+                dbType = "Sqlite"
+            });
+            generator.GeneratorConfig = new ZeroDbs.Tools.CodeGenerator.Config
+            {
+                AppProjectDir = @"D:\Work\WanYangProjects\HualianLIS\HualianLIS.DeviceTerminalApp",
+                AppProjectNamespace = "HualianLIS.DeviceTerminalApp",
+                AppProjectName = "HualianLIS.DeviceTerminalApp",
+                EntityDir = @"D:\Work\WanYangProjects\HualianLIS\HualianLIS.DeviceTerminalApp\MyDbs",
+                EntityNamespace = "MyDbs",
+                EntityProjectName = "HualianLIS.DeviceTerminalApp"
+            };
+            generator.OnSingleTableGenerated += (ex) =>
+            {
+                Console.WriteLine(string.Format("[{0}/{1}]\t{2}\t{3}", ex.tableNum, ex.tableCount, ex.table.Name, ex.entityClassFullName));
             };
             generator.Run();
 
@@ -81,6 +110,44 @@ namespace ZeroDbsNet40.Test
             {
                 Console.WriteLine("no data");
             }
+        }
+        static void DataQuery2()
+        {
+            ZeroDbs.ILog log = ZeroDbs.Logs.Factory.GetLogger("sql", 7);
+            dbService = new ZeroDbs.Common.DbService(
+                new ZeroDbs.Common.DbExecuteSqlEvent((sender, e) => {
+#if DEBUG
+                    log.Writer("DbKey={0}&ExecuteType={1}&ExecuteSql=\r\n{2}\r\n&ExecuteResult={3}",
+                    e.DbKey,
+                    e.ExecuteType,
+                    e.ExecuteSql != null && e.ExecuteSql.Count > 0 ? string.Join("\r\n", e.ExecuteSql.ToArray()) : "no sql",
+                    e.Message);
+#endif
+                }),
+                new ZeroDbs.Common.LocalMemCache(null));
+
+            /*List<MyDbs.LocalFiles.tUploadRecord> fileRecords = new List<MyDbs.LocalFiles.tUploadRecord>();
+            for (var i=0;i<5; i++)
+            {
+                fileRecords.Add(new MyDbs.LocalFiles.tUploadRecord
+                {
+                    ID = 0,
+                    FilePath = "D:\\works\\a"+i+".txt",
+                    FileCreationTime = DateTime.Now,
+                    FileLastWriteTime = DateTime.Now,
+                    FileUploadTime = DateTime.Now,
+                    FileUploadStatus = 0,
+                    FileUploadStatusRemark = "待上传(新加入)"
+                });
+            }
+            dbService.Insert(fileRecords);*/
+            var records = dbService.Select<MyDbs.LocalFiles.tUploadRecord>("");
+            foreach(var m in records)
+            {
+                Console.WriteLine("{0}\t{1}", m.ID, m.FilePath);
+            }
+            dbService.Update(records);
+
         }
 
 

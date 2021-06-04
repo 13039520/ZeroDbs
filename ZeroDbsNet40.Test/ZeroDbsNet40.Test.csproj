@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MyDbs\LocalFiles\tUploadRecord.cs" />
     <Compile Include="MyDbs\TestDb\tArticle.cs" />
     <Compile Include="MyDbs\TestDb\tArticleCategory.cs" />
     <Compile Include="MyDbs\TestDb\tArticleComment.cs" />

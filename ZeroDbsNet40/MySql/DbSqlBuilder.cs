@@ -350,12 +350,12 @@ namespace ZeroDbs.MySql
                 whereFieldNames = temp.Distinct().ToArray();
                 if (whereFieldNames.Length < 1)
                 {
-                    setFieldNames = tableInfo.Colunms.FindAll(o => o.IsIdentity || o.IsPrimaryKey).Select(o => o.Name).ToArray();
+                    whereFieldNames = tableInfo.Colunms.FindAll(o => o.IsIdentity || o.IsPrimaryKey).Select(o => o.Name).ToArray();
                 }
             }
             else
             {
-                setFieldNames = tableInfo.Colunms.FindAll(o => o.IsIdentity || o.IsPrimaryKey).Select(o => o.Name).ToArray();
+                whereFieldNames = tableInfo.Colunms.FindAll(o => o.IsIdentity || o.IsPrimaryKey).Select(o => o.Name).ToArray();
             }
             if (sourceEntityList == null || sourceEntityList.Count < 1) { throw new Exception("sourceEntityList is null or contains 0 items"); }
             if (sourceEntityList.Contains(null)) { throw new Exception("sourceEntityList contains null items"); }

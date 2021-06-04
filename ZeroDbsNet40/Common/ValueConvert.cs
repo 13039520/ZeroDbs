@@ -6,7 +6,7 @@ namespace ZeroDbs.Common
 {
     internal static class ValueConvert
     {
-        public static string SqlValueStrByValue(object Value)
+        public static string SqlValueStrByValue(object Value, string datetimeFormat = "")
         {
             if (Value is null)
             {
@@ -32,16 +32,18 @@ namespace ZeroDbs.Common
                     }
                     else if (nt.IndexOf("System.DateTime") > 0)
                     {
-                        s = "'" + Value.ToString() + "'";
+                        if (string.IsNullOrEmpty(datetimeFormat))
+                        {
+                            s = "'" + Value.ToString() + "'";
+                        }
+                        else
+                        {
+                            s = "'" + Convert.ToDateTime(Value).ToString(datetimeFormat) + "'";
+                        }
                     }
                     else if (nt.IndexOf("System.TimeSpan") > 0)
                     {
                         s = "'" + Value.ToString() + "'";
-                    }
-                    else if (nt.IndexOf("System.String") > 0)
-                    {
-                        //重复替换两次单引号以保证转义过的单引号被再次转义
-                        s = "'" + Value.ToString().Replace("''", "'").Replace("'", "''") + "'";
                     }
                     else if (nt.IndexOf("System.Guid") > 0)
                     {
@@ -50,6 +52,21 @@ namespace ZeroDbs.Common
                     else if (nt.IndexOf("System.Char") > 0)
                     {
                         s = "'" + Value.ToString() + "'";
+                    }
+                    else if (nt.IndexOf("System.Single") > 0)
+                    {
+                        float f = Convert.ToSingle(Value);
+                        if (Single.IsNaN(f)) { s = "0"; }
+                        if (Single.IsNegativeInfinity(f)) { s = Single.MinValue.ToString(); }
+                        if (Single.IsPositiveInfinity(f)) { s = Single.MaxValue.ToString(); }
+                    }
+                    else if (nt.IndexOf("System.Double") > 0)
+                    {
+
+                        double d = Convert.ToDouble(Value);
+                        if (Double.IsNaN(d)) { s = "0"; }
+                        if (Double.IsNegativeInfinity(d)) { s = Double.MinValue.ToString(); }
+                        if (Double.IsPositiveInfinity(d)) { s = Double.MaxValue.ToString(); }
                     }
                 }
                 else
@@ -75,17 +92,36 @@ namespace ZeroDbs.Common
                         s = "'" + (Value.ToString()) + "'";
                         break;
                     case "DateTime":
-                        s = "'" + Value.ToString() + "'";
+                        if (string.IsNullOrEmpty(datetimeFormat))
+                        {
+                            s = "'" + Value.ToString() + "'";
+                        }
+                        else
+                        {
+                            s = "'" + Convert.ToDateTime(Value).ToString(datetimeFormat) + "'";
+                        }
                         break;
                     case "TimeSpan":
                         s = "'" + Value.ToString() + "'";
                         break;
                     case "String":
                         //重复替换两次单引号以保证转义过的单引号被再次转义
-                        s = "'" + Value.ToString().Replace("''", "'").Replace("'", "''") + "'";
+                        s = null == Value ? "''" : "'" + Value.ToString().Replace("''", "'").Replace("'", "''") + "'";
                         break;
                     case "Guid":
                         s = "'" + Value.ToString() + "'";
+                        break;
+                    case "Single":
+                        float f = Convert.ToSingle(Value);
+                        if (Single.IsNaN(f)) { s = "0"; }
+                        if (Single.IsNegativeInfinity(f)) { s = Single.MinValue.ToString(); }
+                        if (Single.IsPositiveInfinity(f)) { s = Single.MaxValue.ToString(); }
+                        break;
+                    case "Double":
+                        double d = Convert.ToDouble(Value);
+                        if (Double.IsNaN(d)) { s = "0"; }
+                        if (Double.IsNegativeInfinity(d)) { s = Double.MinValue.ToString(); }
+                        if (Double.IsPositiveInfinity(d)) { s = Double.MaxValue.ToString(); }
                         break;
                 }
             }

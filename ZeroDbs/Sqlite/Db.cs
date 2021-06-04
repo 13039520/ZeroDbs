@@ -73,9 +73,6 @@ namespace ZeroDbs.Sqlite
         }
         public IDbTransactionScope GetDbTransactionScope(System.Data.IsolationLevel level, string identification="", string groupId="")
         {
-            var conn = this.GetDbConnection();
-            conn.Open();
-            var trans = conn.BeginTransaction(level);
             return new ZeroDbs.Common.DbTransactionScope(this, identification, groupId);
         }
         public IDbTransactionScopeCollection GetDbTransactionScopeCollection()
@@ -114,7 +111,7 @@ namespace ZeroDbs.Sqlite
                     int rootpage = Convert.ToInt32(reader["rootpage"].ToString());
                     string sql = (reader["sql"].ToString()).Trim();
 
-                    System.Text.RegularExpressions.Match temp = System.Text.RegularExpressions.Regex.Match(sql, @"\b(?<column>\w+) INTEGER PRIMARY KEY AUTOINCREMENT\b", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                    System.Text.RegularExpressions.Match temp = System.Text.RegularExpressions.Regex.Match(sql, @"(?<column>[^\{\}\(\),]\w+)\b[a-zA-Z0-9 ]{1,}\bAUTOINCREMENT\b", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
                     if (temp.Success)
                     {
                         IdentityNames.Add(temp.Groups["column"].Value);
@@ -201,7 +198,7 @@ namespace ZeroDbs.Sqlite
                     m.Description = (m.IsView ? "VIEW:": "TABLE:") + m.Name;
                     m.Colunms = new List<Common.DbDataColumnInfo>();
                     List.Add(m);
-                    System.Text.RegularExpressions.Match temp = System.Text.RegularExpressions.Regex.Match(sql, @"\b(?<column>\w+) INTEGER PRIMARY KEY AUTOINCREMENT\b", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                    System.Text.RegularExpressions.Match temp = System.Text.RegularExpressions.Regex.Match(sql, @"(?<column>[^\{\}\(\),]\w+)\b[a-zA-Z0-9 ]{1,}\bAUTOINCREMENT\b", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
                     if (temp.Success)
                     {
                         IdentityNames.Add(temp.Groups["column"].Value);

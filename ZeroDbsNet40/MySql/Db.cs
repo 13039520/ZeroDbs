@@ -73,9 +73,6 @@ namespace ZeroDbs.MySql
         }
         public ZeroDbs.IDbTransactionScope GetDbTransactionScope(System.Data.IsolationLevel level, string identification="", string groupId="")
         {
-            var conn = this.GetDbConnection();
-            conn.Open();
-            var trans = conn.BeginTransaction(level);
             return new ZeroDbs.Common.DbTransactionScope(this, identification, groupId);
         }
         public ZeroDbs.IDbTransactionScopeCollection GetDbTransactionScopeCollection()
