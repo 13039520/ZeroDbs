@@ -23,7 +23,7 @@ namespace ZeroDbs.Tools
         }
         public static byte[] Hash16(byte[] buffer)
         {
-            System.Security.Cryptography.MD5CryptoServiceProvider mD5 = new System.Security.Cryptography.MD5CryptoServiceProvider();
+            System.Security.Cryptography.MD5 mD5 = System.Security.Cryptography.MD5.Create();
             byte[] result = mD5.ComputeHash(buffer);
             mD5.Dispose();
             return result;

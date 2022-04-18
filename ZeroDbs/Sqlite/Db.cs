@@ -45,30 +45,21 @@ namespace ZeroDbs.Sqlite
         }
         public IDbCommand GetDbCommand()
         {
-            var cmd = new SQLiteCommand();
-            cmd.Connection = new SQLiteConnection(DbConfigDatabaseInfo.dbConnectionString);
-            cmd.Connection.Open();
+            var conn = this.GetDbConnection();
+            conn.Open();
+            var cmd = conn.CreateCommand();
             return new ZeroDbs.Common.DbCommand(DbConfigDatabaseInfo.dbKey, cmd, this.OnDbExecuteSqlEvent, this.DbSqlBuilder);
         }
-        public IDbCommand GetDbCommand(System.Data.Common.DbConnection dbConnection)
+        public IDbCommand GetDbCommand(System.Data.Common.DbTransaction transaction)
         {
-            var cmd = new SQLiteCommand();
-            cmd.Connection = (SQLiteConnection)dbConnection;
-            if (cmd.Connection.State != System.Data.ConnectionState.Open)
+            if (transaction.Connection.State == System.Data.ConnectionState.Open)
             {
-                cmd.Connection.Open();
+                transaction.Connection.Open();
             }
-            return new ZeroDbs.Common.DbCommand(DbConfigDatabaseInfo.dbKey, cmd, this.OnDbExecuteSqlEvent, this.DbSqlBuilder);
-        }
-        public IDbCommand GetDbCommand(System.Data.Common.DbTransaction dbTransaction)
-        {
-            var cmd = new SQLiteCommand();
-            cmd.Connection = (SQLiteConnection)dbTransaction.Connection;
-            if (cmd.Connection.State != System.Data.ConnectionState.Open)
-            {
-                cmd.Connection.Open();
-            }
-            cmd.Transaction = (SQLiteTransaction)dbTransaction;
+            System.Data.Common.DbCommand cmd = transaction.Connection.CreateCommand();
+            cmd.Connection = transaction.Connection;
+            cmd.Transaction = transaction;
+
             return new ZeroDbs.Common.DbCommand(DbConfigDatabaseInfo.dbKey, cmd, this.OnDbExecuteSqlEvent, this.DbSqlBuilder);
         }
         public IDbTransactionScope GetDbTransactionScope(System.Data.IsolationLevel level, string identification="", string groupId="")
@@ -439,14 +430,9 @@ namespace ZeroDbs.Sqlite
                 var countSql = this.DbSqlBuilder.Count<T>(where);
                 var sql = this.DbSqlBuilder.Page<T>(page, size, where, orderby, threshold, uniqueFieldName);
                 var key = System.Text.RegularExpressions.Regex.Replace((typeof(T).FullName + where), @"[^\w]", "");
-                long total = Common.ZeroDbPageCountCache.Get(key);
-                if (total < 0)
-                {
-                    cmd.CommandText = countSql;
-                    var obj = cmd.ExecuteScalar();
-                    total = Convert.ToInt64(obj);
-                    Common.ZeroDbPageCountCache.Set(key, total);
-                }
+                cmd.CommandText = countSql;
+                var obj = cmd.ExecuteScalar();
+                long total = Convert.ToInt64(obj);
                 if (total < 1)
                 {
                     cmd.Dispose();
@@ -486,14 +472,9 @@ namespace ZeroDbs.Sqlite
                 var countSql = this.DbSqlBuilder.Count<T>(where);
                 var sql = this.DbSqlBuilder.Page<T>(page, size, where, orderby, fieldNames, uniqueFieldName);
                 var key = System.Text.RegularExpressions.Regex.Replace((typeof(T).FullName + where), @"[^\w]", "");
-                long total = Common.ZeroDbPageCountCache.Get(key);
-                if (total < 0)
-                {
-                    cmd.CommandText = countSql;
-                    var obj = cmd.ExecuteScalar();
-                    total = Convert.ToInt64(obj);
-                    Common.ZeroDbPageCountCache.Set(key, total);
-                }
+                cmd.CommandText = countSql;
+                var obj = cmd.ExecuteScalar();
+                long total = Convert.ToInt64(obj);
                 if (total < 1)
                 {
                     cmd.Dispose();

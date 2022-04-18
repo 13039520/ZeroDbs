@@ -148,10 +148,8 @@ namespace ZeroDbs.Logs
                     long lockBegin = fs.Length;
                     long lockEnd = buffer.Length;
                     fs.Position = lockBegin;
-                    fs.Lock(lockBegin, lockEnd);
                     //fs.WriteAsync(buffer, 0, buffer.Length);
                     fs.Write(buffer, 0, buffer.Length);
-                    fs.Unlock(lockBegin, lockEnd);
                     fs.Flush();
                     //fs.Close();
                 }

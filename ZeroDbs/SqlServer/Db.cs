@@ -2,7 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+#if NET40
+using System.Data.SqlClient;
+#else
 using Microsoft.Data.SqlClient;
+#endif
 
 namespace ZeroDbs.SqlServer
 {
@@ -41,34 +45,29 @@ namespace ZeroDbs.SqlServer
 
         public System.Data.Common.DbConnection GetDbConnection()
         {
-            return new SqlConnection(DbConfigDatabaseInfo.dbConnectionString);
+#if NET40
+            return new System.Data.SqlClient.SqlConnection(DbConfigDatabaseInfo.dbConnectionString);
+#else
+            return new  Microsoft.Data.SqlClient.SqlConnection(DbConfigDatabaseInfo.dbConnectionString);
+#endif
         }
         public IDbCommand GetDbCommand()
         {
-            var cmd = new SqlCommand();
-            cmd.Connection = new SqlConnection(DbConfigDatabaseInfo.dbConnectionString);
-            cmd.Connection.Open();
+            var conn = this.GetDbConnection();
+            conn.Open();
+            var cmd = conn.CreateCommand();
             return new ZeroDbs.Common.DbCommand(DbConfigDatabaseInfo.dbKey, cmd, this.OnDbExecuteSqlEvent, this.DbSqlBuilder);
         }
-        public IDbCommand GetDbCommand(System.Data.Common.DbConnection dbConnection)
+        public IDbCommand GetDbCommand(System.Data.Common.DbTransaction transaction)
         {
-            var cmd = new SqlCommand();
-            cmd.Connection = (SqlConnection)dbConnection;
-            if (cmd.Connection.State != System.Data.ConnectionState.Open)
+            if(transaction.Connection.State == System.Data.ConnectionState.Open)
             {
-                cmd.Connection.Open();
+                transaction.Connection.Open();
             }
-            return new ZeroDbs.Common.DbCommand(DbConfigDatabaseInfo.dbKey, cmd, this.OnDbExecuteSqlEvent, this.DbSqlBuilder);
-        }
-        public IDbCommand GetDbCommand(System.Data.Common.DbTransaction dbTransaction)
-        {
-            var cmd = new SqlCommand();
-            cmd.Connection = (SqlConnection)dbTransaction.Connection;
-            if (cmd.Connection.State != System.Data.ConnectionState.Open)
-            {
-                cmd.Connection.Open();
-            }
-            cmd.Transaction = (SqlTransaction)dbTransaction;
+            System.Data.Common.DbCommand cmd=transaction.Connection.CreateCommand();
+            cmd.Connection = transaction.Connection;
+            cmd.Transaction = transaction;
+
             return new ZeroDbs.Common.DbCommand(DbConfigDatabaseInfo.dbKey, cmd, this.OnDbExecuteSqlEvent, this.DbSqlBuilder);
         }
         public IDbTransactionScope GetDbTransactionScope(System.Data.IsolationLevel level, string identification="", string groupId="")
@@ -89,7 +88,7 @@ namespace ZeroDbs.SqlServer
                 throw new Exception("类型" + typeof(T).FullName + "没有映射到" + DbConfigDatabaseInfo.dbKey + "上");
             }
 
-            var key = typeof(T).FullName;
+            string key = typeof(T).FullName;
             var value = Common.DbDataviewStructCache.Get(key);
             if (value != null)
             {
@@ -299,9 +298,9 @@ namespace ZeroDbs.SqlServer
                 conn.Close();
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                throw ex;
+                throw e;
             }
         }
 
@@ -327,6 +326,7 @@ namespace ZeroDbs.SqlServer
             {
                 throw new Exception("类型" + typeof(T).FullName + "没有映射到" + DbConfigDatabaseInfo.dbKey + "上");
             }
+
             var cmd = GetDbCommand();
             try
             {
@@ -484,14 +484,9 @@ namespace ZeroDbs.SqlServer
                 var countSql = this.DbSqlBuilder.Count<T>(where);
                 var sql = this.DbSqlBuilder.Page<T>(page, size, where, orderby, threshold, uniqueFieldName);
                 var key = System.Text.RegularExpressions.Regex.Replace((typeof(T).FullName + where), @"[^\w]", "");
-                long total = Common.ZeroDbPageCountCache.Get(key);
-                if (total < 0)
-                {
-                    cmd.CommandText = countSql;
-                    var obj = cmd.ExecuteScalar();
-                    total = Convert.ToInt64(obj);
-                    Common.ZeroDbPageCountCache.Set(key, total);
-                }
+                cmd.CommandText = countSql;
+                var obj = cmd.ExecuteScalar();
+                long total = Convert.ToInt64(obj);
                 if (total < 1)
                 {
                     cmd.Dispose();
@@ -531,14 +526,9 @@ namespace ZeroDbs.SqlServer
                 var countSql = this.DbSqlBuilder.Count<T>(where);
                 var sql = this.DbSqlBuilder.Page<T>(page, size, where, orderby, fieldNames, uniqueFieldName);
                 var key = System.Text.RegularExpressions.Regex.Replace((typeof(T).FullName + where), @"[^\w]", "");
-                long total = Common.ZeroDbPageCountCache.Get(key);
-                if (total < 0)
-                {
-                    cmd.CommandText = countSql;
-                    var obj = cmd.ExecuteScalar();
-                    total = Convert.ToInt64(obj);
-                    Common.ZeroDbPageCountCache.Set(key, total);
-                }
+                cmd.CommandText = countSql;
+                var obj = cmd.ExecuteScalar();
+                long total = Convert.ToInt64(obj);
                 if (total < 1)
                 {
                     cmd.Dispose();

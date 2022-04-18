@@ -40,7 +40,7 @@ namespace ZeroDbs.Tools
         /// <returns></returns> 
         public static string Encrypt(string Text, string sKey, string sIV)
         {
-            DESCryptoServiceProvider des = new DESCryptoServiceProvider();
+            System.Security.Cryptography.TripleDES des = System.Security.Cryptography.TripleDES.Create();
             des.Padding = PaddingMode.PKCS7;
             byte[] inputByteArray;
             inputByteArray = Encoding.UTF8.GetBytes(Text);
@@ -83,7 +83,7 @@ namespace ZeroDbs.Tools
         /// <returns></returns> 
         public static string Decrypt(string Text, string sKey, string sIV)
         {
-            DESCryptoServiceProvider des = new DESCryptoServiceProvider();
+            System.Security.Cryptography.TripleDES des = System.Security.Cryptography.TripleDES.Create();
             des.Padding = PaddingMode.PKCS7;
             byte[] inputByteArray = Convert.FromBase64String(Text);
             string key = MD5.To16(sKey).Substring(0, 8);

@@ -26,8 +26,6 @@ namespace ZeroDbs.Common
             this.dbTransaction = conn.BeginTransaction();
             this.dbCommand = db.GetDbCommand(this.dbTransaction);
 
-
-
             if (!string.IsNullOrEmpty(identification))
             {
                 this._Identification = identification;
