@@ -88,7 +88,7 @@ namespace ZeroDbs.MySql
                 }
                 SubSql += string.Format(" LIMIT {0},{1}", startIndex, size);
 
-                sql.AppendFormat("SELECT {0} FROM {1} WHERE {2} IN(SELECT T.AreaID FROM ({3}) AS T)", fieldStr, tableInfo.Name, uniqueFieldName, SubSql);
+                sql.AppendFormat("SELECT {0} FROM {1} WHERE {2} IN(SELECT {2} FROM ({3}) AS T)", fieldStr, tableInfo.Name, uniqueFieldName, SubSql);
                 if (!string.IsNullOrEmpty(orderby))
                 {
                     sql.AppendFormat(" ORDER BY {0}", orderby);
