@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <zero>
   <dbs>
-    <db dbKey="TestDb" dbConnectionString="Data Source=.;Initial Catalog=MyTestDb;User ID=sa;Password=yangshaogao;" dbType="SqlServer" />
+    <db dbKey="TestDb" dbConnectionString="Data Source=.;Initial Catalog=MyTestDb;User ID=sa;Password=123456;" dbType="SqlServer" />
   </dbs>
   <dvs>
     <dv dbKey="TestDb" tableName="T_Article" entityKey="MyDbs.TestDb.tArticle" />
