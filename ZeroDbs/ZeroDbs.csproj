@@ -1,13 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net6.0;net5.0;net4.0</TargetFrameworks>
+    <TargetFrameworks>net6.0;net5.0;netcoreapp3.1;net4.0</TargetFrameworks>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <PackageIcon>favicon.png</PackageIcon>
     <Authors>ruzi</Authors>
-    <AssemblyVersion>4.0.0.0</AssemblyVersion>
-    <FileVersion>4.0.0.0</FileVersion>
-    <Version>4.0.0.0</Version>
+    <AssemblyVersion>3.8.0.0</AssemblyVersion>
+    <FileVersion>3.8.0.0</FileVersion>
+    <Version>3.8.0.0</Version>
+    <Description>Database access library of .net4.0/netcoreapp3.1/5.0/6.0, Support SqlServer/MySql/Sqlite.</Description>
   </PropertyGroup>
   <ItemGroup>
     <None Include="favicon.png" Pack="true" PackagePath="" />
@@ -39,6 +40,15 @@
     <PackageReference Include="MySql.Data">
       <Version>8.0.28</Version>
     </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
+		<PackageReference Include="Microsoft.Data.SqlClient">
+			<Version>4.1.0</Version>
+		</PackageReference>
+		<PackageReference Include="MySql.Data">
+			<Version>8.0.28</Version>
+		</PackageReference>
   </ItemGroup>
 
   <ItemGroup>

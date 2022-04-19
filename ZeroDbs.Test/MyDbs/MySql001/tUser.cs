@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-namespace MyDbs.TestDb
+namespace MyDbs.MySql001
 {
     /// <summary>
-    /// TABLE:Q_ProductType
+    /// 用户
     /// </summary>
     [Serializable]
-    public partial class tQ_ProductType
+    public partial class tUser
     {
         
         private int _ID;
@@ -28,23 +28,32 @@ namespace MyDbs.TestDb
             get { return _Name; }
             set { _Name = value; }
         }
-        private string _Type = "";
+        private string _Email = "";
         /// <summary>
-        /// Type
+        /// Email
         /// </summary>
-        public string Type
+        public string Email
         {
-            get { return _Type; }
-            set { _Type = value; }
+            get { return _Email; }
+            set { _Email = value; }
         }
-        private int _Orderby;
+        private string _Password = "";
         /// <summary>
-        /// Orderby
+        /// Password
         /// </summary>
-        public int Orderby
+        public string Password
         {
-            get { return _Orderby; }
-            set { _Orderby = value; }
+            get { return _Password; }
+            set { _Password = value; }
+        }
+        private DateTime _CreateTime = DateTime.Now;
+        /// <summary>
+        /// CreateTime
+        /// </summary>
+        public DateTime CreateTime
+        {
+            get { return _CreateTime; }
+            set { _CreateTime = value; }
         }
 
     }

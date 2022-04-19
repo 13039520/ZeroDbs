@@ -10,11 +10,13 @@ namespace ZeroDbs.Test
         static ZeroDbs.IDbService dbService = null;
         static void Main(string[] args)
         {
-            dbService = new ZeroDbs.Common.DbService();
+            dbService = new ZeroDbs.Common.DbService(new Common.DbExecuteSqlEvent((obj, e) => {
+                //Console.WriteLine(string.Join(Environment.NewLine, e.ExecuteSql));
+                //Console.WriteLine("Message={0}", e.Message);
+            }));
             //CodeGenerator();
-            InsertTest();
+            //InsertTest();
             DataQuery();
-
         }
 
 
@@ -25,9 +27,21 @@ namespace ZeroDbs.Test
             ZeroDbs.Tools.CodeGenerator generator = new Tools.CodeGenerator();
             generator.Dbs.Add(new ZeroDbs.Common.DbConfigDatabaseInfo
             {
-                dbConnectionString = "Data Source=.;Initial Catalog=MyTestDb;User ID=sa;Password=123;",
-                dbKey = "TestDb",
+                dbConnectionString = "Data Source=.;Initial Catalog=ZeroTestDb;User ID=sa;Password=123456;TrustServerCertificate=True;",
+                dbKey = "SqlServer001",
                 dbType = "SqlServer"
+            });
+            generator.Dbs.Add(new ZeroDbs.Common.DbConfigDatabaseInfo
+            {
+                dbConnectionString = "Host=localhost;Port=3306;Database=zerotestdb;User ID=root;Password=123456;",
+                dbKey = "MySql001",
+                dbType = "MySql"
+            });
+            generator.Dbs.Add(new ZeroDbs.Common.DbConfigDatabaseInfo
+            {
+                dbConnectionString = "Data Source=D:\\Program Files\\SQLiteStudio\\ZeroTestDb.db3;version=3;datetimeformat=CurrentCulture",
+                dbKey = "Sqlite001",
+                dbType = "Sqlite"
             });
             generator.GeneratorConfig = new ZeroDbs.Tools.CodeGenerator.Config
             {
@@ -45,44 +59,57 @@ namespace ZeroDbs.Test
 
             Console.WriteLine("生成成功！");
         }
-
+        static void InsertTest()
+        {
+            dbService.Insert(new MyDbs.SqlServer001.tUser { Name = "user001_sqlserver", Email = "user001@domain.com", Password = "123456" });
+            dbService.Insert(new MyDbs.MySql001.tUser { Name = "user001_mysql", Email = "user001@domain.com", Password = "123456" });
+            dbService.Insert(new MyDbs.Sqlite001.tUser { Name = "user001_sqlite", Email = "user001@domain.com", Password = "123456" });
+        }
         static void DataQuery()
         {
-            using(var cmd = dbService.GetDbCommand(""))
-            {
-                cmd.SqlDeleteBuilder("a").ToString();
-            }
             long page = 1;
-            long pageSize = 1000;
-            dbService.AddZeroDbMapping<MyCategory>("TestDb", "T_ArticleCategory");
-            var pageData = dbService.Page<MyCategory>(page, pageSize, "IsDel=0");
+            long pageSize = 100;
+            var pageData = dbService.Page<MyDbs.SqlServer001.tUser>(page, pageSize, "");
+            Console.WriteLine("MyDbs.SqlServer001.tUser:");
             if (pageData.Total > 0)
             {
-                foreach (MyCategory m in pageData.Items)
+                foreach (MyDbs.SqlServer001.tUser m in pageData.Items)
                 {
-                    Console.WriteLine("{0}\t{1}\t{2}\n", m.ID, m.Name, false);
+                    Console.WriteLine("{0}\t{1}\t{2}\t{3}\n", m.ID, m.Name, m.Email, m.CreateTime);
                 }
-                Console.WriteLine("total={0}&page={1}&pageSize={2}&currentPageListCount={3}", pageData.Total, page, pageSize, pageData.Items.Count);
+            }
+            else
+            {
+                Console.WriteLine("no data");
+            }
+            var pageData2 = dbService.Page<MyDbs.MySql001.tUser>(page, pageSize, "");
+            Console.WriteLine("MyDbs.MySql001.tUser:");
+            if (pageData2.Total > 0)
+            {
+                foreach (MyDbs.MySql001.tUser m in pageData2.Items)
+                {
+                    Console.WriteLine("{0}\t{1}\t{2}\t{3}\n", m.ID, m.Name, m.Email, m.CreateTime);
+                }
+            }
+            else
+            {
+                Console.WriteLine("no data");
+            }
+            var pageData3 = dbService.Page<MyDbs.Sqlite001.tUser>(page, pageSize, "");
+            Console.WriteLine("MyDbs.Sqlite001.tUser:");
+            if (pageData3.Total > 0)
+            {
+                foreach (MyDbs.Sqlite001.tUser m in pageData3.Items)
+                {
+                    Console.WriteLine("{0}\t{1}\t{2}\t{3}\n", m.ID, m.Name, m.Email, m.CreateTime);
+                }
             }
             else
             {
                 Console.WriteLine("no data");
             }
         }
-        static void InsertTest()
-        {
-            using(var cmd = dbService.GetDbCommand<MyDbs.TestDb.tArticleCategory>())
-            {
-                cmd.CommandText = "INSERT INTO T_ArticleCategory(ID,IsDel,Name) VALUES(@ID,@IsDel,@Name)";
-                cmd.LoadParameters(new MyDbs.TestDb.tArticleCategory { ID = 13, IsDel = false, Name = "Test777" });
-                cmd.ExecuteNonQuery();
-            }
-        }
-        class MyCategory
-        {
-            public long ID { get; set; }
-            public string Name { get; set; }
-        }
+
 
     }
 }

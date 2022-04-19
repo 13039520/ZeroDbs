@@ -1,30 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <zero>
   <dbs>
-    <db dbKey="TestDb" dbConnectionString="Data Source=.;Initial Catalog=MyTestDb;User ID=sa;Password=123456;" dbType="SqlServer" />
+    <db dbKey="SqlServer001" dbConnectionString="Data Source=.;Initial Catalog=ZeroTestDb;User ID=sa;Password=123456;TrustServerCertificate=True;" dbType="SqlServer" />
+    <db dbKey="MySql001" dbConnectionString="Host=localhost;Port=3306;Database=zerotestdb;User ID=root;Password=123456;" dbType="MySql" />
+    <db dbKey="Sqlite001" dbConnectionString="Data Source=D:\Program Files\SQLiteStudio\ZeroTestDb.db3;version=3;datetimeformat=CurrentCulture" dbType="Sqlite" />
   </dbs>
   <dvs>
-    <dv dbKey="TestDb" tableName="T_Article" entityKey="MyDbs.TestDb.tArticle" />
-    <dv dbKey="TestDb" tableName="T_ArticleCategory" entityKey="MyDbs.TestDb.tArticleCategory" />
-    <dv dbKey="TestDb" tableName="T_ArticleComment" entityKey="MyDbs.TestDb.tArticleComment" />
-    <dv dbKey="TestDb" tableName="BT_WEIGHTTYPE" entityKey="MyDbs.TestDb.tBT_WEIGHTTYPE" />
-    <dv dbKey="TestDb" tableName="DT_CARWEIGHT_WEIGHT" entityKey="MyDbs.TestDb.tDT_CARWEIGHT_WEIGHT" />
-    <dv dbKey="TestDb" tableName="E_Configuration" entityKey="MyDbs.TestDb.tE_Configuration" />
-    <dv dbKey="TestDb" tableName="E_ConfigurationDetails" entityKey="MyDbs.TestDb.tE_ConfigurationDetails" />
-    <dv dbKey="TestDb" tableName="E_RawValues" entityKey="MyDbs.TestDb.tE_RawValues" />
-    <dv dbKey="TestDb" tableName="E_TagInfo" entityKey="MyDbs.TestDb.tE_TagInfo" />
-    <dv dbKey="TestDb" tableName="IT_MATERIAL" entityKey="MyDbs.TestDb.tIT_MATERIAL" />
-    <dv dbKey="TestDb" tableName="IT_MATERIAL_BIG" entityKey="MyDbs.TestDb.tIT_MATERIAL_BIG" />
-    <dv dbKey="TestDb" tableName="IT_MATERIAL_SMALL" entityKey="MyDbs.TestDb.tIT_MATERIAL_SMALL" />
-    <dv dbKey="TestDb" tableName="IT_STORE" entityKey="MyDbs.TestDb.tIT_STORE" />
-    <dv dbKey="TestDb" tableName="IT_SUPPLIER" entityKey="MyDbs.TestDb.tIT_SUPPLIER" />
-    <dv dbKey="TestDb" tableName="IT_TRANS" entityKey="MyDbs.TestDb.tIT_TRANS" />
-    <dv dbKey="TestDb" tableName="M_Alumina" entityKey="MyDbs.TestDb.tM_Alumina" />
-    <dv dbKey="TestDb" tableName="M_AluminaDetail" entityKey="MyDbs.TestDb.tM_AluminaDetail" />
-    <dv dbKey="TestDb" tableName="M_AluminaRawValue" entityKey="MyDbs.TestDb.tM_AluminaRawValue" />
-    <dv dbKey="TestDb" tableName="M_Approval" entityKey="MyDbs.TestDb.tM_Approval" />
-    <dv dbKey="TestDb" tableName="M_JudgePart" entityKey="MyDbs.TestDb.tM_JudgePart" />
-    <dv dbKey="TestDb" tableName="Q_CARWEIGHT120T" entityKey="MyDbs.TestDb.tQ_CARWEIGHT120T" />
-    <dv dbKey="TestDb" tableName="Q_ProductType" entityKey="MyDbs.TestDb.tQ_ProductType" />
+    <dv dbKey="SqlServer001" tableName="User" entityKey="MyDbs.SqlServer001.tUser" />
+    <dv dbKey="MySql001" tableName="user" entityKey="MyDbs.MySql001.tUser" />
+    <dv dbKey="Sqlite001" tableName="User" entityKey="MyDbs.Sqlite001.tUser" />
   </dvs>
 </zero>
