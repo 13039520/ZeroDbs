@@ -16,7 +16,7 @@ namespace ZeroDbs.Test
             }));
             //CodeGenerator();
             //InsertTest();
-            DataQuery();
+            QueryTest();
         }
 
 
@@ -65,7 +65,7 @@ namespace ZeroDbs.Test
             dbService.Insert(new MyDbs.MySql001.tUser { Name = "user001_mysql", Email = "user001@domain.com", Password = "123456" });
             dbService.Insert(new MyDbs.Sqlite001.tUser { Name = "user001_sqlite", Email = "user001@domain.com", Password = "123456" });
         }
-        static void DataQuery()
+        static void QueryTest()
         {
             long page = 1;
             long pageSize = 100;

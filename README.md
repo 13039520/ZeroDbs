@@ -1,18 +1,11 @@
-**[ZeroDbs]**
+Database access library of .net4.0/netcoreapp3.1/5.0/6.0, Support SqlServer/MySql/Sqlite.
 
-Database access library of .net standard 2.0 .  Support SqlServer/MySql/Sqlite .
-
-**[ZeroDbsNet40]**
-
-Database access library of .net framework 4.0 .  Support SqlServer/MySql/Sqlite .
-
-# Nuget
+## Nuget
  ZeroDbs [https://www.nuget.org/packages/ZeroDbs/](https://www.nuget.org/packages/ZeroDbs/ "Nuget")
  
-    PM> Install-Package ZeroDbs -Version 3.6.0
+    PM> Install-Package ZeroDbs -Version 3.8.0
     
-ZeroDbsNet40 [https://www.nuget.org/packages/ZeroDbsNet40/](https://www.nuget.org/packages/ZeroDbsNet40/ "Nuget")
- 
-    PM> Install-Package ZeroDbsNet40 -Version 3.6.0
-    
+ ## Examples
+
+    [ZeroDbs.Test](https://github.com/13039520/ZeroDbs/blob/master/ZeroDbs.Test/ "ZeroDbs.Test")
 
