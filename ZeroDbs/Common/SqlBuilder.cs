@@ -46,6 +46,10 @@ namespace ZeroDbs.Common
         {
             return tableInfo.Name;
         }
+        public virtual string GetColunmName(string colName)
+        {
+            return colName;
+        }
 
         public virtual string Count<T>(string where) where T : class, new()
         {
@@ -80,7 +84,7 @@ namespace ZeroDbs.Common
             {
                 if (!string.IsNullOrEmpty(returnFieldNames[i]))
                 {
-                    fieldStr.AppendFormat("{0},", returnFieldNames[i]);
+                    fieldStr.AppendFormat("{0},", GetColunmName(returnFieldNames[i]));
                 }
             }
             if (fieldStr.Length > 0)
@@ -102,7 +106,7 @@ namespace ZeroDbs.Common
             }
             if (!string.IsNullOrEmpty(uniqueFieldName))//具有唯一性字段
             {
-                string resultFieldName = uniqueFieldName;
+                string resultFieldName = GetColunmName(uniqueFieldName);
                 sql.AppendFormat("SELECT {0} FROM {1}", fieldStr, GetTableName(tableInfo));
                 //获取唯一性字段集合
                 sql.AppendFormat(" WHERE {0} IN(SELECT {0} FROM(", resultFieldName);
@@ -228,7 +232,7 @@ namespace ZeroDbs.Common
             StringBuilder field = new StringBuilder();
             foreach (string s in fieldArray)
             {
-                field.AppendFormat("{0},", s);
+                field.AppendFormat("{0},", GetColunmName(s));
             }
             if (field.Length < 1)
             {
@@ -239,26 +243,27 @@ namespace ZeroDbs.Common
             {
                 where = "1>0";
             }
+            var tableName = GetTableName(tableInfo);
             if (top < 1)
             {
                 if (string.IsNullOrEmpty(orderby))
                 {
-                    return string.Format("SELECT {0} FROM {1} WHERE {2}", field, GetTableName(tableInfo), where);
+                    return string.Format("SELECT {0} FROM {1} WHERE {2}", field, tableName, where);
                 }
                 else
                 {
-                    return string.Format("SELECT {0} FROM {1} WHERE {2} ORDER BY {3}", field, GetTableName(tableInfo), where, orderby);
+                    return string.Format("SELECT {0} FROM {1} WHERE {2} ORDER BY {3}", field, tableName, where, orderby);
                 }
             }
             else
             {
                 if (string.IsNullOrEmpty(orderby))
                 {
-                    return string.Format("SELECT {1} FROM {2} WHERE {3} LIMIT {0}", top, field, GetTableName(tableInfo), where);
+                    return string.Format("SELECT {1} FROM {2} WHERE {3} LIMIT {0}", top, field, tableName, where);
                 }
                 else
                 {
-                    return string.Format("SELECT {1} FROM {2} WHERE {3} ORDER BY {4} LIMIT {0}", top, field, GetTableName(tableInfo), where, orderby);
+                    return string.Format("SELECT {1} FROM {2} WHERE {3} ORDER BY {4} LIMIT {0}", top, field, tableName, where, orderby);
                 }
             }
         }
@@ -327,7 +332,7 @@ namespace ZeroDbs.Common
                 string columnName = ("" + s).ToLower().Trim();
                 if (columnName.Length > 0 && dic.ContainsKey(columnName))
                 {
-                    columnNames.AppendFormat("{0},", dic[columnName].Name);
+                    columnNames.AppendFormat("{0},", GetColunmName(dic[columnName].Name));
                     columnValues.AppendFormat("@{0},", dic[columnName].Name);
                 }
             }
@@ -388,7 +393,7 @@ namespace ZeroDbs.Common
             var tableName = GetTableName(tableInfo);
 
             List<string> result = new List<string>();
-            List<System.Reflection.PropertyInfo> propertyInfoList = typeof(T).GetType().GetProperties().ToList();
+            List<System.Reflection.PropertyInfo> propertyInfoList = typeof(T).GetProperties().ToList();
             int nvcListCount = nvcList.Count;
             for (int i = 0; i < nvcListCount; i++)
             {
@@ -401,7 +406,7 @@ namespace ZeroDbs.Common
                     {
                         if (identityKeys.Find(delegate (ZeroDbs.Common.DbDataColumnInfo temp) { return string.Equals(temp.Name, p.Name, StringComparison.OrdinalIgnoreCase); }) == null)
                         {
-                            sqlInsertFields.AppendFormat("{0},", p.Name);
+                            sqlInsertFields.AppendFormat("{0},", GetColunmName(p.Name));
                             object TargetValue = Common.ValueConvert.StrToTargetType(nvcList[i][key], p.PropertyType);
                             string ValueString = Common.ValueConvert.SqlValueStrByValue(TargetValue);
                             sqlInsertValues.AppendFormat("{0},", ValueString);
@@ -487,12 +492,12 @@ namespace ZeroDbs.Common
                 whereFieldNames = temp.Distinct().ToArray();
                 if (whereFieldNames.Length < 1)
                 {
-                    setFieldNames = tableInfo.Colunms.FindAll(o => o.IsIdentity || o.IsPrimaryKey).Select(o => o.Name).ToArray();
+                    whereFieldNames = tableInfo.Colunms.FindAll(o => o.IsIdentity || o.IsPrimaryKey).Select(o => o.Name).ToArray();
                 }
             }
             else
             {
-                setFieldNames = tableInfo.Colunms.FindAll(o => o.IsIdentity || o.IsPrimaryKey).Select(o => o.Name).ToArray();
+                whereFieldNames = tableInfo.Colunms.FindAll(o => o.IsIdentity || o.IsPrimaryKey).Select(o => o.Name).ToArray();
             }
             if (setFieldNames == null || setFieldNames.Length < 1) { throw new Exception("setFieldNames is null or contains 0 items"); }
             if (whereFieldNames == null || whereFieldNames.Length < 1) { throw new Exception("whereFieldNames is null or contains 0 items"); }
@@ -535,7 +540,7 @@ namespace ZeroDbs.Common
                 string columnName = s.Trim().ToLower();
                 if (columnName.Length > 0 && dic.ContainsKey(columnName))
                 {
-                    setColumnValue.AppendFormat( "{0}=@{0},", dic[columnName].Name);
+                    setColumnValue.AppendFormat( "{0}=@{1},", GetColunmName(dic[columnName].Name), dic[columnName].Name);
                 }
             }
             if (setColumnValue.Length < 1)
@@ -550,7 +555,7 @@ namespace ZeroDbs.Common
                 string columnName = s.Trim().ToLower();
                 if (columnName.Length > 0 && dic.ContainsKey(columnName))
                 {
-                    updateWhere.AppendFormat( "{0}=@{0} AND ", dic[columnName].Name);
+                    updateWhere.AppendFormat( "{0}=@{1} AND ", GetColunmName(dic[columnName].Name), dic[columnName].Name);
                 }
             }
             if (updateWhere.Length < 1)
@@ -621,7 +626,7 @@ namespace ZeroDbs.Common
                 string columnName = s.Trim().ToLower();
                 if (columnName.Length > 0 && dic.ContainsKey(columnName))
                 {
-                    setColumnValue.AppendFormat("{0}=@{0},", dic[columnName].Name);
+                    setColumnValue.AppendFormat("{0}=@{1},", GetColunmName(dic[columnName].Name), dic[columnName].Name);
                 }
             }
             if (setColumnValue.Length < 1)
@@ -632,26 +637,27 @@ namespace ZeroDbs.Common
 
             if (!string.IsNullOrEmpty(appendWhere))
             {
-                appendWhere = " WHERE "+appendWhere.Trim();
+                appendWhere = " WHERE " + appendWhere.Trim();
             }
             return string.Format("UPDATE {0} SET {1}{2}", GetTableName(tableInfo), setColumnValue, appendWhere);
         }
-        public string Update<T>(System.Collections.Specialized.NameValueCollection nvc) where T : class, new()
+
+        public SqlInfo Update<T>(System.Collections.Specialized.NameValueCollection nvc) where T : class, new()
         {
             return Update<T>(nvc, "");
         }
-        public string Update<T>(System.Collections.Specialized.NameValueCollection nvc, string appendWhere) where T : class, new()
+        public SqlInfo Update<T>(System.Collections.Specialized.NameValueCollection nvc, string appendWhere) where T : class, new()
         {
             var li = new List<System.Collections.Specialized.NameValueCollection>();
             li.Add(nvc);
-            List<string> reval = Update<T>(li, appendWhere);
-            return reval.Count > 0 ? reval[0] : string.Empty;
+            List<SqlInfo> reval = Update<T>(li, appendWhere);
+            return reval.Count > 0 ? reval[0] : null;
         }
-        public List<string> Update<T>(List<System.Collections.Specialized.NameValueCollection> nvcList) where T : class, new()
+        public List<SqlInfo> Update<T>(List<System.Collections.Specialized.NameValueCollection> nvcList) where T : class, new()
         {
             return Update<T>(nvcList, "");
         }
-        public virtual List<string> Update<T>(List<System.Collections.Specialized.NameValueCollection> nvcList, string appendWhere) where T : class, new()
+        public virtual List<SqlInfo> Update<T>(List<System.Collections.Specialized.NameValueCollection> nvcList, string appendWhere) where T : class, new()
         {
             if (nvcList == null) { throw new Exception("nvcList is null"); }
             if (nvcList.Count > 5000)
@@ -689,9 +695,8 @@ namespace ZeroDbs.Common
                 appendWhere = appendWhere.Trim();
                 isAppendWhere = !string.IsNullOrEmpty(appendWhere);
             }
-
-            List<string> reval = new List<string>();
-            List<System.Reflection.PropertyInfo> propertyInfoList = typeof(T).GetType().GetProperties().ToList();
+            List<SqlInfo> reval = new List<SqlInfo>();
+            List<System.Reflection.PropertyInfo> propertyInfoList = typeof(T).GetProperties().ToList();
             foreach (var c in primaryKeys)
             {
                 if (propertyInfoList.Find(delegate (System.Reflection.PropertyInfo t) {
@@ -703,8 +708,10 @@ namespace ZeroDbs.Common
             }
             for (int i = 0; i < nvcListCount; i++)
             {
+                SqlInfo sqlInfo = new SqlInfo();
                 bool nvcContainsKeyKeys = true;
                 StringBuilder sqlWhere = new StringBuilder();
+                List<string> keys = new List<string>();
                 foreach (var c in primaryKeys)
                 {
                     System.Reflection.PropertyInfo p = propertyInfoList.Find(delegate (System.Reflection.PropertyInfo t)
@@ -712,9 +719,9 @@ namespace ZeroDbs.Common
                         return string.Equals(t.Name, c.Name, StringComparison.OrdinalIgnoreCase);
                     });
                     object targetValue = Common.ValueConvert.StrToTargetType(nvcList[i][c.Name], p.PropertyType);
-                    string valueString = Common.ValueConvert.SqlValueStrByValue(targetValue);
-                    sqlWhere.AppendFormat("{0}={1} AND ", c.Name, valueString);
-                    nvcList[i].Remove(c.Name);
+                    sqlInfo.Paras.Add(c.Name, targetValue);
+                    sqlWhere.AppendFormat("{0}=@{1} AND ", GetColunmName(c.Name), c.Name);
+                    keys.Add(c.Name);
                 }
                 if (!nvcContainsKeyKeys) { throw new Exception("No primary key passed in"); }
 
@@ -730,26 +737,22 @@ namespace ZeroDbs.Common
                 StringBuilder sqlSet = new StringBuilder();
                 foreach (string key in nvcList[i].Keys)
                 {
-                    foreach (System.Reflection.PropertyInfo p in propertyInfoList)
+                    if (keys.Contains(key)) { continue; }
+                    System.Reflection.PropertyInfo p = propertyInfoList.Find(o => string.Equals(o.Name, key, StringComparison.OrdinalIgnoreCase));
+                    if (p != null)
                     {
-                        if (string.Equals(p.Name, key, StringComparison.OrdinalIgnoreCase))
+                        if (tableInfo.Colunms.Find(o => string.Equals(o.Name, p.Name, StringComparison.OrdinalIgnoreCase)) != null)
                         {
-                            if (tableInfo.Colunms.Find(o => string.Equals(o.Name, p.Name, StringComparison.OrdinalIgnoreCase)) != null)
-                            {
-                                object targetValue = Common.ValueConvert.StrToTargetType(nvcList[i][key], p.PropertyType);
-                                string valueString = Common.ValueConvert.SqlValueStrByValue(targetValue);
-                                sqlSet.AppendFormat("{0}={1},", p.Name, valueString);
-                            }
+                            object targetValue = Common.ValueConvert.StrToTargetType(nvcList[i][key], p.PropertyType);
+                            sqlInfo.Paras.Add(p.Name, targetValue);
+                            sqlSet.AppendFormat("{0}=@{1},", GetColunmName(p.Name), p.Name);
                         }
                     }
                 }
                 if (sqlSet.Length < 1) { continue; }
                 sqlSet.Remove(sqlSet.Length - 1, 1);
-                string sql = string.Format("UPDATE {0} SET {1} WHERE {2}", GetTableName(tableInfo), sqlSet, sqlWhere);
-                if (!reval.Contains(sql))
-                {
-                    reval.Add(sql);
-                }
+                sqlInfo.Sql = string.Format("UPDATE {0} SET {1} WHERE {2}", GetTableName(tableInfo), sqlSet, sqlWhere);
+                reval.Add(sqlInfo);
             }
             return reval;
         }
@@ -985,7 +988,7 @@ namespace ZeroDbs.Common
 
             string tableName = GetTableName(tableInfo);
             List<string> reval = new List<string>();
-            List<System.Reflection.PropertyInfo> propertyInfoList = typeof(T).GetType().GetProperties().ToList();
+            List<System.Reflection.PropertyInfo> propertyInfoList = typeof(T).GetProperties().ToList();
             foreach (var c in primaryKeys)
             {
                 if (propertyInfoList.Find(delegate (System.Reflection.PropertyInfo t) {

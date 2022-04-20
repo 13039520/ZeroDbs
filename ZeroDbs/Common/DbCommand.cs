@@ -46,14 +46,14 @@ namespace ZeroDbs.Common
         {
             var parameter = CreateParameter();
             parameter.ParameterName = parameterName;
-            parameter.Value = value;
+            parameter.Value = value is null ? DBNull.Value : value;
             return parameter;
         }
         public System.Data.Common.DbParameter CreateParameter(string parameterName, System.Data.DbType dbType, int size, object value)
         {
             var parameter = CreateParameter();
             parameter.ParameterName = parameterName;
-            parameter.Value = value;
+            parameter.Value = value is null ? DBNull.Value : value;
             parameter.DbType = dbType;
             parameter.Size = size;
             return parameter;
@@ -262,6 +262,14 @@ namespace ZeroDbs.Common
             for(int i=0; i < paras.Length; i++)
             {
                 Parameters.Add(CreateParameter("@" + i, paras[i]));
+            }
+        }
+        public void ParametersFromDictionary(Dictionary<string,object> dic)
+        {
+            Parameters.Clear();
+            foreach (string key in dic.Keys)
+            {
+                Parameters.Add(CreateParameter("@" + key, dic[key]));
             }
         }
         public ISqlInsertBuilder Insert(string tableName)

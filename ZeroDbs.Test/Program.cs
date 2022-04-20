@@ -12,10 +12,11 @@ namespace ZeroDbs.Test
         {
             dbService = new ZeroDbs.Common.DbService(new Common.DbExecuteSqlEvent((obj, e) => {
                 //Console.WriteLine(string.Join(Environment.NewLine, e.ExecuteSql));
-                //Console.WriteLine("Message={0}", e.Message);
+                //Console.WriteLine("DbKey={0}&Message={1}", e.DbKey, e.Message);
             }));
             //CodeGenerator();
             //InsertTest();
+            UpdateTest();
             QueryTest();
         }
 
@@ -61,9 +62,22 @@ namespace ZeroDbs.Test
         }
         static void InsertTest()
         {
-            dbService.Insert(new MyDbs.SqlServer001.tUser { Name = "user003_sqlserver", Email = "user003@domain.com", Password = "123456" });
-            dbService.Insert(new MyDbs.MySql001.tUser { Name = "user003_mysql", Email = "user003@domain.com", Password = "123456" });
-            dbService.Insert(new MyDbs.Sqlite001.tUser { Name = "user003_sqlite", Email = "user003@domain.com", Password = "123456" });
+            dbService.Update(new MyDbs.SqlServer001.tUser { Name = "user001_sqlserver", Email = "user001@domain.com", Password = "123456" });
+            dbService.Update(new MyDbs.MySql001.tUser { Name = "user001_mysql", Email = "user001@domain.com", Password = "123456" });
+            dbService.Update(new MyDbs.Sqlite001.tUser { Name = "user001_sqlite", Email = "user001@domain.com", Password = "123456" });
+        }
+        static void UpdateTest()
+        {
+            //dbService.Update(new MyDbs.SqlServer001.tUser { ID = 1, Name = "user009_sqlserver", Email = "user009@domain.com", Password = "123456789" });
+            //dbService.Update(new MyDbs.MySql001.tUser { ID = 1, Name = "user009_mysql", Email = "user009@domain.com", Password = "123456789" });
+            //dbService.Update(new MyDbs.Sqlite001.tUser { ID = 1, Name = "user009_sqlite", Email = "user009@domain.com", Password = "123456789" });
+            var nvc = new System.Collections.Specialized.NameValueCollection();
+            nvc.Add("ID", "1");
+            nvc.Add("Password", "aaaaaa");
+            nvc.Add("Email", "aaaaa@bbbb.es");
+            dbService.Update<MyDbs.SqlServer001.tUser>(nvc);
+            dbService.Update<MyDbs.MySql001.tUser>(nvc);
+            dbService.Update<MyDbs.Sqlite001.tUser>(nvc);
         }
         static void QueryTest()
         {

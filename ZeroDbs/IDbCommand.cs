@@ -29,6 +29,7 @@ namespace ZeroDbs
         object ExecuteScalar();
         void ParametersFromEntity(object entity);
         void ParametersFromParas(params object[] paras);
+        void ParametersFromDictionary(Dictionary<string, object> dic);
         ISqlInsertBuilder Insert(string tableName);
         ISqlDeleteBuilder Delete(string tableName);
         ISqlUpdateBuilder Update(string tableName);

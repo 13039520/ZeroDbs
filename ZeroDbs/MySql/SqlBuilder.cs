@@ -16,6 +16,10 @@ namespace ZeroDbs.MySql
         {
             return string.Format("`{0}`", tableInfo.Name);
         }
+        public override string GetColunmName(string colName)
+        {
+            return String.Format("`{0}`", colName);
+        }
         public override string Page<T>(long page, long size, string where, string orderby, string[] returnFieldNames, string uniqueFieldName = "")
         {
             var tableInfo = this.ZeroDb.GetTable<T>();
@@ -32,7 +36,7 @@ namespace ZeroDbs.MySql
             {
                 if (!string.IsNullOrEmpty(returnFieldNames[i]))
                 {
-                    fieldStr.AppendFormat("{0},", returnFieldNames[i]);
+                    fieldStr.AppendFormat("{0},", GetColunmName(returnFieldNames[i]));
                 }
             }
             if (fieldStr.Length > 0)
@@ -48,9 +52,11 @@ namespace ZeroDbs.MySql
                 var ts = GetUniqueFieldName(tableInfo);
                 uniqueFieldName = ts.Length == 1 ? ts[0] : string.Empty;
             }
+            var tableName= GetTableName(tableInfo);
             if (!string.IsNullOrEmpty(uniqueFieldName))
             {
-                string SubSql = string.Format("SELECT {0} FROM {1}", uniqueFieldName, tableInfo.Name);
+                uniqueFieldName = GetColunmName(uniqueFieldName);
+                string SubSql = string.Format("SELECT {0} FROM {1}", uniqueFieldName, tableName);
                 if (!string.IsNullOrEmpty(where))
                 {
                     SubSql += string.Format(" WHERE {0}", where);
@@ -61,7 +67,7 @@ namespace ZeroDbs.MySql
                 }
                 SubSql += string.Format(" LIMIT {0},{1}", startIndex, size);
 
-                sql.AppendFormat("SELECT {0} FROM {1} WHERE {2} IN(SELECT {2} FROM ({3}) AS T)", fieldStr, tableInfo.Name, uniqueFieldName, SubSql);
+                sql.AppendFormat("SELECT {0} FROM {1} WHERE {2} IN(SELECT {2} FROM ({3}) AS T)", fieldStr, tableName, uniqueFieldName, SubSql);
                 if (!string.IsNullOrEmpty(orderby))
                 {
                     sql.AppendFormat(" ORDER BY {0}", orderby);
@@ -69,7 +75,7 @@ namespace ZeroDbs.MySql
             }
             else
             {
-                sql.AppendFormat("SELECT {0} FROM {1}", fieldStr, tableInfo.Name);
+                sql.AppendFormat("SELECT {0} FROM {1}", fieldStr, tableName);
                 if (!string.IsNullOrEmpty(where))
                 {
                     sql.AppendFormat(" WHERE {0}", where);
@@ -114,7 +120,7 @@ namespace ZeroDbs.MySql
             StringBuilder field = new StringBuilder();
             foreach (string s in fieldArray)
             {
-                field.AppendFormat("{0},", s);
+                field.AppendFormat("{0},", GetColunmName(s));
             }
             if (field.Length < 1)
             {
@@ -125,26 +131,27 @@ namespace ZeroDbs.MySql
             {
                 where = "1>0";
             }
+            var tableName = GetTableName(tableInfo);
             if (top < 1)
             {
                 if (string.IsNullOrEmpty(orderby))
                 {
-                    return string.Format("SELECT {0} FROM {1} WHERE {2}", field, tableInfo.Name, where);
+                    return string.Format("SELECT {0} FROM {1} WHERE {2}", field, tableName, where);
                 }
                 else
                 {
-                    return string.Format("SELECT {0} FROM {1} WHERE {2} ORDER BY {3}", field, tableInfo.Name, where, orderby);
+                    return string.Format("SELECT {0} FROM {1} WHERE {2} ORDER BY {3}", field, tableName, where, orderby);
                 }
             }
             else
             {
                 if (string.IsNullOrEmpty(orderby))
                 {
-                    return string.Format("SELECT {0} FROM {1} WHERE {2} LIMIT {3},{4}", field, tableInfo.Name, where, 0, top);
+                    return string.Format("SELECT {0} FROM {1} WHERE {2} LIMIT {3},{4}", field, tableName, where, 0, top);
                 }
                 else
                 {
-                    return string.Format("SELECT {0} FROM {1} WHERE {2} ORDER BY {3} LIMIT {4},{5}", field, tableInfo.Name, where, orderby, 0, top);
+                    return string.Format("SELECT {0} FROM {1} WHERE {2} ORDER BY {3} LIMIT {4},{5}", field, tableName, where, orderby, 0, top);
                 }
             }
         }

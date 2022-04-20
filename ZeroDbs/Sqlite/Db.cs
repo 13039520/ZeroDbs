@@ -595,7 +595,8 @@ namespace ZeroDbs.Sqlite
             var cmd = this.GetDbCommand();
             try
             {
-                cmd.CommandText = sql;
+                cmd.CommandText = sql.Sql;
+                cmd.ParametersFromDictionary(sql.Paras);
                 var reval = cmd.ExecuteNonQuery();
                 cmd.Dispose();
                 return reval;
@@ -617,7 +618,8 @@ namespace ZeroDbs.Sqlite
                 {
                     foreach (var sql in sqlList)
                     {
-                        cmd.CommandText = sql;
+                        cmd.CommandText = sql.Sql;
+                        cmd.ParametersFromDictionary(sql.Paras);
                         reval += cmd.ExecuteNonQuery();
                     }
                 });
