@@ -12,7 +12,7 @@ namespace ZeroDbs.Common
         private System.Data.CommandType commandType = System.Data.CommandType.Text;
         private string dbKey = "";
         private bool isCheckCommandText = true;
-        private IDbSqlBuilder dbSqlBuilder = null;
+        private Common.SqlBuilder dbSqlBuilder = null;
 
         public string CommandText { get { return commandText; } set { commandText = value; } }
         public int CommandTimeout { get { return commandTimeout; } set { commandTimeout = value; } }
@@ -20,7 +20,7 @@ namespace ZeroDbs.Common
         public System.Data.Common.DbParameterCollection Parameters { get { return dbCommand.Parameters; } }
         public System.Data.CommandType CommandType { get { return commandType; } set { commandType = value; } }
         public System.Data.Common.DbConnection DbConnection { get { return dbCommand.Connection; } }
-        public IDbSqlBuilder DbSqlBuilder { get { return dbSqlBuilder; } }
+        public Common.SqlBuilder DbSqlBuilder { get { return dbSqlBuilder; } }
         public string DbKey { get { return dbKey; } }
 
         private event DbExecuteSqlEvent OnExecuteSqlEvent;
@@ -31,7 +31,7 @@ namespace ZeroDbs.Common
                 OnExecuteSqlEvent(this, e);
             }
         }
-        public DbCommand(string dbKey, System.Data.Common.DbCommand dbCommand, Common.DbExecuteSqlEvent onExecuteSqlEvent, IDbSqlBuilder dbSqlBuilder)
+        public DbCommand(string dbKey, System.Data.Common.DbCommand dbCommand, Common.DbExecuteSqlEvent onExecuteSqlEvent, Common.SqlBuilder dbSqlBuilder)
         {
             this.OnExecuteSqlEvent = onExecuteSqlEvent;
             this.dbKey = dbKey;
@@ -240,7 +240,7 @@ namespace ZeroDbs.Common
                 throw ex;
             }
         }
-        public void LoadParameters(object entity)
+        public void ParametersFromEntity(object entity)
         {
             Parameters.Clear();
             if (entity == null) { return; }
@@ -253,6 +253,15 @@ namespace ZeroDbs.Common
                     value = DBNull.Value;
                 }
                 Parameters.Add(CreateParameter("@" + p.Name, value));
+            }
+        }
+        public void ParametersFromParas(params object[] paras)
+        {
+            Parameters.Clear();
+            if (paras.Length < 1) { return; }
+            for(int i=0; i < paras.Length; i++)
+            {
+                Parameters.Add(CreateParameter("@" + i, paras[i]));
             }
         }
         public ISqlInsertBuilder Insert(string tableName)

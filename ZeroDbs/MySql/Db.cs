@@ -9,18 +9,18 @@ namespace ZeroDbs.MySql
     internal class Db: ZeroDbs.IDb
     {
         private IDataTypeMaping dbDataTypeMaping = null;
-        private Common.DbConfigDatabaseInfo dbConfigDatabaseInfo = null;
-        private IDbSqlBuilder dbSqlBuilder = null;
-        public Common.DbConfigDatabaseInfo DbConfigDatabaseInfo { get { return dbConfigDatabaseInfo; } }
-        public IDbSqlBuilder DbSqlBuilder { get { return dbSqlBuilder; } }
+        private Common.DbConfigDatabaseInfo database = null;
+        private Common.SqlBuilder dbSqlBuilder = null;
+        public Common.DbConfigDatabaseInfo Database { get { return database; } }
+        public Common.SqlBuilder DbSqlBuilder { get { return dbSqlBuilder; } }
         public IDataTypeMaping DbDataTypeMaping { get { return dbDataTypeMaping; } }
 
         public event ZeroDbs.Common.DbExecuteSqlEvent OnDbExecuteSqlEvent = null;
-        public Db(Common.DbConfigDatabaseInfo dbConfigDatabaseInfo)
+        public Db(Common.DbConfigDatabaseInfo database)
         {
-            this.dbConfigDatabaseInfo = dbConfigDatabaseInfo;
+            this.database = database;
             this.dbDataTypeMaping = new DbDataTypeMaping();
-            this.dbSqlBuilder = new DbSqlBuilder(this);
+            this.dbSqlBuilder = new SqlBuilder(this);
         }
         public void FireZeroDbExecuteSqlEvent(ZeroDbs.Common.DbExecuteSqlEventArgs args)
         {
@@ -36,19 +36,19 @@ namespace ZeroDbs.MySql
             {
                 return false;
             }
-            return null != temp.Find(o => string.Equals(o.dbKey, DbConfigDatabaseInfo.dbKey, StringComparison.OrdinalIgnoreCase));
+            return null != temp.Find(o => string.Equals(o.dbKey, Database.dbKey, StringComparison.OrdinalIgnoreCase));
         }
 
         public System.Data.Common.DbConnection GetDbConnection()
         {
-            return new MySqlConnection(DbConfigDatabaseInfo.dbConnectionString);
+            return new MySqlConnection(Database.dbConnectionString);
         }
         public IDbCommand GetDbCommand()
         {
             var conn = GetDbConnection();
             conn.Open();
             var cmd = conn.CreateCommand();
-            return new ZeroDbs.Common.DbCommand(DbConfigDatabaseInfo.dbKey, cmd, this.OnDbExecuteSqlEvent, this.DbSqlBuilder);
+            return new ZeroDbs.Common.DbCommand(Database.dbKey, cmd, this.OnDbExecuteSqlEvent, this.DbSqlBuilder);
         }
         public IDbCommand GetDbCommand(System.Data.Common.DbTransaction transaction)
         {
@@ -60,7 +60,7 @@ namespace ZeroDbs.MySql
             cmd.Connection = transaction.Connection;
             cmd.Transaction = transaction;
 
-            return new ZeroDbs.Common.DbCommand(DbConfigDatabaseInfo.dbKey, cmd, this.OnDbExecuteSqlEvent, this.DbSqlBuilder);
+            return new ZeroDbs.Common.DbCommand(Database.dbKey, cmd, this.OnDbExecuteSqlEvent, this.DbSqlBuilder);
         }
         public IDbTransactionScope GetDbTransactionScope(System.Data.IsolationLevel level, string identification="", string groupId="")
         {
@@ -77,7 +77,7 @@ namespace ZeroDbs.MySql
         {
             if (!IsMappingToDbKey<T>())
             {
-                throw new Exception("类型" + typeof(T).FullName + "没有映射到" + DbConfigDatabaseInfo.dbKey + "上");
+                throw new Exception("类型" + typeof(T).FullName + "没有映射到" + Database.dbKey + "上");
             }
 
             var key = typeof(T).FullName;
@@ -91,7 +91,7 @@ namespace ZeroDbs.MySql
             try
             {
                 var dbName = cmd.DbConnection.Database;
-                var dv = Common.DbMapping.GetDbConfigDataViewInfo<T>().Find(o => string.Equals(o.dbKey, DbConfigDatabaseInfo.dbKey, StringComparison.OrdinalIgnoreCase));
+                var dv = Common.DbMapping.GetDbConfigDataViewInfo<T>().Find(o => string.Equals(o.dbKey, Database.dbKey, StringComparison.OrdinalIgnoreCase));
                 string getTableOrViewSql = "SELECT * FROM information_schema.TABLES WHERE TABLE_SCHEMA='" + dbName + "' AND TABLE_NAME='" + dv.tableName + "'";
 
                 Common.DbDataTableInfo dbDataTableInfo = null;
@@ -274,7 +274,7 @@ namespace ZeroDbs.MySql
         {
             if (!IsMappingToDbKey<T>())
             {
-                throw new Exception("类型" + typeof(T).FullName + "没有映射到" + DbConfigDatabaseInfo.dbKey + "上");
+                throw new Exception("类型" + typeof(T).FullName + "没有映射到" + Database.dbKey + "上");
             }
             return GetDbCommand();
         }
@@ -282,49 +282,20 @@ namespace ZeroDbs.MySql
         {
             if (!IsMappingToDbKey<T>())
             {
-                throw new Exception("类型" + typeof(T).FullName + "没有映射到" + DbConfigDatabaseInfo.dbKey + "上");
+                throw new Exception("类型" + typeof(T).FullName + "没有映射到" + Database.dbKey + "上");
             }
             return GetDbTransactionScope(level, identification, groupId);
         }
 
-        public T Get<T>(object key) where T : class, new()
-        {
-            if (!IsMappingToDbKey<T>())
-            {
-                throw new Exception("类型" + typeof(T).FullName + "没有映射到" + DbConfigDatabaseInfo.dbKey + "上");
-            }
-            var cmd = GetDbCommand();
-            try
-            {
-                var sql = DbSqlBuilder.SelectByKey<T>(key);
-
-                cmd.CommandText = sql;
-                List<T> reval = cmd.ExecuteReader<T>();
-                cmd.Dispose();
-
-                return reval != null && reval.Count > 0 ? reval[0] : null;
-            }
-            catch(Exception ex)
-            {
-                cmd.Dispose();
-                throw ex;
-            }
-        }
         public List<T> Select<T>(string where) where T : class, new()
         {
-            if (!IsMappingToDbKey<T>())
-            {
-                throw new Exception("类型" + typeof(T).FullName + "没有映射到" + DbConfigDatabaseInfo.dbKey + "上");
-            }
+            var sql = DbSqlBuilder.Select<T>(where, "");
             var cmd = GetDbCommand();
             try
             {
-                var sql = DbSqlBuilder.Select<T>(where, "");
-
                 cmd.CommandText = sql;
                 List<T> reval = cmd.ExecuteReader<T>();
                 cmd.Dispose();
-
                 return reval;
             }
             catch (Exception ex)
@@ -335,19 +306,13 @@ namespace ZeroDbs.MySql
         }
         public List<T> Select<T>(string where, string orderby) where T : class, new()
         {
-            if (!IsMappingToDbKey<T>())
-            {
-                throw new Exception("类型" + typeof(T).FullName + "没有映射到" + DbConfigDatabaseInfo.dbKey + "上");
-            }
+            var sql = DbSqlBuilder.Select<T>(where, orderby);
             var cmd = GetDbCommand();
             try
             {
-                var sql = DbSqlBuilder.Select<T>(where, orderby);
-
                 cmd.CommandText = sql;
                 List<T> reval = cmd.ExecuteReader<T>();
                 cmd.Dispose();
-
                 return reval;
             }
             catch (Exception ex)
@@ -358,19 +323,13 @@ namespace ZeroDbs.MySql
         }
         public List<T> Select<T>(string where, string orderby, int top) where T : class, new()
         {
-            if (!IsMappingToDbKey<T>())
-            {
-                throw new Exception("类型" + typeof(T).FullName + "没有映射到" + DbConfigDatabaseInfo.dbKey + "上");
-            }
+            var sql = DbSqlBuilder.Select<T>(where, orderby, top);
             var cmd = GetDbCommand();
             try
             {
-                var sql = DbSqlBuilder.Select<T>(where, orderby, top);
-
                 cmd.CommandText = sql;
                 List<T> reval = cmd.ExecuteReader<T>();
                 cmd.Dispose();
-
                 return reval;
             }
             catch (Exception ex)
@@ -381,15 +340,10 @@ namespace ZeroDbs.MySql
         }
         public List<T> Select<T>(string where, string orderby, int top, int threshold) where T : class, new()
         {
-            if (!IsMappingToDbKey<T>())
-            {
-                throw new Exception("类型" + typeof(T).FullName + "没有映射到" + DbConfigDatabaseInfo.dbKey + "上");
-            }
+            var sql = DbSqlBuilder.Select<T>(where, orderby, top, threshold);
             var cmd = GetDbCommand();
             try
             {
-                var sql = DbSqlBuilder.Select<T>(where, orderby, top, threshold);
-
                 cmd.CommandText = sql;
                 List<T> reval = cmd.ExecuteReader<T>();
                 cmd.Dispose();
@@ -404,19 +358,13 @@ namespace ZeroDbs.MySql
         }
         public List<T> Select<T>(string where, string orderby, int top, string[] fieldNames) where T : class, new()
         {
-            if (!IsMappingToDbKey<T>())
-            {
-                throw new Exception("类型" + typeof(T).FullName + "没有映射到" + DbConfigDatabaseInfo.dbKey + "上");
-            }
+            var sql = DbSqlBuilder.Select<T>(where, orderby, top, fieldNames);
             var cmd = GetDbCommand();
             try
             {
-                var sql = DbSqlBuilder.Select<T>(where, orderby, top, fieldNames);
-
                 cmd.CommandText = sql;
                 List<T> reval = cmd.ExecuteReader<T>();
                 cmd.Dispose();
-
                 return reval;
             }
             catch (Exception ex)
@@ -440,15 +388,11 @@ namespace ZeroDbs.MySql
         }
         public ZeroDbs.Common.PageData<T> Page<T>(long page, long size, string where, string orderby, int threshold, string uniqueFieldName) where T : class, new()
         {
-            if (!IsMappingToDbKey<T>())
-            {
-                throw new Exception("类型" + typeof(T).FullName + "没有映射到" + DbConfigDatabaseInfo.dbKey + "上");
-            }
+            var countSql = this.DbSqlBuilder.Count<T>(where);
+            var sql = this.DbSqlBuilder.Page<T>(page, size, where, orderby, threshold, uniqueFieldName);
             var cmd = this.GetDbCommand();
             try
             {
-                var countSql = this.DbSqlBuilder.Count<T>(where);
-                var sql = this.DbSqlBuilder.Page<T>(page, size, where, orderby, threshold, uniqueFieldName);
                 var key = System.Text.RegularExpressions.Regex.Replace((typeof(T).FullName + where), @"[^\w]", "");
                 cmd.CommandText = countSql;
                 var obj = cmd.ExecuteScalar();
@@ -482,15 +426,11 @@ namespace ZeroDbs.MySql
         }
         public ZeroDbs.Common.PageData<T> Page<T>(long page, long size, string where, string orderby, string[] fieldNames, string uniqueFieldName) where T : class, new()
         {
-            if (!IsMappingToDbKey<T>())
-            {
-                throw new Exception("类型" + typeof(T).FullName + "没有映射到" + DbConfigDatabaseInfo.dbKey + "上");
-            }
+            var countSql = this.DbSqlBuilder.Count<T>(where);
+            var sql = this.DbSqlBuilder.Page<T>(page, size, where, orderby, fieldNames, uniqueFieldName);
             var cmd = this.GetDbCommand();
             try
             {
-                var countSql = this.DbSqlBuilder.Count<T>(where);
-                var sql = this.DbSqlBuilder.Page<T>(page, size, where, orderby, fieldNames, uniqueFieldName);
                 var key = System.Text.RegularExpressions.Regex.Replace((typeof(T).FullName + where), @"[^\w]", "");
                 cmd.CommandText = countSql;
                 var obj = cmd.ExecuteScalar();
@@ -522,15 +462,10 @@ namespace ZeroDbs.MySql
 
         public long Count<T>(string where) where T : class, new()
         {
-            if (!IsMappingToDbKey<T>())
-            {
-                throw new Exception("类型" + typeof(T).FullName + "没有映射到" + DbConfigDatabaseInfo.dbKey + "上");
-            }
+            var sql = this.DbSqlBuilder.Count<T>(where);
             var cmd = this.GetDbCommand();
             try
             {
-                var sql = this.DbSqlBuilder.Count<T>(where);
-
                 cmd.CommandText = sql;
                 var obj = cmd.ExecuteScalar();
                 var reval = Convert.ToInt64(obj);
@@ -546,16 +481,12 @@ namespace ZeroDbs.MySql
 
         public int Insert<T>(T entity) where T : class, new()
         {
-            if (!IsMappingToDbKey<T>())
-            {
-                throw new Exception("类型" + typeof(T).FullName + "没有映射到" + DbConfigDatabaseInfo.dbKey + "上");
-            }
+            var sql = this.DbSqlBuilder.Insert<T>();
             var cmd = this.GetDbCommand();
             try
             {
-                var sql = this.DbSqlBuilder.Insert<T>(entity, new string[] { });
-
                 cmd.CommandText = sql;
+                cmd.ParametersFromEntity(entity);
                 var reval = cmd.ExecuteNonQuery();
                 cmd.Dispose();
                 return reval;
@@ -568,22 +499,17 @@ namespace ZeroDbs.MySql
         }
         public int Insert<T>(List<T> entityList) where T : class, new()
         {
-            if (!IsMappingToDbKey<T>())
-            {
-                throw new Exception("类型" + typeof(T).FullName + "没有映射到" + DbConfigDatabaseInfo.dbKey + "上");
-            }
-
+            var sql = this.DbSqlBuilder.Insert<T>();
             var ts = this.GetDbTransactionScope(System.Data.IsolationLevel.ReadUncommitted);
-
             try
             {
                 int reval = 0;
-                var sqlList = this.DbSqlBuilder.Insert<T>(entityList, new string[] { });
                 ts.Execute((cmd) =>
                 {
-                    foreach (var sql in sqlList)
+                    cmd.CommandText = sql;
+                    foreach (var entity in entityList)
                     {
-                        cmd.CommandText = sql;
+                        cmd.ParametersFromEntity(entity);
                         reval += cmd.ExecuteNonQuery();
                     }
                 });
@@ -598,15 +524,10 @@ namespace ZeroDbs.MySql
         }
         public int Insert<T>(System.Collections.Specialized.NameValueCollection nvc) where T : class, new()
         {
-            if (!IsMappingToDbKey<T>())
-            {
-                throw new Exception("类型" + typeof(T).FullName + "没有映射到" + DbConfigDatabaseInfo.dbKey + "上");
-            }
+            var sql = this.DbSqlBuilder.Insert<T>(nvc);
             var cmd = this.GetDbCommand();
             try
             {
-                var sql = this.DbSqlBuilder.Insert<T>(nvc);
-
                 cmd.CommandText = sql;
                 var reval = cmd.ExecuteNonQuery();
                 cmd.Dispose();
@@ -620,17 +541,12 @@ namespace ZeroDbs.MySql
         }
         public int Insert<T>(List<System.Collections.Specialized.NameValueCollection> nvcList) where T : class, new()
         {
-            if (!IsMappingToDbKey<T>())
-            {
-                throw new Exception("类型" + typeof(T).FullName + "没有映射到" + DbConfigDatabaseInfo.dbKey + "上");
-            }
-
+            var sqlList = this.DbSqlBuilder.Insert<T>(nvcList);
             var ts = this.GetDbTransactionScope(System.Data.IsolationLevel.ReadUncommitted);
-
             try
             {
                 int reval = 0;
-                var sqlList = this.DbSqlBuilder.Insert<T>(nvcList);
+                
                 ts.Execute((cmd) =>
                 {
                     foreach (var sql in sqlList)
@@ -651,16 +567,12 @@ namespace ZeroDbs.MySql
 
         public int Update<T>(T entity) where T : class, new()
         {
-            if (!IsMappingToDbKey<T>())
-            {
-                throw new Exception("类型" + typeof(T).FullName + "没有映射到" + DbConfigDatabaseInfo.dbKey + "上");
-            }
+            var sql = this.DbSqlBuilder.Update<T>();
             var cmd = this.GetDbCommand();
             try
             {
-                var sql = this.DbSqlBuilder.Update<T>(entity, new string[] { }, new string[] { });
-
                 cmd.CommandText = sql;
+                cmd.ParametersFromEntity(entity);
                 var reval = cmd.ExecuteNonQuery();
                 cmd.Dispose();
                 return reval;
@@ -673,22 +585,17 @@ namespace ZeroDbs.MySql
         }
         public int Update<T>(List<T> entityList) where T : class, new()
         {
-            if (!IsMappingToDbKey<T>())
-            {
-                throw new Exception("类型" + typeof(T).FullName + "没有映射到" + DbConfigDatabaseInfo.dbKey + "上");
-            }
-
+            var sql = this.DbSqlBuilder.Update<T>();
             var ts = this.GetDbTransactionScope(System.Data.IsolationLevel.ReadUncommitted);
-
             try
             {
                 int reval = 0;
-                var sqlList = this.DbSqlBuilder.Update<T>(entityList, new string[] { }, new string[] { });
                 ts.Execute((cmd) =>
                 {
-                    foreach (var sql in sqlList)
+                    cmd.CommandText = sql;
+                    foreach (var entity in entityList)
                     {
-                        cmd.CommandText = sql;
+                        cmd.ParametersFromEntity(entity);
                         reval += cmd.ExecuteNonQuery();
                     }
                 });
@@ -703,15 +610,10 @@ namespace ZeroDbs.MySql
         }
         public int Update<T>(System.Collections.Specialized.NameValueCollection nvc) where T : class, new()
         {
-            if (!IsMappingToDbKey<T>())
-            {
-                throw new Exception("类型" + typeof(T).FullName + "没有映射到" + DbConfigDatabaseInfo.dbKey + "上");
-            }
+            var sql = this.DbSqlBuilder.Update<T>(nvc);
             var cmd = this.GetDbCommand();
             try
             {
-                var sql = this.DbSqlBuilder.Update<T>(nvc);
-
                 cmd.CommandText = sql;
                 var reval = cmd.ExecuteNonQuery();
                 cmd.Dispose();
@@ -725,17 +627,11 @@ namespace ZeroDbs.MySql
         }
         public int Update<T>(List<System.Collections.Specialized.NameValueCollection> nvcList) where T : class, new()
         {
-            if (!IsMappingToDbKey<T>())
-            {
-                throw new Exception("类型" + typeof(T).FullName + "没有映射到" + DbConfigDatabaseInfo.dbKey + "上");
-            }
-
+            var sqlList = this.DbSqlBuilder.Update<T>(nvcList);
             var ts = this.GetDbTransactionScope(System.Data.IsolationLevel.ReadUncommitted);
-
             try
             {
                 int reval = 0;
-                var sqlList = this.DbSqlBuilder.Update<T>(nvcList);
                 ts.Execute((cmd) =>
                 {
                     foreach (var sql in sqlList)
@@ -756,15 +652,10 @@ namespace ZeroDbs.MySql
 
         public int Delete<T>(T entity) where T : class, new()
         {
-            if (!IsMappingToDbKey<T>())
-            {
-                throw new Exception("类型" + typeof(T).FullName + "没有映射到" + DbConfigDatabaseInfo.dbKey + "上");
-            }
+            var sql = this.DbSqlBuilder.Delete<T>(entity);
             var cmd = this.GetDbCommand();
             try
             {
-                var sql = this.DbSqlBuilder.Delete<T>(entity, new string[] { });
-
                 cmd.CommandText = sql;
                 var reval = cmd.ExecuteNonQuery();
                 cmd.Dispose();
@@ -778,17 +669,11 @@ namespace ZeroDbs.MySql
         }
         public int Delete<T>(List<T> entityList) where T : class, new()
         {
-            if (!IsMappingToDbKey<T>())
-            {
-                throw new Exception("类型" + typeof(T).FullName + "没有映射到" + DbConfigDatabaseInfo.dbKey + "上");
-            }
-
+            var sqlList = this.DbSqlBuilder.Delete<T>(entityList, new string[0]);
             var ts = this.GetDbTransactionScope(System.Data.IsolationLevel.ReadUncommitted);
-
             try
             {
                 int reval = 0;
-                var sqlList = this.DbSqlBuilder.Delete<T>(entityList, new string[] { });
                 ts.Execute((cmd) =>
                 {
                     foreach (var sql in sqlList)
@@ -808,15 +693,10 @@ namespace ZeroDbs.MySql
         }
         public int Delete<T>(System.Collections.Specialized.NameValueCollection nvc) where T : class, new()
         {
-            if (!IsMappingToDbKey<T>())
-            {
-                throw new Exception("类型" + typeof(T).FullName + "没有映射到" + DbConfigDatabaseInfo.dbKey + "上");
-            }
+            var sql = this.DbSqlBuilder.Delete<T>(nvc);
             var cmd = this.GetDbCommand();
             try
             {
-                var sql = this.DbSqlBuilder.Delete<T>(nvc);
-
                 cmd.CommandText = sql;
                 var reval = cmd.ExecuteNonQuery();
                 cmd.Dispose();
@@ -830,17 +710,11 @@ namespace ZeroDbs.MySql
         }
         public int Delete<T>(List<System.Collections.Specialized.NameValueCollection> nvcList) where T : class, new()
         {
-            if (!IsMappingToDbKey<T>())
-            {
-                throw new Exception("类型" + typeof(T).FullName + "没有映射到" + DbConfigDatabaseInfo.dbKey + "上");
-            }
-
+            var sqlList = this.DbSqlBuilder.Delete<T>(nvcList);
             var ts = this.GetDbTransactionScope(System.Data.IsolationLevel.ReadUncommitted);
-
             try
             {
                 int reval = 0;
-                var sqlList = this.DbSqlBuilder.Delete<T>(nvcList);
                 ts.Execute((cmd) =>
                 {
                     foreach (var sql in sqlList)

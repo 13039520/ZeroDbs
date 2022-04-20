@@ -122,7 +122,7 @@ namespace %NameSpace%
             {
                 var db = dbs[key];
                 var tables = db.GetTables();
-                Builder(db.DbConfigDatabaseInfo, tables, db.DbConfigDatabaseInfo, generatorConfig.EntityDir, generatorConfig.AppProjectDir, generatorConfig.EntityNamespace, generatorConfig.EntityTemplate);
+                Builder(db.Database, tables, db.Database, generatorConfig.EntityDir, generatorConfig.AppProjectDir, generatorConfig.EntityNamespace, generatorConfig.EntityTemplate);
             }
         }
         private void Builder(Common.DbConfigDatabaseInfo db, List<Common.DbDataTableInfo> tables, Common.DbConfigDatabaseInfo dbInfo, string entityProjectRootDir, string targetProjectRootDir, string nameSpace, string entityTemplate = "")

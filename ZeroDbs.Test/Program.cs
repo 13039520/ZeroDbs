@@ -61,9 +61,9 @@ namespace ZeroDbs.Test
         }
         static void InsertTest()
         {
-            dbService.Insert(new MyDbs.SqlServer001.tUser { Name = "user001_sqlserver", Email = "user001@domain.com", Password = "123456" });
-            dbService.Insert(new MyDbs.MySql001.tUser { Name = "user001_mysql", Email = "user001@domain.com", Password = "123456" });
-            dbService.Insert(new MyDbs.Sqlite001.tUser { Name = "user001_sqlite", Email = "user001@domain.com", Password = "123456" });
+            dbService.Insert(new MyDbs.SqlServer001.tUser { Name = "user003_sqlserver", Email = "user003@domain.com", Password = "123456" });
+            dbService.Insert(new MyDbs.MySql001.tUser { Name = "user003_mysql", Email = "user003@domain.com", Password = "123456" });
+            dbService.Insert(new MyDbs.Sqlite001.tUser { Name = "user003_sqlite", Email = "user003@domain.com", Password = "123456" });
         }
         static void QueryTest()
         {

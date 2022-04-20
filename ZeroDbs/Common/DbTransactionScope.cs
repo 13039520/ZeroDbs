@@ -79,24 +79,24 @@ namespace ZeroDbs.Common
                     if (isSuccess)
                     {
                         this.dbTransaction.Commit();
-                        FireEvent(new DbExecuteSqlEventArgs(db.DbConfigDatabaseInfo.dbKey, new List<string>(), DbExecuteSqlType.TRANSACTION, "事务" + this.Identification + "(" + this.GroupId + ")已经提交"));
+                        FireEvent(new DbExecuteSqlEventArgs(db.Database.dbKey, new List<string>(), DbExecuteSqlType.TRANSACTION, "事务" + this.Identification + "(" + this.GroupId + ")已经提交"));
                     }
                     else
                     {
                         this.dbTransaction.Rollback();
                         if (string.IsNullOrEmpty(executeExceptionMsg))
                         {
-                            FireEvent(new DbExecuteSqlEventArgs(db.DbConfigDatabaseInfo.dbKey, new List<string>(), DbExecuteSqlType.TRANSACTION, "事务" + this.Identification + "(" + this.GroupId + ")已经回滚"));
+                            FireEvent(new DbExecuteSqlEventArgs(db.Database.dbKey, new List<string>(), DbExecuteSqlType.TRANSACTION, "事务" + this.Identification + "(" + this.GroupId + ")已经回滚"));
                         }
                         else
                         {
-                            FireEvent(new DbExecuteSqlEventArgs(db.DbConfigDatabaseInfo.dbKey, new List<string>(), DbExecuteSqlType.TRANSACTION, "事务" + this.Identification + "(" + this.GroupId + ")已经回滚(" + executeExceptionMsg + ")"));
+                            FireEvent(new DbExecuteSqlEventArgs(db.Database.dbKey, new List<string>(), DbExecuteSqlType.TRANSACTION, "事务" + this.Identification + "(" + this.GroupId + ")已经回滚(" + executeExceptionMsg + ")"));
                         }
                     }
                 }
                 else
                 {
-                    FireEvent(new DbExecuteSqlEventArgs(db.DbConfigDatabaseInfo.dbKey, new List<string>(), DbExecuteSqlType.TRANSACTION, "事务" + this.Identification + "(" + this.GroupId + ")已经执行过Complete()"));
+                    FireEvent(new DbExecuteSqlEventArgs(db.Database.dbKey, new List<string>(), DbExecuteSqlType.TRANSACTION, "事务" + this.Identification + "(" + this.GroupId + ")已经执行过Complete()"));
                 }
             }
             Dispose();

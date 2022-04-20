@@ -220,11 +220,6 @@ namespace ZeroDbs.Common
             return DbConfigReader.AddZeroDbMapping(entityFullName, dbKey, tableName);
         }
 
-
-        public T Get<T>(object key) where T : class, new()
-        {
-            return GetDb<T>().Get<T>(key);
-        }
         public List<T> Select<T>(string where) where T : class, new()
         {
             return GetDb<T>().Select<T>(where);

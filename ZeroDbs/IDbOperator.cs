@@ -6,7 +6,6 @@ namespace ZeroDbs
 {
     public interface IDbOperator
     {
-        T Get<T>(object key) where T : class, new();
         List<T> Select<T>(string where) where T : class, new();
         List<T> Select<T>(string where, string orderby) where T : class, new();
         List<T> Select<T>(string where, string orderby, int top) where T : class, new();

@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ZeroDbs" Version="3.8.0" />
+    <ProjectReference Include="..\ZeroDbs\ZeroDbs.csproj" />
   </ItemGroup>
 
   <ItemGroup>

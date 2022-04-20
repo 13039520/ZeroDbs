@@ -12,7 +12,7 @@ namespace ZeroDbs
         System.Data.Common.DbParameterCollection Parameters { get; }
         System.Data.CommandType CommandType { get; set; }
         System.Data.Common.DbConnection DbConnection { get; }
-        IDbSqlBuilder DbSqlBuilder { get; }
+        Common.SqlBuilder DbSqlBuilder { get; }
         System.Data.Common.DbParameter CreateParameter();
         System.Data.Common.DbParameter CreateParameter(string parameterName, object value);
         System.Data.Common.DbParameter CreateParameter(string parameterName, System.Data.DbType dbType, int size, object value);
@@ -27,7 +27,8 @@ namespace ZeroDbs
         void ExecuteReader<T>(Common.DbExecuteReadOnebyOneAction<T> action, bool useEmit = true) where T : class, new();
         System.Data.IDataReader ExecuteReader();
         object ExecuteScalar();
-        void LoadParameters(object entity);
+        void ParametersFromEntity(object entity);
+        void ParametersFromParas(params object[] paras);
         ISqlInsertBuilder Insert(string tableName);
         ISqlDeleteBuilder Delete(string tableName);
         ISqlUpdateBuilder Update(string tableName);
