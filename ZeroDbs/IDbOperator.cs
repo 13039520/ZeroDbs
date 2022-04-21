@@ -24,9 +24,7 @@ namespace ZeroDbs
         int UpdateFromCustomEntity<DbEntity>(object source) where DbEntity : class, new();
         int UpdateFromDictionary<DbEntity>(Dictionary<string, object> dic) where DbEntity : class, new();
 
-        int Delete<DbEntity>(DbEntity entity) where DbEntity : class, new();
-        int Delete<DbEntity>(List<DbEntity> entityList) where DbEntity : class, new();
-        int Delete<DbEntity>(System.Collections.Specialized.NameValueCollection nvc) where DbEntity : class, new();
-        int Delete<DbEntity>(List<System.Collections.Specialized.NameValueCollection> nvcList) where DbEntity : class, new();
+        int Delete<DbEntity>(string where, params object[] paras) where DbEntity : class, new();
+
     }
 }

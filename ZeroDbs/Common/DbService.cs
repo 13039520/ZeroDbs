@@ -275,23 +275,10 @@ namespace ZeroDbs.Common
             return GetDb<DbEntity>().UpdateFromDictionary<DbEntity>(dic);
         }
 
-        public int Delete<DbEntity>(DbEntity entity) where DbEntity : class, new()
+        public int Delete<DbEntity>(string where, params object[] paras) where DbEntity : class, new()
         {
-            return GetDb<DbEntity>().Delete<DbEntity>(entity);
+            return GetDb<DbEntity>().Delete<DbEntity>(where, paras);
         }
-        public int Delete<DbEntity>(List<DbEntity> entityList) where DbEntity : class, new()
-        {
-            return GetDb<DbEntity>().Delete<DbEntity>(entityList);
-        }
-        public int Delete<DbEntity>(System.Collections.Specialized.NameValueCollection nvc) where DbEntity : class, new()
-        {
-            return GetDb<DbEntity>().Delete<DbEntity>(nvc);
-        }
-        public int Delete<DbEntity>(List<System.Collections.Specialized.NameValueCollection> nvcList) where DbEntity : class, new()
-        {
-            return GetDb<DbEntity>().Delete<DbEntity>(nvcList);
-        }
-
 
 
 

@@ -410,13 +410,14 @@ namespace ZeroDbs.Common
             }
         }
 
-        public int Delete<DbEntity>(DbEntity entity) where DbEntity : class, new()
+        public int Delete<DbEntity>(string where, params object[] paras) where DbEntity : class, new()
         {
-            var sql = this.DbSqlBuilder.Delete<DbEntity>(entity);
+            var sql = this.DbSqlBuilder.Delete<DbEntity>(where, paras);
             var cmd = this.GetDbCommand();
             try
             {
-                cmd.CommandText = sql;
+                cmd.CommandText = sql.Sql;
+                cmd.ParametersFromDictionary(sql.Paras);
                 var reval = cmd.ExecuteNonQuery();
                 cmd.Dispose();
                 return reval;
@@ -424,71 +425,6 @@ namespace ZeroDbs.Common
             catch (Exception ex)
             {
                 cmd.Dispose();
-                throw ex;
-            }
-        }
-        public int Delete<DbEntity>(List<DbEntity> entityList) where DbEntity : class, new()
-        {
-            var sqlList = this.DbSqlBuilder.Delete<DbEntity>(entityList, new string[0]);
-            var ts = this.GetDbTransactionScope(System.Data.IsolationLevel.ReadUncommitted);
-            try
-            {
-                int reval = 0;
-                ts.Execute((cmd) =>
-                {
-                    foreach (var sql in sqlList)
-                    {
-                        cmd.CommandText = sql;
-                        reval += cmd.ExecuteNonQuery();
-                    }
-                });
-                ts.Dispose();
-                return reval;
-            }
-            catch (Exception ex)
-            {
-                ts.Dispose();
-                throw ex;
-            }
-        }
-        public int Delete<DbEntity>(System.Collections.Specialized.NameValueCollection nvc) where DbEntity : class, new()
-        {
-            var sql = this.DbSqlBuilder.Delete<DbEntity>(nvc);
-            var cmd = this.GetDbCommand();
-            try
-            {
-                cmd.CommandText = sql;
-                var reval = cmd.ExecuteNonQuery();
-                cmd.Dispose();
-                return reval;
-            }
-            catch (Exception ex)
-            {
-                cmd.Dispose();
-                throw ex;
-            }
-        }
-        public int Delete<DbEntity>(List<System.Collections.Specialized.NameValueCollection> nvcList) where DbEntity : class, new()
-        {
-            var sqlList = this.DbSqlBuilder.Delete<DbEntity>(nvcList);
-            var ts = this.GetDbTransactionScope(System.Data.IsolationLevel.ReadUncommitted);
-            try
-            {
-                int reval = 0;
-                ts.Execute((cmd) =>
-                {
-                    foreach (var sql in sqlList)
-                    {
-                        cmd.CommandText = sql;
-                        reval += cmd.ExecuteNonQuery();
-                    }
-                });
-                ts.Dispose();
-                return reval;
-            }
-            catch (Exception ex)
-            {
-                ts.Dispose();
                 throw ex;
             }
         }
