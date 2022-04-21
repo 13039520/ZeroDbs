@@ -10,40 +10,13 @@ using Microsoft.Data.SqlClient;
 
 namespace ZeroDbs.SqlServer
 {
-    internal class Db: IDb
+    internal class Db: Common.Db
     {
-        private IDataTypeMaping dbDataTypeMaping = null;
-        private Common.DbConfigDatabaseInfo database = null;
-        private Common.SqlBuilder dbSqlBuilder = null;
-        public Common.DbConfigDatabaseInfo Database { get { return database; } }
-        public Common.SqlBuilder DbSqlBuilder { get { return dbSqlBuilder; } }
-        public IDataTypeMaping DbDataTypeMaping { get { return dbDataTypeMaping; } }
+        public Db(Common.DbConfigDatabaseInfo database): base(database)
+        {
 
-        public event ZeroDbs.Common.DbExecuteSqlEvent OnDbExecuteSqlEvent = null;
-        public Db(Common.DbConfigDatabaseInfo database)
-        {
-            this.database = database;
-            this.dbDataTypeMaping = new DbDataTypeMaping();
-            this.dbSqlBuilder = new SqlBuilder(this);
         }
-        public void FireZeroDbExecuteSqlEvent(ZeroDbs.Common.DbExecuteSqlEventArgs args)
-        {
-            if (this.OnDbExecuteSqlEvent != null)
-            {
-                this.OnDbExecuteSqlEvent(this, args);
-            }
-        }
-        private bool IsMappingToDbKey<T>()
-        {
-            var temp = Common.DbMapping.GetZeroDbConfigDatabaseInfo<T>();
-            if (temp == null || temp.Count < 1)
-            {
-                return false;
-            }
-            return null != temp.Find(o => string.Equals(o.dbKey, Database.dbKey, StringComparison.OrdinalIgnoreCase));
-        }
-
-        public System.Data.Common.DbConnection GetDbConnection()
+        public override System.Data.Common.DbConnection GetDbConnection()
         {
 #if NET40
             return new System.Data.SqlClient.SqlConnection(Database.dbConnectionString);
@@ -51,44 +24,14 @@ namespace ZeroDbs.SqlServer
             return new  Microsoft.Data.SqlClient.SqlConnection(Database.dbConnectionString);
 #endif
         }
-        public IDbCommand GetDbCommand()
+        public override Common.DbDataTableInfo GetTable<DbEntity>()
         {
-            var conn = this.GetDbConnection();
-            conn.Open();
-            var cmd = conn.CreateCommand();
-            return new ZeroDbs.Common.DbCommand(Database.dbKey, cmd, this.OnDbExecuteSqlEvent, this.DbSqlBuilder);
-        }
-        public IDbCommand GetDbCommand(System.Data.Common.DbTransaction transaction)
-        {
-            if(transaction.Connection.State == System.Data.ConnectionState.Open)
+            if (!IsMappingToDbKey<DbEntity>())
             {
-                transaction.Connection.Open();
-            }
-            System.Data.Common.DbCommand cmd = transaction.Connection.CreateCommand();
-            cmd.Connection = transaction.Connection;
-            cmd.Transaction = transaction;
-
-            return new ZeroDbs.Common.DbCommand(Database.dbKey, cmd, this.OnDbExecuteSqlEvent, this.DbSqlBuilder);
-        }
-        public IDbTransactionScope GetDbTransactionScope(System.Data.IsolationLevel level, string identification="", string groupId="")
-        {
-            var conn = this.GetDbConnection();
-            conn.Open();
-            var trans = conn.BeginTransaction(level);
-            return new ZeroDbs.Common.DbTransactionScope(this, identification, groupId);
-        }
-        public IDbTransactionScopeCollection GetDbTransactionScopeCollection()
-        {
-            return new ZeroDbs.Common.DbTransactionScopeCollection();
-        }
-        public ZeroDbs.Common.DbDataTableInfo GetTable<T>() where T : class, new()
-        {
-            if (!IsMappingToDbKey<T>())
-            {
-                throw new Exception("类型" + typeof(T).FullName + "没有映射到" + Database.dbKey + "上");
+                throw new Exception("类型" + typeof(DbEntity).FullName + "没有映射到" + Database.dbKey + "上");
             }
 
-            string key = typeof(T).FullName;
+            string key = typeof(DbEntity).FullName;
             var value = Common.DbDataviewStructCache.Get(key);
             if (value != null)
             {
@@ -98,7 +41,7 @@ namespace ZeroDbs.SqlServer
             var cmd = this.GetDbCommand();
             try
             {
-                var dv = Common.DbMapping.GetDbConfigDataViewInfo<T>().Find(o => string.Equals(o.dbKey, Database.dbKey, StringComparison.OrdinalIgnoreCase));
+                var dv = Common.DbMapping.GetDbConfigDataViewInfo<DbEntity>().Find(o => string.Equals(o.dbKey, Database.dbKey, StringComparison.OrdinalIgnoreCase));
                 string getTableOrViewSql = "SELECT A.[id],A.[type],A.[name],"
                     + "(SELECT TOP 1 ISNULL(value, '') FROM sys.extended_properties AS E LEFT JOIN (SELECT object_id,name AS name2 FROM sys.views UNION SELECT object_id,name AS name2 FROM sys.tables) AS T1 ON T1.object_id=major_id WHERE E.minor_id=0 AND E.name='MS_Description' AND name2=A.[name])"
                     + "AS [description]"
@@ -106,7 +49,7 @@ namespace ZeroDbs.SqlServer
                     + " WHERE [name]='" + dv.tableName + "' AND ([type] = 'U' OR [type]= 'V')  ORDER BY [type],[name]";
 
                 Common.DbDataTableInfo dbDataTableInfo = null;
-                
+
                 cmd.CommandText = getTableOrViewSql;
                 var reader = cmd.ExecuteReader();
                 while (reader.Read())
@@ -139,7 +82,7 @@ namespace ZeroDbs.SqlServer
                     throw new Exception("查询" + dv.tableName + "的表信息不成功");
                 }
 
-                string getColumnInfoSql = "SELECT C.Name AS [Name],T.Name AS [Type],"
+                string getColumnInfoSql = "SELECT C.Name AS [Name],DbEntity.Name AS [Type],"
                     + "CONVERT(bit,C.IsNullable) AS [IsNullable],"
                     + "CONVERT(bit,CASE WHEN EXISTS(SELECT 1 FROM sysobjects WHERE xtype='PK' AND parent_obj=C.Id AND Name IN("
                     + "SELECT Name FROM sysindexes WHERE Indid IN("
@@ -152,7 +95,7 @@ namespace ZeroDbs.SqlServer
                     + "ISNULL(CM.text,'') AS [DefaultValue],"
                     + "ISNULL(ETP.value,'') AS [Description] "
                     + "FROM syscolumns C "
-                    + "INNER JOIN systypes T ON C.xusertype = T.xusertype "
+                    + "INNER JOIN systypes DbEntity ON C.xusertype = DbEntity.xusertype "
                     + "LEFT JOIN sys.extended_properties ETP ON ETP.major_id=C.id AND ETP.minor_id=C.colid AND ETP.name='MS_Description' "
                     + "LEFT JOIN syscomments CM ON C.cdefault=CM.id"
                     + " WHERE C.Id=object_id('" + dv.tableName + "')";
@@ -194,7 +137,7 @@ namespace ZeroDbs.SqlServer
                 throw ex;
             }
         }
-        public List<ZeroDbs.Common.DbDataTableInfo> GetTables()
+        public override List<ZeroDbs.Common.DbDataTableInfo> GetTables()
         {
             var cmd = this.GetDbCommand();
             try
@@ -239,7 +182,7 @@ namespace ZeroDbs.SqlServer
 
                 foreach (ZeroDbs.Common.DbDataTableInfo m in List)
                 {
-                    string sql = "SELECT C.Name AS [Name],T.Name AS [Type],"
+                    string sql = "SELECT C.Name AS [Name],DbEntity.Name AS [Type],"
                     + "CONVERT(bit,C.IsNullable) AS [IsNullable],"
                     + "CONVERT(bit,CASE WHEN EXISTS(SELECT 1 FROM sysobjects WHERE xtype='PK' AND parent_obj=C.Id AND Name IN("
                     + "SELECT Name FROM sysindexes WHERE Indid IN("
@@ -252,7 +195,7 @@ namespace ZeroDbs.SqlServer
                     + "ISNULL(CM.text,'') AS [DefaultValue],"
                     + "ISNULL(ETP.value,'') AS [Description] "
                     + "FROM syscolumns C "
-                    + "INNER JOIN systypes T ON C.xusertype = T.xusertype "
+                    + "INNER JOIN systypes DbEntity ON C.xusertype = DbEntity.xusertype "
                     + "LEFT JOIN sys.extended_properties ETP ON ETP.major_id=C.id AND ETP.minor_id=C.colid AND ETP.name='MS_Description' "
                     + "LEFT JOIN syscomments CM ON C.cdefault=CM.id"
                     + " WHERE C.Id=object_id('" + m.Name + "')";
@@ -289,506 +232,5 @@ namespace ZeroDbs.SqlServer
                 throw ex;
             }
         }
-        public bool DbConnectionTest()
-        {
-            try
-            {
-                var conn = this.GetDbConnection();
-                conn.Open();
-                conn.Close();
-                return true;
-            }
-            catch (Exception e)
-            {
-                throw e;
-            }
-        }
-
-        public IDbCommand GetDbCommand<T>() where T : class, new()
-        {
-            if (!IsMappingToDbKey<T>())
-            {
-                throw new Exception("类型" + typeof(T).FullName + "没有映射到" + Database.dbKey + "上");
-            }
-            return GetDbCommand();
-        }
-        public IDbTransactionScope GetDbTransactionScope<T>(System.Data.IsolationLevel level, string identification = "", string groupId = "") where T : class, new()
-        {
-            if (!IsMappingToDbKey<T>())
-            {
-                throw new Exception("类型" + typeof(T).FullName + "没有映射到" + Database.dbKey + "上");
-            }
-            return GetDbTransactionScope(level, identification, groupId);
-        }
-        public List<T> Select<T>(string where) where T : class, new()
-        {
-            if (!IsMappingToDbKey<T>())
-            {
-                throw new Exception("类型" + typeof(T).FullName + "没有映射到" + Database.dbKey + "上");
-            }
-            var cmd = GetDbCommand();
-            try
-            {
-                var sql = DbSqlBuilder.Select<T>(where, ""); //.Select<T>(where, "");
-
-                cmd.CommandText = sql;
-                List<T> reval = cmd.ExecuteReader<T>();
-                cmd.Dispose();
-
-                return reval;
-            }
-            catch (Exception ex)
-            {
-                cmd.Dispose();
-                throw ex;
-            }
-        }
-        public List<T> Select<T>(string where, string orderby) where T : class, new()
-        {
-            if (!IsMappingToDbKey<T>())
-            {
-                throw new Exception("类型" + typeof(T).FullName + "没有映射到" + Database.dbKey + "上");
-            }
-            var cmd = GetDbCommand();
-            try
-            {
-                var sql = DbSqlBuilder.Select<T>(where, orderby);
-
-                cmd.CommandText = sql;
-                List<T> reval = cmd.ExecuteReader<T>();
-                cmd.Dispose();
-
-                return reval;
-            }
-            catch (Exception ex)
-            {
-                cmd.Dispose();
-                throw ex;
-            }
-        }
-        public List<T> Select<T>(string where, string orderby, int top) where T : class, new()
-        {
-            if (!IsMappingToDbKey<T>())
-            {
-                throw new Exception("类型" + typeof(T).FullName + "没有映射到" + Database.dbKey + "上");
-            }
-            var cmd = GetDbCommand();
-            try
-            {
-                var sql = DbSqlBuilder.Select<T>(where, orderby, top);
-
-                cmd.CommandText = sql;
-                List<T> reval = cmd.ExecuteReader<T>();
-                cmd.Dispose();
-
-                return reval;
-            }
-            catch (Exception ex)
-            {
-                cmd.Dispose();
-                throw ex;
-            }
-        }
-        public List<T> Select<T>(string where, string orderby, int top, int threshold) where T : class, new()
-        {
-            var sql = DbSqlBuilder.Select<T>(where, orderby, top, threshold);
-            var cmd = GetDbCommand();
-            try
-            {
-                cmd.CommandText = sql;
-                List<T> reval = cmd.ExecuteReader<T>();
-                cmd.Dispose();
-                return reval;
-            }
-            catch (Exception ex)
-            {
-                cmd.Dispose();
-                throw ex;
-            }
-        }
-        public List<T> Select<T>(string where, string orderby, int top, string[] fieldNames) where T : class, new()
-        {
-            if (!IsMappingToDbKey<T>())
-            {
-                throw new Exception("类型" + typeof(T).FullName + "没有映射到" + Database.dbKey + "上");
-            }
-            var cmd = GetDbCommand();
-            try
-            {
-                var sql = DbSqlBuilder.Select<T>(where, orderby, top, fieldNames);
-
-                cmd.CommandText = sql;
-                List<T> reval = cmd.ExecuteReader<T>();
-                cmd.Dispose();
-
-                return reval;
-            }
-            catch (Exception ex)
-            {
-                cmd.Dispose();
-                throw ex;
-            }
-        }
-
-        public ZeroDbs.Common.PageData<T> Page<T>(long page, long size, string where) where T : class, new()
-        {
-            return Page<T>(page, size, where, "");
-        }
-        public ZeroDbs.Common.PageData<T> Page<T>(long page, long size, string where, string orderby) where T : class, new()
-        {
-            return Page<T>(page, size, where, orderby, new string[] { });
-        }
-        public ZeroDbs.Common.PageData<T> Page<T>(long page, long size, string where, string orderby, int threshold) where T : class, new()
-        {
-            return Page<T>(page, size, where, orderby, threshold, "");
-        }
-        public ZeroDbs.Common.PageData<T> Page<T>(long page, long size, string where, string orderby, int threshold, string uniqueFieldName) where T : class, new()
-        {
-            var countSql = DbSqlBuilder.Count<T>(where);
-            var sql = DbSqlBuilder.Page<T>(page, size, where, orderby, threshold, uniqueFieldName);
-
-            var cmd = this.GetDbCommand();
-            try
-            {
-                cmd.CommandText = countSql;
-                var obj = cmd.ExecuteScalar();
-                long total = Convert.ToInt64(obj);
-                if (total < 1)
-                {
-                    cmd.Dispose();
-                    return new Common.PageData<T> { Total = total, Items = new List<T>() };
-                }
-                long pages = total % size == 0 ? total / size : (total / size + 1);
-                if (page > pages)
-                {
-                    cmd.Dispose();
-                    return new Common.PageData<T >{ Total = total, Items = new List<T>() };
-                }
-                cmd.CommandText = sql;
-                var reval = cmd.ExecuteReader<T>();
-                cmd.Dispose();
-
-                return new Common.PageData<T> { Total = total, Items = reval };
-            }
-            catch (Exception ex)
-            {
-                cmd.Dispose();
-                throw ex;
-            }
-        }
-        public ZeroDbs.Common.PageData<T> Page<T>(long page, long size, string where, string orderby, string[] fieldNames) where T : class, new()
-        {
-            return Page<T>(page, size, where, orderby, fieldNames, "");
-        }
-        public ZeroDbs.Common.PageData<T> Page<T>(long page, long size, string where, string orderby, string[] fieldNames, string uniqueFieldName) where T : class, new()
-        {
-            var countSql = DbSqlBuilder.Count<T>(where);
-            var sql = DbSqlBuilder.Page<T>(page, size, where, orderby, fieldNames, uniqueFieldName);
-            var cmd = this.GetDbCommand();
-            try
-            {
-                cmd.CommandText = countSql;
-                var obj = cmd.ExecuteScalar();
-                long total = Convert.ToInt64(obj);
-                if (total < 1)
-                {
-                    cmd.Dispose();
-                    return new Common.PageData<T> { Total = total, Items = new List<T>() };
-                }
-                long pages = total % size == 0 ? total / size : (total / size + 1);
-                if (page > pages)
-                {
-                    cmd.Dispose();
-                    return new Common.PageData<T> { Total = total, Items = new List<T>() };
-                }
-                cmd.CommandText = sql;
-                var reval = cmd.ExecuteReader<T>();
-                cmd.Dispose();
-
-                return new Common.PageData<T> { Total = total, Items = reval };
-            }
-            catch (Exception ex)
-            {
-                cmd.Dispose();
-
-                throw ex;
-            }
-        }
-
-        public long Count<T>(string where) where T : class, new()
-        {
-            var sql = DbSqlBuilder.Count<T>(where);
-            var cmd = this.GetDbCommand();
-            try
-            {
-                cmd.CommandText = sql;
-                var obj = cmd.ExecuteScalar();
-                var reval = Convert.ToInt64(obj);
-                cmd.Dispose();
-                return reval;
-            }
-            catch (Exception ex)
-            {
-                cmd.Dispose();
-                throw ex;
-            }
-        }
-
-        public int Insert<T>(T entity) where T : class, new()
-        {
-            var sql = DbSqlBuilder.Insert<T>();
-            var cmd = this.GetDbCommand();
-            try
-            {
-                cmd.CommandText = sql;
-                cmd.ParametersFromEntity(entity);
-                var reval = cmd.ExecuteNonQuery();
-                cmd.Dispose();
-                return reval;
-            }
-            catch (Exception ex)
-            {
-                cmd.Dispose();
-                throw ex;
-            }
-        }
-        public int Insert<T>(List<T> entityList) where T : class, new()
-        {
-            var sql = DbSqlBuilder.Insert<T>();
-            var ts = this.GetDbTransactionScope(System.Data.IsolationLevel.ReadUncommitted);
-            try
-            {
-                int reval = 0;
-                ts.Execute((cmd) =>
-                {
-                    cmd.CommandText = sql;
-                    foreach (var entity in entityList)
-                    {
-                        cmd.ParametersFromEntity(entity);
-                        reval += cmd.ExecuteNonQuery();
-                    }
-                });
-                ts.Dispose();
-                return reval;
-            }
-            catch (Exception ex)
-            {
-                ts.Dispose();
-                throw ex;
-            }
-        }
-        public int Insert<T>(System.Collections.Specialized.NameValueCollection nvc) where T : class, new()
-        {
-            var sql = this.DbSqlBuilder.Insert<T>(nvc);
-            var cmd = this.GetDbCommand();
-            try
-            {
-                cmd.CommandText = sql;
-                var reval = cmd.ExecuteNonQuery();
-                cmd.Dispose();
-                return reval;
-            }
-            catch (Exception ex)
-            {
-                cmd.Dispose();
-                throw ex;
-            }
-        }
-        public int Insert<T>(List<System.Collections.Specialized.NameValueCollection> nvcList) where T : class, new()
-        {
-            var sqlList = this.DbSqlBuilder.Insert<T>(nvcList);
-            var ts = this.GetDbTransactionScope(System.Data.IsolationLevel.ReadUncommitted);
-            try
-            {
-                int reval = 0;
-                ts.Execute((cmd) =>
-                {
-                    foreach (var sql in sqlList)
-                    {
-                        cmd.CommandText = sql;
-                        reval += cmd.ExecuteNonQuery();
-                    }
-                });
-                ts.Dispose();
-                return reval;
-            }
-            catch (Exception ex)
-            {
-                ts.Dispose();
-                throw ex;
-            }
-        }
-
-        public int Update<T>(T entity) where T : class, new()
-        {
-            var sql = this.DbSqlBuilder.Update<T>();
-            var cmd = this.GetDbCommand();
-            try
-            {
-                cmd.CommandText = sql;
-                cmd.ParametersFromEntity(entity);
-                var reval = cmd.ExecuteNonQuery();
-                cmd.Dispose();
-                return reval;
-            }
-            catch (Exception ex)
-            {
-                cmd.Dispose();
-                throw ex;
-            }
-        }
-        public int Update<T>(List<T> entityList) where T : class, new()
-        {
-            var sql = this.DbSqlBuilder.Update<T>();
-            var ts = this.GetDbTransactionScope(System.Data.IsolationLevel.ReadUncommitted);
-            try
-            {
-                int reval = 0;
-                ts.Execute((cmd) =>
-                {
-                    cmd.CommandText = sql;
-                    foreach (var entity in entityList)
-                    {
-                        cmd.ParametersFromEntity(entity);
-                        reval += cmd.ExecuteNonQuery();
-                    }
-                });
-                ts.Dispose();
-                return reval;
-            }
-            catch (Exception ex)
-            {
-                ts.Dispose();
-                throw ex;
-            }
-        }
-        public int Update<T>(System.Collections.Specialized.NameValueCollection nvc) where T : class, new()
-        {
-            var sql = this.DbSqlBuilder.Update<T>(nvc);
-            var cmd = this.GetDbCommand();
-            try
-            {
-                cmd.CommandText = sql.Sql;
-                cmd.ParametersFromDictionary(sql.Paras);
-                var reval = cmd.ExecuteNonQuery();
-                cmd.Dispose();
-                return reval;
-            }
-            catch (Exception ex)
-            {
-                cmd.Dispose();
-                throw ex;
-            }
-        }
-        public int Update<T>(List<System.Collections.Specialized.NameValueCollection> nvcList) where T : class, new()
-        {
-            var sqlList = this.DbSqlBuilder.Update<T>(nvcList);
-            var ts = this.GetDbTransactionScope(System.Data.IsolationLevel.ReadUncommitted);
-            try
-            {
-                int reval = 0;
-                ts.Execute((cmd) =>
-                {
-                    foreach (var sql in sqlList)
-                    {
-                        cmd.CommandText = sql.Sql;
-                        cmd.ParametersFromDictionary(sql.Paras);
-                        reval += cmd.ExecuteNonQuery();
-                    }
-                });
-                ts.Dispose();
-                return reval;
-            }
-            catch (Exception ex)
-            {
-                ts.Dispose();
-                throw ex;
-            }
-        }
-
-        public int Delete<T>(T entity) where T : class, new()
-        {
-            var sql = this.DbSqlBuilder.Delete<T>(entity);
-            var cmd = this.GetDbCommand();
-            try
-            {
-                cmd.CommandText = sql;
-                var reval = cmd.ExecuteNonQuery();
-                cmd.Dispose();
-                return reval;
-            }
-            catch (Exception ex)
-            {
-                cmd.Dispose();
-                throw ex;
-            }
-        }
-        public int Delete<T>(List<T> entityList) where T : class, new()
-        {
-            var sqlList = this.DbSqlBuilder.Delete<T>(entityList, new string[0]);
-            var ts = this.GetDbTransactionScope(System.Data.IsolationLevel.ReadUncommitted);
-            try
-            {
-                int reval = 0;
-                ts.Execute((cmd) =>
-                {
-                    foreach (var sql in sqlList)
-                    {
-                        cmd.CommandText = sql;
-                        reval += cmd.ExecuteNonQuery();
-                    }
-                });
-                ts.Dispose();
-                return reval;
-            }
-            catch (Exception ex)
-            {
-                ts.Dispose();
-                throw ex;
-            }
-        }
-        public int Delete<T>(System.Collections.Specialized.NameValueCollection nvc) where T : class, new()
-        {
-            var sql = this.DbSqlBuilder.Delete<T>(nvc);
-            var cmd = this.GetDbCommand();
-            try
-            {
-                cmd.CommandText = sql;
-                var reval = cmd.ExecuteNonQuery();
-                cmd.Dispose();
-                return reval;
-            }
-            catch (Exception ex)
-            {
-                cmd.Dispose();
-                throw ex;
-            }
-        }
-        public int Delete<T>(List<System.Collections.Specialized.NameValueCollection> nvcList) where T : class, new()
-        {
-            var sqlList = this.DbSqlBuilder.Delete<T>(nvcList);
-            var ts = this.GetDbTransactionScope(System.Data.IsolationLevel.ReadUncommitted);
-            try
-            {
-                int reval = 0;
-                ts.Execute((cmd) =>
-                {
-                    foreach (var sql in sqlList)
-                    {
-                        cmd.CommandText = sql;
-                        reval += cmd.ExecuteNonQuery();
-                    }
-                });
-                ts.Dispose();
-                return reval;
-            }
-            catch (Exception ex)
-            {
-                ts.Dispose();
-                throw ex;
-            }
-        }
-
-
     }
 }

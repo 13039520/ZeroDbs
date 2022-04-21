@@ -20,9 +20,9 @@ namespace ZeroDbs.MySql
         {
             return String.Format("`{0}`", colName);
         }
-        public override string Page<T>(long page, long size, string where, string orderby, string[] returnFieldNames, string uniqueFieldName = "")
+        public override string Page<DbEntity>(long page, long size, string where, string orderby, string[] returnFieldNames, string uniqueFieldName = "")
         {
-            var tableInfo = this.ZeroDb.GetTable<T>();
+            var tableInfo = this.ZeroDb.GetTable<DbEntity>();
 
             page = page < 0 ? 0 : page;
             page = page > 0 ? page - 1 : page;
@@ -67,7 +67,7 @@ namespace ZeroDbs.MySql
                 }
                 SubSql += string.Format(" LIMIT {0},{1}", startIndex, size);
 
-                sql.AppendFormat("SELECT {0} FROM {1} WHERE {2} IN(SELECT {2} FROM ({3}) AS T)", fieldStr, tableName, uniqueFieldName, SubSql);
+                sql.AppendFormat("SELECT {0} FROM {1} WHERE {2} IN(SELECT {2} FROM ({3}) AS DbEntity)", fieldStr, tableName, uniqueFieldName, SubSql);
                 if (!string.IsNullOrEmpty(orderby))
                 {
                     sql.AppendFormat(" ORDER BY {0}", orderby);
@@ -89,9 +89,10 @@ namespace ZeroDbs.MySql
 
             return sql.ToString();
         }
-        public override string Select<T>(string where, string orderby, int top, string[] returnFieldNames)
+        public override Common.SqlInfo Select<DbEntity>(string where, string orderby, int top, string[] returnFieldNames, params object[] paras)
         {
-            var tableInfo = this.GetTable<T>();
+            Common.SqlInfo reval = new Common.SqlInfo();
+            var tableInfo = this.GetTable<DbEntity>();
             string[] fieldArray = tableInfo.Colunms.Select(o => o.Name).ToArray();
             if (returnFieldNames != null && returnFieldNames.Length > 0)
             {
@@ -136,24 +137,32 @@ namespace ZeroDbs.MySql
             {
                 if (string.IsNullOrEmpty(orderby))
                 {
-                    return string.Format("SELECT {0} FROM {1} WHERE {2}", field, tableName, where);
+                    reval.Sql = string.Format("SELECT {0} FROM {1} WHERE {2}", field, tableName, where);
                 }
                 else
                 {
-                    return string.Format("SELECT {0} FROM {1} WHERE {2} ORDER BY {3}", field, tableName, where, orderby);
+                    reval.Sql = string.Format("SELECT {0} FROM {1} WHERE {2} ORDER BY {3}", field, tableName, where, orderby);
                 }
             }
             else
             {
                 if (string.IsNullOrEmpty(orderby))
                 {
-                    return string.Format("SELECT {0} FROM {1} WHERE {2} LIMIT {3},{4}", field, tableName, where, 0, top);
+                    reval.Sql = string.Format("SELECT {0} FROM {1} WHERE {2} LIMIT {3},{4}", field, tableName, where, 0, top);
                 }
                 else
                 {
-                    return string.Format("SELECT {0} FROM {1} WHERE {2} ORDER BY {3} LIMIT {4},{5}", field, tableName, where, orderby, 0, top);
+                    reval.Sql = string.Format("SELECT {0} FROM {1} WHERE {2} ORDER BY {3} LIMIT {4},{5}", field, tableName, where, orderby, 0, top);
                 }
             }
+            int n = 0;
+            int m = paras.Length;
+            while(n < m)
+            {
+                reval.Paras.Add(n.ToString(), paras[n]);
+                n++;
+            }
+            return reval;
         }
 
 

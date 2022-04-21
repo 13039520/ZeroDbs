@@ -11,8 +11,10 @@ namespace ZeroDbs.Test
         static void Main(string[] args)
         {
             dbService = new ZeroDbs.Common.DbService(new Common.DbExecuteSqlEvent((obj, e) => {
-                //Console.WriteLine(string.Join(Environment.NewLine, e.ExecuteSql));
-                //Console.WriteLine("DbKey={0}&Message={1}", e.DbKey, e.Message);
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine(string.Join(Environment.NewLine, e.ExecuteSql));
+                Console.WriteLine("DbKey={0}&Message={1}", e.DbKey, e.Message);
+                Console.ResetColor();
             }));
             //CodeGenerator();
             //InsertTest();
@@ -68,9 +70,13 @@ namespace ZeroDbs.Test
         }
         static void UpdateTest()
         {
-            //dbService.Update(new MyDbs.SqlServer001.tUser { ID = 1, Name = "user009_sqlserver", Email = "user009@domain.com", Password = "123456789" });
-            //dbService.Update(new MyDbs.MySql001.tUser { ID = 1, Name = "user009_mysql", Email = "user009@domain.com", Password = "123456789" });
-            //dbService.Update(new MyDbs.Sqlite001.tUser { ID = 1, Name = "user009_sqlite", Email = "user009@domain.com", Password = "123456789" });
+            /*
+            dbService.Update(new MyDbs.SqlServer001.tUser { ID = 1, Name = "user009_sqlserver", Email = "user009@domain.com", Password = "123456789" });
+            dbService.Update(new MyDbs.MySql001.tUser { ID = 1, Name = "user009_mysql", Email = "user009@domain.com", Password = "123456789" });
+            dbService.Update(new MyDbs.Sqlite001.tUser { ID = 1, Name = "user009_sqlite", Email = "user009@domain.com", Password = "123456789" });
+            */
+
+            /*
             var nvc = new System.Collections.Specialized.NameValueCollection();
             nvc.Add("ID", "1");
             nvc.Add("Password", "aaaaaa");
@@ -78,52 +84,107 @@ namespace ZeroDbs.Test
             dbService.Update<MyDbs.SqlServer001.tUser>(nvc);
             dbService.Update<MyDbs.MySql001.tUser>(nvc);
             dbService.Update<MyDbs.Sqlite001.tUser>(nvc);
+            */
+            using (var cmd = dbService.GetDbCommand<MyDbs.SqlServer001.tUser>())
+            {
+                var sql = cmd.DbSqlBuilder.UpdateFromCustomEntity<MyDbs.SqlServer001.tUser>(new { ID = 1, Name = "rrrrrrrrrrr" });
+                cmd.CommandText = sql.Sql;
+                cmd.ParametersFromDictionary(sql.Paras);
+                cmd.ExecuteNonQuery();
+            }
         }
         static void QueryTest()
         {
+            /**/
             long page = 1;
             long pageSize = 100;
-            var pageData = dbService.Page<MyDbs.SqlServer001.tUser>(page, pageSize, "");
+            var page1 = dbService.Page<MyDbs.SqlServer001.tUser>(page, pageSize, "ID>1", "ID DESC", new string[0], "");
             Console.WriteLine("MyDbs.SqlServer001.tUser:");
-            if (pageData.Total > 0)
+            if (page1.Total > 0)
             {
-                foreach (MyDbs.SqlServer001.tUser m in pageData.Items)
+                foreach (MyDbs.SqlServer001.tUser m in page1.Items)
                 {
-                    Console.WriteLine("{0}\t{1}\t{2}\t{3}\n", m.ID, m.Name, m.Email, m.CreateTime);
+                    Console.WriteLine("{0}\t{1}\t{2}\t{3}", m.ID, m.Name, m.Email, m.CreateTime);
                 }
             }
             else
             {
                 Console.WriteLine("no data");
             }
-            var pageData2 = dbService.Page<MyDbs.MySql001.tUser>(page, pageSize, "");
+            var page2 = dbService.Page<MyDbs.MySql001.tUser>(page, pageSize, "ID>1", "ID DESC", new string[0], "");
             Console.WriteLine("MyDbs.MySql001.tUser:");
-            if (pageData2.Total > 0)
+            if (page2.Total > 0)
             {
-                foreach (MyDbs.MySql001.tUser m in pageData2.Items)
+                foreach (MyDbs.MySql001.tUser m in page2.Items)
                 {
-                    Console.WriteLine("{0}\t{1}\t{2}\t{3}\n", m.ID, m.Name, m.Email, m.CreateTime);
+                    Console.WriteLine("{0}\t{1}\t{2}\t{3}", m.ID, m.Name, m.Email, m.CreateTime);
                 }
             }
             else
             {
                 Console.WriteLine("no data");
             }
-            var pageData3 = dbService.Page<MyDbs.Sqlite001.tUser>(page, pageSize, "");
+            var page3 = dbService.Page<MyDbs.Sqlite001.tUser>(page, pageSize, "ID>1", "ID DESC", new string[0], "");
             Console.WriteLine("MyDbs.Sqlite001.tUser:");
-            if (pageData3.Total > 0)
+            if (page3.Total > 0)
             {
-                foreach (MyDbs.Sqlite001.tUser m in pageData3.Items)
+                foreach (MyDbs.Sqlite001.tUser m in page3.Items)
                 {
-                    Console.WriteLine("{0}\t{1}\t{2}\t{3}\n", m.ID, m.Name, m.Email, m.CreateTime);
+                    Console.WriteLine("{0}\t{1}\t{2}\t{3}", m.ID, m.Name, m.Email, m.CreateTime);
                 }
             }
             else
             {
                 Console.WriteLine("no data");
             }
-        }
 
+            var list1 = dbService.Select<MyDbs.SqlServer001.tUser,MyEntity>("ID>@0", "ID DESC", 0, 1);
+            Console.WriteLine("MyDbs.SqlServer001.tUser:");
+            if (list1.Count > 0)
+            {
+                foreach (MyEntity m in list1)
+                {
+                    Console.WriteLine("{0}\t{1}\t{2}\t{3}", m.ID, m.Name, "", m.CreateTime);
+                }
+            }
+            else
+            {
+                Console.WriteLine("no data");
+            }
+            var list2 = dbService.Select<MyDbs.MySql001.tUser, MyEntity>("ID>@0", "ID DESC", 0, 1);
+            Console.WriteLine("MyDbs.MySql001.tUser:");
+            if (list2.Count > 0)
+            {
+                foreach (MyEntity m in list2)
+                {
+                    Console.WriteLine("{0}\t{1}\t{2}\t{3}", m.ID, m.Name, "", m.CreateTime);
+                }
+            }
+            else
+            {
+                Console.WriteLine("no data");
+            }
+            var list3 = dbService.Select<MyDbs.Sqlite001.tUser, MyEntity>("ID>@0", "ID DESC", 0, 1);
+            Console.WriteLine("MyDbs.Sqlite001.tUser:");
+            if (list3.Count > 0)
+            {
+                foreach (MyEntity m in list3)
+                {
+                    Console.WriteLine("{0}\t{1}\t{2}\t{3}", m.ID, m.Name, "", m.CreateTime);
+                }
+            }
+            else
+            {
+                Console.WriteLine("no data");
+            }
+
+        }
+        class MyEntity
+        {
+            public object ID { get; set; }
+            public string Name { get; set; }
+            public DateTime CreateTime { get; set; }
+        }
 
     }
 }

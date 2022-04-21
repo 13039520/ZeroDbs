@@ -6,34 +6,27 @@ namespace ZeroDbs
 {
     public interface IDbOperator
     {
-        List<T> Select<T>(string where) where T : class, new();
-        List<T> Select<T>(string where, string orderby) where T : class, new();
-        List<T> Select<T>(string where, string orderby, int top) where T : class, new();
-        List<T> Select<T>(string where, string orderby, int top, int threshold) where T : class, new();
-        List<T> Select<T>(string where, string orderby, int top, string[] fieldNames) where T : class, new();
+        List<Target> Select<DbEntity, Target>(string where, string orderby, int top, params object[] paras) where DbEntity : class, new() where Target : class, new();
+        List<DbEntity> Select<DbEntity>(string where, string orderby, int top, string[] fieldNames, params object[] paras) where DbEntity : class, new();
 
-        Common.PageData<T> Page<T>(long page, long size,string where) where T : class, new();
-        Common.PageData<T> Page<T>(long page, long size,string where, string orderby) where T : class, new();
-        Common.PageData<T> Page<T>(long page, long size,string where, string orderby, int threshold) where T : class, new();
-        Common.PageData<T> Page<T>(long page, long size,string where, string orderby, string[] fieldNames) where T : class, new();
-        Common.PageData<T> Page<T>(long page, long size,string where, string orderby, int threshold, string uniqueFieldName) where T : class, new();
-        Common.PageData<T> Page<T>(long page, long size, string where, string orderby, string[] fieldNames, string uniqueFieldName) where T : class, new();
+        Common.PageData<DbEntity> Page<DbEntity>(long page, long size, string where, string orderby, string[] fieldNames, string uniqueFieldName) where DbEntity : class, new();
 
-        long Count<T>(string where) where T : class, new();
+        long Count<DbEntity>(string where) where DbEntity : class, new();
 
-        int Insert<T>(T entity) where T : class, new();
-        int Insert<T>(List<T> entityList) where T : class, new();
-        int Insert<T>(System.Collections.Specialized.NameValueCollection nvc) where T : class, new();
-        int Insert<T>(List<System.Collections.Specialized.NameValueCollection> nvcList) where T : class, new();
+        int Insert<DbEntity>(DbEntity entity) where DbEntity : class, new();
+        int Insert<DbEntity>(List<DbEntity> entityList) where DbEntity : class, new();
+        int Insert<DbEntity>(System.Collections.Specialized.NameValueCollection nvc) where DbEntity : class, new();
+        int Insert<DbEntity>(List<System.Collections.Specialized.NameValueCollection> nvcList) where DbEntity : class, new();
 
-        int Update<T>(T entity) where T : class, new();
-        int Update<T>(List<T> entityList) where T : class, new();
-        int Update<T>(System.Collections.Specialized.NameValueCollection nvc) where T : class, new();
-        int Update<T>(List<System.Collections.Specialized.NameValueCollection> nvcList) where T : class, new();
+        int Update<DbEntity>(DbEntity entity) where DbEntity : class, new();
+        int Update<DbEntity>(List<DbEntity> entityList) where DbEntity : class, new();
+        int UpdateFromNameValueCollection<DbEntity>(System.Collections.Specialized.NameValueCollection nvc) where DbEntity : class, new();
+        int UpdateFromCustomEntity<DbEntity>(object source) where DbEntity : class, new();
+        int UpdateFromDictionary<DbEntity>(Dictionary<string, object> dic) where DbEntity : class, new();
 
-        int Delete<T>(T entity) where T : class, new();
-        int Delete<T>(List<T> entityList) where T : class, new();
-        int Delete<T>(System.Collections.Specialized.NameValueCollection nvc) where T : class, new();
-        int Delete<T>(List<System.Collections.Specialized.NameValueCollection> nvcList) where T : class, new();
+        int Delete<DbEntity>(DbEntity entity) where DbEntity : class, new();
+        int Delete<DbEntity>(List<DbEntity> entityList) where DbEntity : class, new();
+        int Delete<DbEntity>(System.Collections.Specialized.NameValueCollection nvc) where DbEntity : class, new();
+        int Delete<DbEntity>(List<System.Collections.Specialized.NameValueCollection> nvcList) where DbEntity : class, new();
     }
 }

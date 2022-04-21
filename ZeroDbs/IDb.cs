@@ -19,7 +19,7 @@ namespace ZeroDbs
         IDbCommand GetDbCommand();
         IDbCommand GetDbCommand(System.Data.Common.DbTransaction transaction);
         IDbTransactionScope GetDbTransactionScope(System.Data.IsolationLevel level, string identification = "", string groupId = "");
-        Common.DbDataTableInfo GetTable<T>() where T : class, new();
+        Common.DbDataTableInfo GetTable<DbEntity>() where DbEntity : class, new();
         List<Common.DbDataTableInfo> GetTables();
         bool DbConnectionTest();
     }

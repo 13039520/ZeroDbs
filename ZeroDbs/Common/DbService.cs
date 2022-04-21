@@ -137,9 +137,9 @@ namespace ZeroDbs.Common
             }
             return dbs;
         }
-        public IDb GetDb<T>() where T : class, new()
+        public IDb GetDb<DbEntity>() where DbEntity : class, new()
         {
-            return GetDb(typeof(T).FullName);
+            return GetDb(typeof(DbEntity).FullName);
         }
         public IDb GetDb(string entityFullName)
         {
@@ -180,9 +180,9 @@ namespace ZeroDbs.Common
             }
             return reval;
         }
-        public IDbCommand GetDbCommand<T>() where T : class, new()
+        public IDbCommand GetDbCommand<DbEntity>() where DbEntity : class, new()
         {
-            return GetDb<T>().GetDbCommand();
+            return GetDb<DbEntity>().GetDbCommand();
         }
         public IDbCommand GetDbCommand(string entityFullName)
         {
@@ -192,9 +192,9 @@ namespace ZeroDbs.Common
         {
             return GetDbByDbKey(dbKey).GetDbCommand();
         }
-        public IDbTransactionScope GetDbTransactionScope<T>(System.Data.IsolationLevel level, string identification = "", string groupId = "") where T : class, new()
+        public IDbTransactionScope GetDbTransactionScope<DbEntity>(System.Data.IsolationLevel level, string identification = "", string groupId = "") where DbEntity : class, new()
         {
-            var db = this.GetDb<T>();
+            var db = this.GetDb<DbEntity>();
             return db.GetDbTransactionScope(level, identification, groupId);
         }
         public IDbTransactionScope GetDbTransactionScope(string entityFullName, System.Data.IsolationLevel level, string identification = "", string groupId = "")
@@ -211,115 +211,86 @@ namespace ZeroDbs.Common
         {
             return new DbTransactionScopeCollection();
         }
-        public bool AddZeroDbMapping<T>(string dbKey, string tableName) where T : class
+        public bool AddZeroDbMapping<DbEntity>(string dbKey, string tableName) where DbEntity : class
         {
-            return AddZeroDbMapping(typeof(T).FullName, dbKey, tableName);
+            return AddZeroDbMapping(typeof(DbEntity).FullName, dbKey, tableName);
         }
         public bool AddZeroDbMapping(string entityFullName, string dbKey, string tableName)
         {
             return DbConfigReader.AddZeroDbMapping(entityFullName, dbKey, tableName);
         }
 
-        public List<T> Select<T>(string where) where T : class, new()
+        public List<IntoEntity> Select<DbEntity, IntoEntity>(string where, string orderby, int top, params object[] paras) where DbEntity : class, new() where IntoEntity : class, new()
         {
-            return GetDb<T>().Select<T>(where);
+            return GetDb<DbEntity>().Select<DbEntity, IntoEntity>(where, orderby, top, paras);
         }
-        public List<T> Select<T>(string where, string orderby) where T : class, new()
+        public List<DbEntity> Select<DbEntity>(string where, string orderby, int top, string[] fieldNames, params object[] paras) where DbEntity : class, new()
         {
-            return GetDb<T>().Select<T>(where, orderby);
+            return GetDb<DbEntity>().Select<DbEntity>(where, orderby, top, fieldNames, paras);
         }
-        public List<T> Select<T>(string where, string orderby, int top) where T : class, new()
+        public Common.PageData<DbEntity> Page<DbEntity>(long page, long size, string where, string orderby, string[] fieldNames, string uniqueFieldName) where DbEntity : class, new()
         {
-            return GetDb<T>().Select<T>(where, orderby, top);
-        }
-        public List<T> Select<T>(string where, string orderby, int top, int threshold) where T : class, new()
-        {
-            return GetDb<T>().Select<T>(where, orderby, top, threshold);
-        }
-        public List<T> Select<T>(string where, string orderby, int top, string[] fieldNames) where T : class, new()
-        {
-            return GetDb<T>().Select<T>(where, orderby, top, fieldNames);
+            return GetDb<DbEntity>().Page<DbEntity>(page, size, where, orderby, fieldNames, uniqueFieldName);
         }
 
-        public Common.PageData<T> Page<T>(long page, long size, string where) where T : class, new()
+        public long Count<DbEntity>(string where) where DbEntity : class, new()
         {
-            return GetDb<T>().Page<T>(page, size, where);
-        }
-        public Common.PageData<T> Page<T>(long page, long size, string where, string orderby) where T : class, new()
-        {
-            return GetDb<T>().Page<T>(page, size, where, orderby);
-        }
-        public Common.PageData<T> Page<T>(long page, long size, string where, string orderby, int threshold) where T : class, new()
-        {
-            return GetDb<T>().Page<T>(page, size, where, orderby, threshold);
-        }
-        public Common.PageData<T> Page<T>(long page, long size, string where, string orderby, string[] fieldNames) where T : class, new()
-        {
-            return GetDb<T>().Page<T>(page, size, where, orderby, fieldNames);
-        }
-        public Common.PageData<T> Page<T>(long page, long size, string where, string orderby, int threshold, string uniqueFieldName) where T : class, new()
-        {
-            return GetDb<T>().Page<T>(page, size, where, orderby, threshold, uniqueFieldName);
-        }
-        public Common.PageData<T> Page<T>(long page, long size, string where, string orderby, string[] fieldNames, string uniqueFieldName) where T : class, new()
-        {
-            return GetDb<T>().Page<T>(page, size, where, orderby, fieldNames, uniqueFieldName);
+            return GetDb<DbEntity>().Count<DbEntity>(where);
         }
 
-        public long Count<T>(string where) where T : class, new()
+        public int Insert<DbEntity>(DbEntity entity) where DbEntity : class, new()
         {
-            return GetDb<T>().Count<T>(where);
+            return GetDb<DbEntity>().Insert<DbEntity>(entity);
+        }
+        public int Insert<DbEntity>(List<DbEntity> entityList) where DbEntity : class, new()
+        {
+            return GetDb<DbEntity>().Insert<DbEntity>(entityList);
+        }
+        public int Insert<DbEntity>(System.Collections.Specialized.NameValueCollection nvc) where DbEntity : class, new()
+        {
+            return GetDb<DbEntity>().Insert<DbEntity>(nvc);
+        }
+        public int Insert<DbEntity>(List<System.Collections.Specialized.NameValueCollection> nvcList) where DbEntity : class, new()
+        {
+            return GetDb<DbEntity>().Insert<DbEntity>(nvcList);
         }
 
-        public int Insert<T>(T entity) where T : class, new()
+        public int Update<DbEntity>(DbEntity entity) where DbEntity : class, new()
         {
-            return GetDb<T>().Insert<T>(entity);
+            return GetDb<DbEntity>().Update<DbEntity>(entity);
         }
-        public int Insert<T>(List<T> entityList) where T : class, new()
+        public int Update<DbEntity>(List<DbEntity> entityList) where DbEntity : class, new()
         {
-            return GetDb<T>().Insert<T>(entityList);
+            return GetDb<DbEntity>().Update<DbEntity>(entityList);
         }
-        public int Insert<T>(System.Collections.Specialized.NameValueCollection nvc) where T : class, new()
+        public int UpdateFromNameValueCollection<DbEntity>(System.Collections.Specialized.NameValueCollection nvc) where DbEntity : class, new()
         {
-            return GetDb<T>().Insert<T>(nvc);
+            return GetDb<DbEntity>().UpdateFromNameValueCollection<DbEntity>(nvc);
         }
-        public int Insert<T>(List<System.Collections.Specialized.NameValueCollection> nvcList) where T : class, new()
+        public int UpdateFromCustomEntity<DbEntity>(object source) where DbEntity : class, new()
         {
-            return GetDb<T>().Insert<T>(nvcList);
+            return GetDb<DbEntity>().UpdateFromCustomEntity<DbEntity>(source);
         }
-
-        public int Update<T>(T entity) where T : class, new()
+        public int UpdateFromDictionary<DbEntity>(Dictionary<string, object> dic) where DbEntity : class, new()
         {
-            return GetDb<T>().Update<T>(entity);
-        }
-        public int Update<T>(List<T> entityList) where T : class, new()
-        {
-            return GetDb<T>().Update<T>(entityList);
-        }
-        public int Update<T>(System.Collections.Specialized.NameValueCollection nvc) where T : class, new()
-        {
-            return GetDb<T>().Update<T>(nvc);
-        }
-        public int Update<T>(List<System.Collections.Specialized.NameValueCollection> nvcList) where T : class, new()
-        {
-            return GetDb<T>().Update<T>(nvcList);
+            return GetDb<DbEntity>().UpdateFromDictionary<DbEntity>(dic);
         }
 
-        public int Delete<T>(T entity) where T : class, new()
+        public int Delete<DbEntity>(DbEntity entity) where DbEntity : class, new()
         {
-            return GetDb<T>().Delete<T>(entity);
+            return GetDb<DbEntity>().Delete<DbEntity>(entity);
         }
-        public int Delete<T>(List<T> entityList) where T : class, new()
+        public int Delete<DbEntity>(List<DbEntity> entityList) where DbEntity : class, new()
         {
-            return GetDb<T>().Delete<T>(entityList);
+            return GetDb<DbEntity>().Delete<DbEntity>(entityList);
         }
-        public int Delete<T>(System.Collections.Specialized.NameValueCollection nvc) where T : class, new()
+        public int Delete<DbEntity>(System.Collections.Specialized.NameValueCollection nvc) where DbEntity : class, new()
         {
-            return GetDb<T>().Delete<T>(nvc);
+            return GetDb<DbEntity>().Delete<DbEntity>(nvc);
         }
-        public int Delete<T>(List<System.Collections.Specialized.NameValueCollection> nvcList) where T : class, new()
+        public int Delete<DbEntity>(List<System.Collections.Specialized.NameValueCollection> nvcList) where DbEntity : class, new()
         {
-            return GetDb<T>().Delete<T>(nvcList);
+            return GetDb<DbEntity>().Delete<DbEntity>(nvcList);
         }
 
 

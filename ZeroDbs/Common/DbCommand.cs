@@ -45,14 +45,14 @@ namespace ZeroDbs.Common
         public System.Data.Common.DbParameter CreateParameter(string parameterName, object value)
         {
             var parameter = CreateParameter();
-            parameter.ParameterName = parameterName;
+            parameter.ParameterName = parameterName[0] == '@' ? parameterName : String.Format("@{0}", parameterName);
             parameter.Value = value is null ? DBNull.Value : value;
             return parameter;
         }
         public System.Data.Common.DbParameter CreateParameter(string parameterName, System.Data.DbType dbType, int size, object value)
         {
             var parameter = CreateParameter();
-            parameter.ParameterName = parameterName;
+            parameter.ParameterName = parameterName[0] == '@' ? parameterName : String.Format("@{0}", parameterName);
             parameter.Value = value is null ? DBNull.Value : value;
             parameter.DbType = dbType;
             parameter.Size = size;
@@ -252,7 +252,7 @@ namespace ZeroDbs.Common
                 {
                     value = DBNull.Value;
                 }
-                Parameters.Add(CreateParameter("@" + p.Name, value));
+                Parameters.Add(CreateParameter(p.Name, value));
             }
         }
         public void ParametersFromParas(params object[] paras)
@@ -261,7 +261,12 @@ namespace ZeroDbs.Common
             if (paras.Length < 1) { return; }
             for(int i=0; i < paras.Length; i++)
             {
-                Parameters.Add(CreateParameter("@" + i, paras[i]));
+                object value = paras[i];
+                if (value == null)
+                {
+                    value = DBNull.Value;
+                }
+                Parameters.Add(CreateParameter(i.ToString(), value));
             }
         }
         public void ParametersFromDictionary(Dictionary<string,object> dic)
@@ -269,25 +274,15 @@ namespace ZeroDbs.Common
             Parameters.Clear();
             foreach (string key in dic.Keys)
             {
-                Parameters.Add(CreateParameter("@" + key, dic[key]));
+                object value = dic[key];
+                if (value == null)
+                {
+                    value = DBNull.Value;
+                }
+                Parameters.Add(CreateParameter(key, value));
             }
         }
-        public ISqlInsertBuilder Insert(string tableName)
-        {
-            return new SqlInsertBuilder(tableName);
-        }
-        public ISqlDeleteBuilder Delete(string tableName)
-        {
-            return new SqlDeleteBuilder(tableName);
-        }
-        public ISqlUpdateBuilder Update(string tableName)
-        {
-            return new SqlUpdateBuilder(tableName);
-        }
-        public ISqlSelectBuilder Select(string tableName)
-        {
-            return new SqlSelectBuilder(tableName);
-        }
+
 
         bool _disposed;
         public void Dispose()
