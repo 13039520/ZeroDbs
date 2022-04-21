@@ -18,7 +18,7 @@ namespace ZeroDbs.Common
         IDb db = null;
         IDbCommand dbCommand = null;
 
-        public DbTransactionScope(IDb db, string identification="", string groupId="")
+        public DbTransactionScope(IDb db, System.Data.IsolationLevel level, string identification="", string groupId="")
         {
             this.db = db;
             var conn = db.GetDbConnection();

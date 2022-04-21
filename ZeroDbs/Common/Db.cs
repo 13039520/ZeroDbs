@@ -75,13 +75,16 @@ namespace ZeroDbs.Common
         public IDbCommand GetDbCommand()
         {
             var conn = this.GetDbConnection();
-            conn.Open();
+            if (conn.State != System.Data.ConnectionState.Open)
+            {
+                conn.Open();
+            }
             var cmd = conn.CreateCommand();
             return new ZeroDbs.Common.DbCommand(Database.dbKey, cmd, this.OnDbExecuteSqlEvent, this.DbSqlBuilder);
         }
         public IDbCommand GetDbCommand(System.Data.Common.DbTransaction transaction)
         {
-            if (transaction.Connection.State == System.Data.ConnectionState.Open)
+            if (transaction.Connection.State != System.Data.ConnectionState.Open)
             {
                 transaction.Connection.Open();
             }
@@ -93,10 +96,7 @@ namespace ZeroDbs.Common
         }
         public IDbTransactionScope GetDbTransactionScope(System.Data.IsolationLevel level, string identification = "", string groupId = "")
         {
-            var conn = this.GetDbConnection();
-            conn.Open();
-            var trans = conn.BeginTransaction(level);
-            return new ZeroDbs.Common.DbTransactionScope(this, identification, groupId);
+            return new ZeroDbs.Common.DbTransactionScope(this, level, identification, groupId);
         }
         public IDbTransactionScopeCollection GetDbTransactionScopeCollection()
         {

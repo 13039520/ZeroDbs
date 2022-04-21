@@ -89,6 +89,17 @@ namespace ZeroDbs.Test
             dbService.UpdateFromCustomEntity<MyDbs.SqlServer001.tUser>(new { ID = 1, Name = "aaaaaaaaaaaa" });
             dbService.UpdateFromCustomEntity<MyDbs.MySql001.tUser>(new { ID = 1, Name = "aaaaaaaaaaaa" });
             dbService.UpdateFromCustomEntity<MyDbs.Sqlite001.tUser>(new { ID = 1, Name = "aaaaaaaaaaaa" });
+
+            var trans = dbService.GetDbTransactionScope<MyDbs.MySql001.tUser>(System.Data.IsolationLevel.ReadCommitted);
+            trans.Execute((cmd) => {
+                var sql = cmd.DbSqlBuilder.Select<MyDbs.MySql001.tUser>("", "ID DESC", 0, new string[0]);
+                cmd.CommandText = sql.Sql;
+                cmd.ParametersFromDictionary(sql.Paras);
+                cmd.ExecuteReader<MyDbs.MySql001.tUser>((e) => { 
+                    Console.WriteLine("{0}\t{1}\t{2}\t{3}", e.RowData.ID, e.RowData.Name, e.RowData.Email, e.RowData.CreateTime);
+                });
+            });
+            trans.Complete(false);
         }
         static void QueryTest()
         {
