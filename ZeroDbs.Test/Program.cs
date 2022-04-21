@@ -85,13 +85,9 @@ namespace ZeroDbs.Test
             dbService.Update<MyDbs.MySql001.tUser>(nvc);
             dbService.Update<MyDbs.Sqlite001.tUser>(nvc);
             */
-            using (var cmd = dbService.GetDbCommand<MyDbs.SqlServer001.tUser>())
-            {
-                var sql = cmd.DbSqlBuilder.UpdateFromCustomEntity<MyDbs.SqlServer001.tUser>(new { ID = 1, Name = "rrrrrrrrrrr" });
-                cmd.CommandText = sql.Sql;
-                cmd.ParametersFromDictionary(sql.Paras);
-                cmd.ExecuteNonQuery();
-            }
+            dbService.UpdateFromCustomEntity<MyDbs.SqlServer001.tUser>(new { ID = 1, Name = "aaaaaaaaaaaa" });
+            dbService.UpdateFromCustomEntity<MyDbs.MySql001.tUser>(new { ID = 1, Name = "aaaaaaaaaaaa" });
+            dbService.UpdateFromCustomEntity<MyDbs.Sqlite001.tUser>(new { ID = 1, Name = "aaaaaaaaaaaa" });
         }
         static void QueryTest()
         {
