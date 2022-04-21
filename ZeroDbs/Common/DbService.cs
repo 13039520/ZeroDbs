@@ -194,8 +194,7 @@ namespace ZeroDbs.Common
         }
         public IDbTransactionScope GetDbTransactionScope<DbEntity>(System.Data.IsolationLevel level, string identification = "", string groupId = "") where DbEntity : class, new()
         {
-            var db = this.GetDb<DbEntity>();
-            return db.GetDbTransactionScope(level, identification, groupId);
+            return this.GetDb<DbEntity>().GetDbTransactionScope(level, identification, groupId);
         }
         public IDbTransactionScope GetDbTransactionScope(string entityFullName, System.Data.IsolationLevel level, string identification = "", string groupId = "")
         {

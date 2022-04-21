@@ -99,7 +99,7 @@ namespace ZeroDbs.Test
                     Console.WriteLine("{0}\t{1}\t{2}\t{3}", e.RowData.ID, e.RowData.Name, e.RowData.Email, e.RowData.CreateTime);
                 });
             });
-            trans.Complete(false);
+            trans.Complete(true);
         }
         static void QueryTest()
         {
