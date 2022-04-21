@@ -101,7 +101,7 @@ namespace ZeroDbs.Common
             }
             return dbs;
         }
-        public Dictionary<string, IDb> GetDbs(List<DbConfigDatabaseInfo> dbConfigList)
+        public Dictionary<string, IDb> GetDbs(List<DatabaseInfo> dbConfigList)
         {
             var dbs = new Dictionary<string, IDb>();
             if (dbConfigList != null && dbConfigList.Count > 0)

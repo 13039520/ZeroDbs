@@ -28,19 +28,19 @@ namespace ZeroDbs.Test
             Console.WriteLine("正在生成……");
 
             ZeroDbs.Tools.CodeGenerator generator = new Tools.CodeGenerator();
-            generator.Dbs.Add(new ZeroDbs.Common.DbConfigDatabaseInfo
+            generator.Dbs.Add(new ZeroDbs.Common.DatabaseInfo
             {
                 dbConnectionString = "Data Source=.;Initial Catalog=ZeroTestDb;User ID=sa;Password=123456;TrustServerCertificate=True;",
                 dbKey = "SqlServer001",
                 dbType = "SqlServer"
             });
-            generator.Dbs.Add(new ZeroDbs.Common.DbConfigDatabaseInfo
+            generator.Dbs.Add(new ZeroDbs.Common.DatabaseInfo
             {
                 dbConnectionString = "Host=localhost;Port=3306;Database=zerotestdb;User ID=root;Password=123456;",
                 dbKey = "MySql001",
                 dbType = "MySql"
             });
-            generator.Dbs.Add(new ZeroDbs.Common.DbConfigDatabaseInfo
+            generator.Dbs.Add(new ZeroDbs.Common.DatabaseInfo
             {
                 dbConnectionString = "Data Source=D:\\Program Files\\SQLiteStudio\\ZeroTestDb.db3;version=3;datetimeformat=CurrentCulture",
                 dbKey = "Sqlite001",
@@ -85,6 +85,7 @@ namespace ZeroDbs.Test
             dbService.Update<MyDbs.MySql001.tUser>(nvc);
             dbService.Update<MyDbs.Sqlite001.tUser>(nvc);
             */
+
             dbService.UpdateFromCustomEntity<MyDbs.SqlServer001.tUser>(new { ID = 1, Name = "aaaaaaaaaaaa" });
             dbService.UpdateFromCustomEntity<MyDbs.MySql001.tUser>(new { ID = 1, Name = "aaaaaaaaaaaa" });
             dbService.UpdateFromCustomEntity<MyDbs.Sqlite001.tUser>(new { ID = 1, Name = "aaaaaaaaaaaa" });

@@ -78,7 +78,7 @@ namespace ZeroDbs.Common
                 {
                     throw new Exception("缺少db配置");
                 }
-                temp.Dbs = new List<Common.DbConfigDatabaseInfo>();
+                temp.Dbs = new List<Common.DatabaseInfo>();
                 foreach(System.Xml.XmlNode node in xmlNodeList)
                 {
                     System.Xml.XmlAttribute dbKey = node.Attributes["dbKey"];
@@ -119,7 +119,7 @@ namespace ZeroDbs.Common
                     {
                         continue;
                     }
-                    temp.Dbs.Add(new Common.DbConfigDatabaseInfo
+                    temp.Dbs.Add(new Common.DatabaseInfo
                     {
                         dbConnectionString = conn,
                         dbKey = key,

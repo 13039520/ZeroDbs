@@ -8,7 +8,7 @@ namespace ZeroDbs.Sqlite
 {
     internal class Db: Common.Db
     {
-        public Db(Common.DbConfigDatabaseInfo database):base(database)
+        public Db(Common.DatabaseInfo database):base(database)
         {
 
         }

@@ -6,7 +6,7 @@ namespace ZeroDbs.Common
 {
     public static class DbFactory
     {
-        public static IDb Create(Common.DbConfigDatabaseInfo dbConfig)
+        public static IDb Create(Common.DatabaseInfo dbConfig)
         {
             IDb db = null;
             switch (dbConfig.dbType)
@@ -23,7 +23,7 @@ namespace ZeroDbs.Common
             }
             return db;
         }
-        public static IDb Create(Common.DbConfigDatabaseInfo dbConfig, Common.DbExecuteSqlEvent dbExecuteSqlEvent)
+        public static IDb Create(Common.DatabaseInfo dbConfig, Common.DbExecuteSqlEvent dbExecuteSqlEvent)
         {
             IDb db = Create(dbConfig);
             if(db!=null&& dbExecuteSqlEvent != null)

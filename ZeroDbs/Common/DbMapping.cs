@@ -7,7 +7,7 @@ namespace ZeroDbs.Common
 {
     static class DbMapping
     {
-        public static DbConfigDatabaseInfo GetZeroDbConfigDatabaseInfo(string dbKey)
+        public static DatabaseInfo GetZeroDbConfigDatabaseInfo(string dbKey)
         {
             var zeroConfigInfo = DbConfigReader.GetZeroDbConfigInfo();
             if (zeroConfigInfo != null && zeroConfigInfo.Dbs != null && zeroConfigInfo.Dbs.Count > 0)
@@ -16,11 +16,11 @@ namespace ZeroDbs.Common
             }
             return null;
         }
-        public static List<DbConfigDatabaseInfo> GetZeroDbConfigDatabaseInfo<T>()
+        public static List<DatabaseInfo> GetZeroDbConfigDatabaseInfo<T>()
         {
             return GetZeroDbConfigDatabaseInfoByEntityFullName(typeof(T).FullName);
         }
-        public static List<DbConfigDatabaseInfo> GetZeroDbConfigDatabaseInfoByEntityFullName(string entityFullName)
+        public static List<DatabaseInfo> GetZeroDbConfigDatabaseInfoByEntityFullName(string entityFullName)
         {
             if (string.IsNullOrEmpty(entityFullName)) { return null; }
             var zeroConfigInfo = DbConfigReader.GetZeroDbConfigInfo();
@@ -33,7 +33,7 @@ namespace ZeroDbs.Common
                     return null;
                 }
                 var dbKeys = info1.Select(o => o.dbKey).Distinct().ToArray();
-                var reval = new List<DbConfigDatabaseInfo>();
+                var reval = new List<DatabaseInfo>();
                 foreach (var dbKey in dbKeys)
                 {
                     var db = zeroConfigInfo.Dbs.Find(o => string.Equals(o.dbKey, dbKey, StringComparison.OrdinalIgnoreCase));

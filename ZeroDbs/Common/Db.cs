@@ -12,14 +12,14 @@ namespace ZeroDbs.Common
     public abstract class Db : IDb
     {
         private IDataTypeMaping dbDataTypeMaping = null;
-        private Common.DbConfigDatabaseInfo database = null;
+        private Common.DatabaseInfo database = null;
         private Common.SqlBuilder dbSqlBuilder = null;
-        public Common.DbConfigDatabaseInfo Database { get { return database; } }
+        public Common.DatabaseInfo Database { get { return database; } }
         public Common.SqlBuilder DbSqlBuilder { get { return dbSqlBuilder; } }
         public IDataTypeMaping DbDataTypeMaping { get { return dbDataTypeMaping; } }
 
         public event ZeroDbs.Common.DbExecuteSqlEvent OnDbExecuteSqlEvent = null;
-        public Db(Common.DbConfigDatabaseInfo database)
+        public Db(Common.DatabaseInfo database)
         {
             this.database = database;
             if (string.Equals("SqlServer", database.dbType, StringComparison.OrdinalIgnoreCase))
