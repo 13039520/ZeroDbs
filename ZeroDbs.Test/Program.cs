@@ -11,14 +11,14 @@ namespace ZeroDbs.Test
         static void Main(string[] args)
         {
             dbService = new ZeroDbs.Common.DbService(new Common.DbExecuteSqlEvent((obj, e) => {
-                Console.ForegroundColor = ConsoleColor.Green;
+                Console.ForegroundColor = ConsoleColor.Blue;
                 Console.WriteLine(string.Join(Environment.NewLine, e.ExecuteSql));
                 Console.WriteLine("DbKey={0}&Message={1}", e.DbKey, e.Message);
                 Console.ResetColor();
             }));
             //CodeGenerator();
             //InsertTest();
-            UpdateTest();
+            //UpdateTest();
             QueryTest();
         }
 
@@ -125,11 +125,11 @@ namespace ZeroDbs.Test
         static void QueryTest()
         {
             #region -- page --
-            /*
+            
             var query = new ZeroDbs.Common.PageQuery
             {
                 Page = 1,
-                Size = 100,
+                Size = 5,
                 Orderby = "ID DESC",
                 Where = "ID>@0",
                 Paras = new object[] { 2 },//@0=2
@@ -175,16 +175,17 @@ namespace ZeroDbs.Test
             {
                 Console.WriteLine("no data");
             }
-            */
+            /**/
             #endregion
 
             #region -- list --
+
             var listQuery = new ZeroDbs.Common.ListQuery
             {
                 Where = "ID>@0",
                 Paras = new object[] { 0 },
                 Orderby = "ID DESC",
-                Top = 0
+                Top = 10
             };
             var list1 = dbService.Select<MyDbs.SqlServer001.tUser>(listQuery);
             Console.WriteLine("MyDbs.SqlServer001.tUser:");
@@ -225,6 +226,7 @@ namespace ZeroDbs.Test
             {
                 Console.WriteLine("no data");
             }
+            /**/
             #endregion
 
         }
