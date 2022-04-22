@@ -86,17 +86,26 @@ namespace ZeroDbs.Test
             dbService.Update<MyDbs.Sqlite001.tUser>(nvc);
             */
 
-            dbService.UpdateFromCustomEntity<MyDbs.SqlServer001.tUser>(new { ID = 1, Name = "aaaaaaaaaaaa" });
-            dbService.UpdateFromCustomEntity<MyDbs.MySql001.tUser>(new { ID = 1, Name = "aaaaaaaaaaaa" });
-            dbService.UpdateFromCustomEntity<MyDbs.Sqlite001.tUser>(new { ID = 1, Name = "aaaaaaaaaaaa" });
+            dbService.UpdateFromCustomEntity<MyDbs.SqlServer001.tUser>(new { ID = 1, Name = "abcdefgh" });
+            dbService.UpdateFromCustomEntity<MyDbs.MySql001.tUser>(new { ID = 1, Name = "abcdefgh" });
+            dbService.UpdateFromCustomEntity<MyDbs.Sqlite001.tUser>(new { ID = 1, Name = "abcdefgh" });
 
         }
         static void QueryTest()
         {
-            /**/
-            long page = 1;
-            long pageSize = 100;
-            var page1 = dbService.Page<MyDbs.SqlServer001.tUser>(page, pageSize, "ID>1", "ID DESC", new string[0], "");
+            #region -- page --
+            /*
+            var query = new ZeroDbs.Common.PageQuery
+            {
+                Page = 1,
+                Size = 100,
+                Orderby = "ID DESC",
+                Where = "ID>@0",
+                Paras = new object[] { 2 },//@0=2
+                Fields = new string[0],
+                UniqueField = ""
+            };
+            var page1 = dbService.Page<MyDbs.SqlServer001.tUser>(query);
             Console.WriteLine("MyDbs.SqlServer001.tUser:");
             if (page1.Total > 0)
             {
@@ -109,7 +118,7 @@ namespace ZeroDbs.Test
             {
                 Console.WriteLine("no data");
             }
-            var page2 = dbService.Page<MyDbs.MySql001.tUser>(page, pageSize, "ID>1", "ID DESC", new string[0], "");
+            var page2 = dbService.Page<MyDbs.MySql001.tUser>(query);
             Console.WriteLine("MyDbs.MySql001.tUser:");
             if (page2.Total > 0)
             {
@@ -122,7 +131,7 @@ namespace ZeroDbs.Test
             {
                 Console.WriteLine("no data");
             }
-            var page3 = dbService.Page<MyDbs.Sqlite001.tUser>(page, pageSize, "ID>1", "ID DESC", new string[0], "");
+            var page3 = dbService.Page<MyDbs.Sqlite001.tUser>(query);
             Console.WriteLine("MyDbs.Sqlite001.tUser:");
             if (page3.Total > 0)
             {
@@ -135,12 +144,22 @@ namespace ZeroDbs.Test
             {
                 Console.WriteLine("no data");
             }
+            */
+            #endregion
 
-            var list1 = dbService.Select<MyDbs.SqlServer001.tUser,MyEntity>("ID>@0", "ID DESC", 0, 1);
+            #region -- list --
+            var listQuery = new ZeroDbs.Common.ListQuery
+            {
+                Where = "ID>@0",
+                Paras = new object[] { 0 },
+                Orderby = "ID DESC",
+                Top = 0
+            };
+            var list1 = dbService.Select<MyDbs.SqlServer001.tUser>(listQuery);
             Console.WriteLine("MyDbs.SqlServer001.tUser:");
             if (list1.Count > 0)
             {
-                foreach (MyEntity m in list1)
+                foreach (var m in list1)
                 {
                     Console.WriteLine("{0}\t{1}\t{2}\t{3}", m.ID, m.Name, "", m.CreateTime);
                 }
@@ -149,11 +168,11 @@ namespace ZeroDbs.Test
             {
                 Console.WriteLine("no data");
             }
-            var list2 = dbService.Select<MyDbs.MySql001.tUser, MyEntity>("ID>@0", "ID DESC", 0, 1);
+            var list2 = dbService.Select<MyDbs.MySql001.tUser>(listQuery);
             Console.WriteLine("MyDbs.MySql001.tUser:");
             if (list2.Count > 0)
             {
-                foreach (MyEntity m in list2)
+                foreach (var m in list2)
                 {
                     Console.WriteLine("{0}\t{1}\t{2}\t{3}", m.ID, m.Name, "", m.CreateTime);
                 }
@@ -162,11 +181,11 @@ namespace ZeroDbs.Test
             {
                 Console.WriteLine("no data");
             }
-            var list3 = dbService.Select<MyDbs.Sqlite001.tUser, MyEntity>("ID>@0", "ID DESC", 0, 1);
+            var list3 = dbService.Select<MyDbs.Sqlite001.tUser, MyEntity>(listQuery);
             Console.WriteLine("MyDbs.Sqlite001.tUser:");
             if (list3.Count > 0)
             {
-                foreach (MyEntity m in list3)
+                foreach (var m in list3)
                 {
                     Console.WriteLine("{0}\t{1}\t{2}\t{3}", m.ID, m.Name, "", m.CreateTime);
                 }
@@ -175,6 +194,7 @@ namespace ZeroDbs.Test
             {
                 Console.WriteLine("no data");
             }
+            #endregion
 
         }
         class MyEntity

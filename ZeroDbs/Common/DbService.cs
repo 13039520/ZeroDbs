@@ -219,22 +219,43 @@ namespace ZeroDbs.Common
             return DbConfigReader.AddZeroDbMapping(entityFullName, dbKey, tableName);
         }
 
+
+        public List<Target> Select<DbEntity, Target>(Common.ListQuery query) where DbEntity : class, new() where Target : class, new()
+        {
+            return GetDb<DbEntity>().Select<DbEntity, Target>(query);
+        }
+        public List<DbEntity> Select<DbEntity>(Common.ListQuery query) where DbEntity : class, new()
+        {
+            return GetDb<DbEntity>().Select<DbEntity>(query);
+        }
         public List<IntoEntity> Select<DbEntity, IntoEntity>(string where, string orderby, int top, params object[] paras) where DbEntity : class, new() where IntoEntity : class, new()
         {
             return GetDb<DbEntity>().Select<DbEntity, IntoEntity>(where, orderby, top, paras);
         }
-        public List<DbEntity> Select<DbEntity>(string where, string orderby, int top, string[] fieldNames, params object[] paras) where DbEntity : class, new()
+        public List<DbEntity> Select<DbEntity>(string where, string orderby, int top, string[] fields, params object[] paras) where DbEntity : class, new()
         {
-            return GetDb<DbEntity>().Select<DbEntity>(where, orderby, top, fieldNames, paras);
-        }
-        public Common.PageData<DbEntity> Page<DbEntity>(long page, long size, string where, string orderby, string[] fieldNames, string uniqueFieldName) where DbEntity : class, new()
-        {
-            return GetDb<DbEntity>().Page<DbEntity>(page, size, where, orderby, fieldNames, uniqueFieldName);
+            return GetDb<DbEntity>().Select<DbEntity>(where, orderby, top, fields, paras);
         }
 
-        public long Count<DbEntity>(string where) where DbEntity : class, new()
+        public Common.PageData<IntoEntity> Page<DbEntity, IntoEntity>(PageQuery query) where DbEntity : class, new() where IntoEntity : class, new()
         {
-            return GetDb<DbEntity>().Count<DbEntity>(where);
+            return GetDb<DbEntity>().Page<DbEntity, IntoEntity>(query);
+        }
+        public Common.PageData<DbEntity> Page<DbEntity>(PageQuery query) where DbEntity : class, new()
+        {
+            return GetDb<DbEntity>().Page<DbEntity>(query);
+        }
+        public Common.PageData<IntoEntity> Page<DbEntity, IntoEntity>(long page, long size, string where, string orderby, string uniqueField, params object[] paras) where DbEntity : class, new() where IntoEntity : class, new()
+        {
+            return GetDb<DbEntity>().Page<DbEntity, IntoEntity>(page, size, where, orderby, uniqueField, paras);
+        }
+        public Common.PageData<DbEntity> Page<DbEntity>(long page, long size, string where, string orderby, string[] fields, string uniqueField, params object[] paras) where DbEntity : class, new()
+        {
+            return GetDb<DbEntity>().Page<DbEntity>(page, size, where, orderby, fields, uniqueField, paras);
+        }
+        public long Count<DbEntity>(string where, params object[] paras) where DbEntity : class, new()
+        {
+            return GetDb<DbEntity>().Count<DbEntity>(where, paras);
         }
 
         public int Insert<DbEntity>(DbEntity entity) where DbEntity : class, new()

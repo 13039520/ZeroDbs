@@ -12,7 +12,7 @@ namespace ZeroDbs.Sqlite
         {
 
         }
-        public override string Page<DbEntity>(long page, long size, string where, string orderby, string[] returnFieldNames, string uniqueFieldName = "")
+        public override Common.SqlInfo Page<DbEntity>(long page, long size, string where, string orderby, string[] fields, string uniqueField = "", params object[] paras)
         {
             var tableInfo = this.GetTable<DbEntity>();
 
@@ -22,15 +22,15 @@ namespace ZeroDbs.Sqlite
             long startIndex = page * size - size;
             StringBuilder sql = new StringBuilder();
             StringBuilder fieldStr = new StringBuilder();
-            if (returnFieldNames == null)
+            if (fields == null)
             {
-                returnFieldNames = tableInfo.Colunms.FindAll(o => o.MaxLength < 1000).Select(o => o.Name).ToArray();
+                fields = tableInfo.Colunms.FindAll(o => o.MaxLength < 1000).Select(o => o.Name).ToArray();
             }
-            for (int i = 0; i < returnFieldNames.Length; i++)
+            for (int i = 0; i < fields.Length; i++)
             {
-                if (!string.IsNullOrEmpty(returnFieldNames[i]))
+                if (!string.IsNullOrEmpty(fields[i]))
                 {
-                    fieldStr.AppendFormat("{0},", returnFieldNames[i]);
+                    fieldStr.AppendFormat("{0},", fields[i]);
                 }
             }
             if (fieldStr.Length > 0)
@@ -45,15 +45,15 @@ namespace ZeroDbs.Sqlite
             {
                 orderby = "(SELECT NULL)";
             }
-            if (string.IsNullOrEmpty(uniqueFieldName))
+            if (string.IsNullOrEmpty(uniqueField))
             {
                 var ts = GetUniqueFieldName(tableInfo);
-                uniqueFieldName = ts.Length == 1 ? ts[0] : string.Empty;
+                uniqueField = ts.Length == 1 ? ts[0] : string.Empty;
             }
             string tableName = GetTableName(tableInfo);
-            if (!string.IsNullOrEmpty(uniqueFieldName))//具有唯一性字段
+            if (!string.IsNullOrEmpty(uniqueField))//具有唯一性字段
             {
-                string resultFieldName = uniqueFieldName;
+                string resultFieldName = uniqueField;
 
                 sql.AppendFormat("SELECT {0} FROM {1}", fieldStr, tableName);
                 //获取唯一性字段集合
@@ -77,23 +77,32 @@ namespace ZeroDbs.Sqlite
                 sql.AppendFormat(" ORDER BY {0}", orderby);
                 sql.AppendFormat(" LIMIT {0} OFFSET {1}", size, startIndex);
             }
-            return sql.ToString();
+            Common.SqlInfo reval = new Common.SqlInfo();
+            reval.Sql = sql.ToString();
+            int n = 0;
+            int m = paras.Length;
+            while (n < m)
+            {
+                reval.Paras.Add(n.ToString(), paras[n]);
+                n++;
+            }
+            return reval;
         }
-        public override Common.SqlInfo Select<DbEntity>(string where, string orderby, int top, string[] returnFieldNames, params object[] paras)
+        public override Common.SqlInfo Select<DbEntity>(string where, string orderby, int top, string[] fields, params object[] paras)
         {
             Common.SqlInfo reval = new Common.SqlInfo();
             var tableInfo = this.GetTable<DbEntity>();
             string[] fieldArray = tableInfo.Colunms.Select(o => o.Name).ToArray();
-            if (returnFieldNames != null && returnFieldNames.Length > 0)
+            if (fields != null && fields.Length > 0)
             {
                 int i = 0;
                 List<string> temp = new List<string>();
-                while (i < returnFieldNames.Length)
+                while (i < fields.Length)
                 {
                     int j = 0;
                     while (j < fieldArray.Length)
                     {
-                        if (string.Equals(returnFieldNames[i], fieldArray[j], StringComparison.OrdinalIgnoreCase))
+                        if (string.Equals(fields[i], fieldArray[j], StringComparison.OrdinalIgnoreCase))
                         {
                             temp.Add(fieldArray[j]);
                             break;
@@ -102,10 +111,10 @@ namespace ZeroDbs.Sqlite
                     }
                     i++;
                 }
-                returnFieldNames = temp.Distinct().ToArray();
-                if (returnFieldNames.Length > 0)
+                fields = temp.Distinct().ToArray();
+                if (fields.Length > 0)
                 {
-                    fieldArray = returnFieldNames;
+                    fieldArray = fields;
                 }
             }
             StringBuilder field = new StringBuilder();

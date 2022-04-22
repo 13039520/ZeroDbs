@@ -135,10 +135,18 @@ namespace ZeroDbs.Common
             return GetDbTransactionScope(level, identification, groupId);
         }
 
+        public List<Target> Select<DbEntity, Target>(Common.ListQuery query) where DbEntity : class, new() where Target : class, new()
+        {
+            return Select<DbEntity, Target>(query.Where, query.Orderby, query.Top, query.Paras);
+        }
+        public List<DbEntity> Select<DbEntity>(Common.ListQuery query) where DbEntity : class, new()
+        {
+            return Select<DbEntity>(query.Where, query.Orderby, query.Top, query.Fields, query.Paras);
+        }
         public List<IntoEntity> Select<DbEntity, IntoEntity>(string where, string orderby, int top, params object[] paras) where DbEntity : class, new() where IntoEntity : class, new()
         {
-            string[] fieldNames = typeof(IntoEntity).GetProperties().Select(o => o.Name).ToArray();
-            var sql = DbSqlBuilder.Select<DbEntity>(where, orderby, top, fieldNames, paras);
+            string[] fields = typeof(IntoEntity).GetProperties().Select(o => o.Name).ToArray();
+            var sql = DbSqlBuilder.Select<DbEntity>(where, orderby, top, fields, paras);
             var cmd = GetDbCommand();
             try
             {
@@ -154,9 +162,9 @@ namespace ZeroDbs.Common
                 throw ex;
             }
         }
-        public List<DbEntity> Select<DbEntity>(string where, string orderby, int top, string[] fieldNames, params object[] paras) where DbEntity : class, new()
+        public List<DbEntity> Select<DbEntity>(string where, string orderby, int top, string[] fields, params object[] paras) where DbEntity : class, new()
         {
-            var sql = DbSqlBuilder.Select<DbEntity>(where, orderby, top, fieldNames, paras);
+            var sql = DbSqlBuilder.Select<DbEntity>(where, orderby, top, fields, paras);
             var cmd = GetDbCommand();
             try
             {
@@ -173,14 +181,60 @@ namespace ZeroDbs.Common
             }
         }
 
-        public ZeroDbs.Common.PageData<DbEntity> Page<DbEntity>(long page, long size, string where, string orderby, string[] fieldNames, string uniqueFieldName) where DbEntity : class, new()
+        public Common.PageData<DbEntity> Page<DbEntity>(Common.PageQuery query) where DbEntity : class, new()
         {
-            var countSql = DbSqlBuilder.Count<DbEntity>(where);
-            var sql = DbSqlBuilder.Page<DbEntity>(page, size, where, orderby, fieldNames, uniqueFieldName);
+            return Page<DbEntity>(query.Page, query.Size, query.Where, query.Orderby, query.Fields, query.UniqueField, query.Paras);
+        }
+        public Common.PageData<IntoEntity> Page<DbEntity, IntoEntity>(Common.PageQuery query) where DbEntity : class, new() where IntoEntity : class, new()
+        {
+            return Page<IntoEntity, IntoEntity>(query.Page, query.Size, query.Where, query.Orderby, query.UniqueField, query.Paras);
+        }
+        public Common.PageData<IntoEntity> Page<DbEntity, IntoEntity>(long page, long size, string where, string orderby, string uniqueField, params object[] paras) where DbEntity : class, new() where IntoEntity : class, new()
+        {
+            string[] fields = typeof(IntoEntity).GetProperties().Select(o => o.Name).ToArray();
+            var countSql = DbSqlBuilder.Count<DbEntity>(where, paras);
+            var sql = DbSqlBuilder.Page<DbEntity>(page, size, where, orderby, fields, uniqueField, paras);
             var cmd = this.GetDbCommand();
             try
             {
-                cmd.CommandText = countSql;
+                cmd.CommandText = countSql.Sql;
+                cmd.ParametersFromDictionary(countSql.Paras);
+                var obj = cmd.ExecuteScalar();
+                long total = Convert.ToInt64(obj);
+                if (total < 1)
+                {
+                    cmd.Dispose();
+                    return new Common.PageData<IntoEntity> { Total = total, Items = new List<IntoEntity>() };
+                }
+                long pages = total % size == 0 ? total / size : (total / size + 1);
+                if (page > pages)
+                {
+                    cmd.Dispose();
+                    return new Common.PageData<IntoEntity> { Total = total, Items = new List<IntoEntity>() };
+                }
+                cmd.CommandText = sql.Sql;
+                cmd.ParametersFromDictionary(sql.Paras);
+                var reval = cmd.ExecuteReader<IntoEntity>();
+                cmd.Dispose();
+
+                return new Common.PageData<IntoEntity> { Total = total, Items = reval };
+            }
+            catch (Exception ex)
+            {
+                cmd.Dispose();
+
+                throw ex;
+            }
+        }
+        public ZeroDbs.Common.PageData<DbEntity> Page<DbEntity>(long page, long size, string where, string orderby, string[] fields, string uniqueField, params object[] paras) where DbEntity : class, new()
+        {
+            var countSql = DbSqlBuilder.Count<DbEntity>(where,paras);
+            var sql = DbSqlBuilder.Page<DbEntity>(page, size, where, orderby, fields, uniqueField,paras);
+            var cmd = this.GetDbCommand();
+            try
+            {
+                cmd.CommandText = countSql.Sql;
+                cmd.ParametersFromDictionary(countSql.Paras);
                 var obj = cmd.ExecuteScalar();
                 long total = Convert.ToInt64(obj);
                 if (total < 1)
@@ -194,7 +248,8 @@ namespace ZeroDbs.Common
                     cmd.Dispose();
                     return new Common.PageData<DbEntity> { Total = total, Items = new List<DbEntity>() };
                 }
-                cmd.CommandText = sql;
+                cmd.CommandText = sql.Sql;
+                cmd.ParametersFromDictionary(sql.Paras);
                 var reval = cmd.ExecuteReader<DbEntity>();
                 cmd.Dispose();
 
@@ -208,13 +263,14 @@ namespace ZeroDbs.Common
             }
         }
 
-        public long Count<DbEntity>(string where) where DbEntity : class, new()
+        public long Count<DbEntity>(string where, params object[] paras) where DbEntity : class, new()
         {
             var sql = DbSqlBuilder.Count<DbEntity>(where);
             var cmd = this.GetDbCommand();
             try
             {
-                cmd.CommandText = sql;
+                cmd.CommandText = sql.Sql;
+                cmd.ParametersFromDictionary(sql.Paras);
                 var obj = cmd.ExecuteScalar();
                 var reval = Convert.ToInt64(obj);
                 cmd.Dispose();

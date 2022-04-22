@@ -20,7 +20,7 @@ namespace ZeroDbs.MySql
         {
             return String.Format("`{0}`", colName);
         }
-        public override string Page<DbEntity>(long page, long size, string where, string orderby, string[] returnFieldNames, string uniqueFieldName = "")
+        public override Common.SqlInfo Page<DbEntity>(long page, long size, string where, string orderby, string[] fields, string uniqueField = "", params object[] paras)
         {
             var tableInfo = this.ZeroDb.GetTable<DbEntity>();
 
@@ -32,11 +32,11 @@ namespace ZeroDbs.MySql
             long endIndex = startIndex + size;
             StringBuilder sql = new StringBuilder();
             StringBuilder fieldStr = new StringBuilder();
-            for (int i = 0; i < returnFieldNames.Length; i++)
+            for (int i = 0; i < fields.Length; i++)
             {
-                if (!string.IsNullOrEmpty(returnFieldNames[i]))
+                if (!string.IsNullOrEmpty(fields[i]))
                 {
-                    fieldStr.AppendFormat("{0},", GetColunmName(returnFieldNames[i]));
+                    fieldStr.AppendFormat("{0},", GetColunmName(fields[i]));
                 }
             }
             if (fieldStr.Length > 0)
@@ -47,16 +47,16 @@ namespace ZeroDbs.MySql
             {
                 fieldStr.Append("*");
             }
-            if (string.IsNullOrEmpty(uniqueFieldName))
+            if (string.IsNullOrEmpty(uniqueField))
             {
                 var ts = GetUniqueFieldName(tableInfo);
-                uniqueFieldName = ts.Length == 1 ? ts[0] : string.Empty;
+                uniqueField = ts.Length == 1 ? ts[0] : string.Empty;
             }
             var tableName= GetTableName(tableInfo);
-            if (!string.IsNullOrEmpty(uniqueFieldName))
+            if (!string.IsNullOrEmpty(uniqueField))
             {
-                uniqueFieldName = GetColunmName(uniqueFieldName);
-                string SubSql = string.Format("SELECT {0} FROM {1}", uniqueFieldName, tableName);
+                uniqueField = GetColunmName(uniqueField);
+                string SubSql = string.Format("SELECT {0} FROM {1}", uniqueField, tableName);
                 if (!string.IsNullOrEmpty(where))
                 {
                     SubSql += string.Format(" WHERE {0}", where);
@@ -67,7 +67,7 @@ namespace ZeroDbs.MySql
                 }
                 SubSql += string.Format(" LIMIT {0},{1}", startIndex, size);
 
-                sql.AppendFormat("SELECT {0} FROM {1} WHERE {2} IN(SELECT {2} FROM ({3}) AS DbEntity)", fieldStr, tableName, uniqueFieldName, SubSql);
+                sql.AppendFormat("SELECT {0} FROM {1} WHERE {2} IN(SELECT {2} FROM ({3}) AS DbEntity)", fieldStr, tableName, uniqueField, SubSql);
                 if (!string.IsNullOrEmpty(orderby))
                 {
                     sql.AppendFormat(" ORDER BY {0}", orderby);
@@ -86,24 +86,32 @@ namespace ZeroDbs.MySql
                 }
                 sql.AppendFormat(" LIMIT {0},{1}", startIndex, size);
             }
-
-            return sql.ToString();
+            Common.SqlInfo reval = new Common.SqlInfo();
+            reval.Sql = sql.ToString();
+            int n = 0;
+            int m = paras.Length;
+            while (n < m)
+            {
+                reval.Paras.Add(n.ToString(), paras[n]);
+                n++;
+            }
+            return reval;
         }
-        public override Common.SqlInfo Select<DbEntity>(string where, string orderby, int top, string[] returnFieldNames, params object[] paras)
+        public override Common.SqlInfo Select<DbEntity>(string where, string orderby, int top, string[] fields, params object[] paras)
         {
             Common.SqlInfo reval = new Common.SqlInfo();
             var tableInfo = this.GetTable<DbEntity>();
             string[] fieldArray = tableInfo.Colunms.Select(o => o.Name).ToArray();
-            if (returnFieldNames != null && returnFieldNames.Length > 0)
+            if (fields != null && fields.Length > 0)
             {
                 int i = 0;
                 List<string> temp = new List<string>();
-                while (i < returnFieldNames.Length)
+                while (i < fields.Length)
                 {
                     int j = 0;
                     while (j < fieldArray.Length)
                     {
-                        if (string.Equals(returnFieldNames[i], fieldArray[j], StringComparison.OrdinalIgnoreCase))
+                        if (string.Equals(fields[i], fieldArray[j], StringComparison.OrdinalIgnoreCase))
                         {
                             temp.Add(fieldArray[j]);
                             break;
@@ -112,10 +120,10 @@ namespace ZeroDbs.MySql
                     }
                     i++;
                 }
-                returnFieldNames = temp.Distinct().ToArray();
-                if (returnFieldNames.Length > 0)
+                fields = temp.Distinct().ToArray();
+                if (fields.Length > 0)
                 {
-                    fieldArray = returnFieldNames;
+                    fieldArray = fields;
                 }
             }
             StringBuilder field = new StringBuilder();

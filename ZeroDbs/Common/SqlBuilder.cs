@@ -51,13 +51,22 @@ namespace ZeroDbs.Common
             return colName;
         }
 
-        public virtual string Count<DbEntity>(string where) where DbEntity : class, new()
+        public virtual SqlInfo Count<DbEntity>(string where, params object[] paras) where DbEntity : class, new()
         {
             var tableInfo = this.GetTable<DbEntity>();
-            return string.Format("SELECT COUNT(1) FROM {0} WHERE {1}", GetTableName(tableInfo), string.IsNullOrEmpty(where) ? "1>0" : where);
+            SqlInfo reval = new SqlInfo();
+            reval.Sql = string.Format("SELECT COUNT(1) FROM {0} WHERE {1}", GetTableName(tableInfo), string.IsNullOrEmpty(where) ? "1>0" : where);
+            int n = 0;
+            int m = paras.Length;
+            while (n < m)
+            {
+                reval.Paras.Add(n.ToString(), paras[n]);
+                n++;
+            }
+            return reval;
         }
-        
-        public virtual string Page<DbEntity>(long page, long size, string where, string orderby, string[] returnFieldNames, string uniqueFieldName = "") where DbEntity : class, new()
+
+        public virtual SqlInfo Page<DbEntity>(long page, long size, string where, string orderby, string[] fields, string uniqueField = "", params object[] paras) where DbEntity : class, new()
         {
             var tableInfo = this.ZeroDb.GetTable<DbEntity>();
 
@@ -68,15 +77,15 @@ namespace ZeroDbs.Common
             long endIndex = page * size;
             StringBuilder sql = new StringBuilder();
             StringBuilder fieldStr = new StringBuilder();
-            if (returnFieldNames == null)
+            if (fields == null)
             {
-                returnFieldNames = tableInfo.Colunms.FindAll(o => o.MaxLength < 1000).Select(o => o.Name).ToArray();
+                fields = tableInfo.Colunms.FindAll(o => o.MaxLength < 1000).Select(o => o.Name).ToArray();
             }
-            for (int i = 0; i < returnFieldNames.Length; i++)
+            for (int i = 0; i < fields.Length; i++)
             {
-                if (!string.IsNullOrEmpty(returnFieldNames[i]))
+                if (!string.IsNullOrEmpty(fields[i]))
                 {
-                    fieldStr.AppendFormat("{0},", GetColunmName(returnFieldNames[i]));
+                    fieldStr.AppendFormat("{0},", GetColunmName(fields[i]));
                 }
             }
             if (fieldStr.Length > 0)
@@ -91,14 +100,14 @@ namespace ZeroDbs.Common
             {
                 orderby = "(SELECT NULL)";
             }
-            if (string.IsNullOrEmpty(uniqueFieldName))
+            if (string.IsNullOrEmpty(uniqueField))
             {
                 var ts = GetUniqueFieldName(tableInfo);
-                uniqueFieldName = ts.Length == 1 ? ts[0] : string.Empty;
+                uniqueField = ts.Length == 1 ? ts[0] : string.Empty;
             }
-            if (!string.IsNullOrEmpty(uniqueFieldName))//具有唯一性字段
+            if (!string.IsNullOrEmpty(uniqueField))//具有唯一性字段
             {
-                string resultFieldName = GetColunmName(uniqueFieldName);
+                string resultFieldName = GetColunmName(uniqueField);
                 sql.AppendFormat("SELECT {0} FROM {1}", fieldStr, GetTableName(tableInfo));
                 //获取唯一性字段集合
                 sql.AppendFormat(" WHERE {0} IN(SELECT {0} FROM(", resultFieldName);
@@ -120,24 +129,33 @@ namespace ZeroDbs.Common
                 sql.Append(") TT");
                 sql.AppendFormat(" WHERE TT.Row BETWEEN {0} AND {1}", startIndex, endIndex);
             }
-            return sql.ToString();
+            SqlInfo reval = new SqlInfo();
+            reval.Sql = sql.ToString();
+            int n = 0;
+            int m = paras.Length;
+            while (n < m)
+            {
+                reval.Paras.Add(n.ToString(), paras[n]);
+                n++;
+            }
+            return reval;
         }
 
-        public virtual SqlInfo Select<DbEntity>(string where, string orderby, int top, string[] returnFieldNames, params object[] paras) where DbEntity : class, new()
+        public virtual SqlInfo Select<DbEntity>(string where, string orderby, int top, string[] fields, params object[] paras) where DbEntity : class, new()
         {
             SqlInfo reval = new SqlInfo();
             var tableInfo = this.GetTable<DbEntity>();
             string[] fieldArray = tableInfo.Colunms.Select(o => o.Name).ToArray();
-            if (returnFieldNames != null && returnFieldNames.Length > 0)
+            if (fields != null && fields.Length > 0)
             {
                 int i = 0;
                 List<string> temp = new List<string>();
-                while (i < returnFieldNames.Length)
+                while (i < fields.Length)
                 {
                     int j = 0;
                     while (j < fieldArray.Length)
                     {
-                        if (string.Equals(returnFieldNames[i], fieldArray[j], StringComparison.OrdinalIgnoreCase))
+                        if (string.Equals(fields[i], fieldArray[j], StringComparison.OrdinalIgnoreCase))
                         {
                             temp.Add(fieldArray[j]);
                             break;
@@ -146,10 +164,10 @@ namespace ZeroDbs.Common
                     }
                     i++;
                 }
-                returnFieldNames = temp.Distinct().ToArray();
-                if (returnFieldNames.Length > 0)
+                fields = temp.Distinct().ToArray();
+                if (fields.Length > 0)
                 {
-                    fieldArray = returnFieldNames;
+                    fieldArray = fields;
                 }
             }
             StringBuilder field = new StringBuilder();
@@ -182,11 +200,11 @@ namespace ZeroDbs.Common
             {
                 if (string.IsNullOrEmpty(orderby))
                 {
-                    reval.Sql = string.Format("SELECT {1} FROM {2} WHERE {3} LIMIT {0}", top, field, tableName, where);
+                    reval.Sql = string.Format("SELECT TOP {0} {1} FROM {2} WHERE {3}", top, field, tableName, where);
                 }
                 else
                 {
-                    reval.Sql = string.Format("SELECT {1} FROM {2} WHERE {3} ORDER BY {4} LIMIT {0}", top, field, tableName, where, orderby);
+                    reval.Sql = string.Format("SELECT TOP {0} {1} FROM {2} WHERE {3} ORDER BY {4}", top, field, tableName, where, orderby);
                 }
             }
             int n = 0;
