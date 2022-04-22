@@ -12,6 +12,14 @@ namespace ZeroDbs.Sqlite
         {
 
         }
+        public override string GetTableName(Common.DbDataTableInfo tableInfo)
+        {
+            return string.Format("[{0}]", tableInfo.Name);
+        }
+        public override string GetColunmName(string colName)
+        {
+            return string.Format("[{0}]", colName);
+        }
         public override Common.SqlInfo Page<DbEntity>(long page, long size, string where, string orderby, string[] fields, string uniqueField = "", params object[] paras)
         {
             var tableInfo = this.GetTable<DbEntity>();
@@ -30,7 +38,7 @@ namespace ZeroDbs.Sqlite
             {
                 if (!string.IsNullOrEmpty(fields[i]))
                 {
-                    fieldStr.AppendFormat("{0},", fields[i]);
+                    fieldStr.AppendFormat("{0},", GetColunmName(fields[i]));
                 }
             }
             if (fieldStr.Length > 0)
@@ -120,7 +128,7 @@ namespace ZeroDbs.Sqlite
             StringBuilder field = new StringBuilder();
             foreach (string s in fieldArray)
             {
-                field.AppendFormat("{0},", s);
+                field.AppendFormat("{0},", GetColunmName(s));
             }
             if (field.Length < 1)
             {
@@ -131,26 +139,27 @@ namespace ZeroDbs.Sqlite
             {
                 where = "1>0";
             }
+            var tableName = GetTableName(tableInfo);
             if (top < 1)
             {
                 if (string.IsNullOrEmpty(orderby))
                 {
-                    reval.Sql = string.Format("SELECT {0} FROM {1} WHERE {2}", field, GetTableName(tableInfo), where);
+                    reval.Sql = string.Format("SELECT {0} FROM {1} WHERE {2}", field, tableName, where);
                 }
                 else
                 {
-                    reval.Sql = string.Format("SELECT {0} FROM {1} WHERE {2} ORDER BY {3}", field, GetTableName(tableInfo), where, orderby);
+                    reval.Sql = string.Format("SELECT {0} FROM {1} WHERE {2} ORDER BY {3}", field, tableName, where, orderby);
                 }
             }
             else
             {
                 if (string.IsNullOrEmpty(orderby))
                 {
-                    reval.Sql = string.Format("SELECT {1} FROM {2} WHERE {3} LIMIT {0}", top, field, GetTableName(tableInfo), where);
+                    reval.Sql = string.Format("SELECT {1} FROM {2} WHERE {3} LIMIT {0}", top, field, tableName, where);
                 }
                 else
                 {
-                    reval.Sql = string.Format("SELECT {1} FROM {2} WHERE {3} ORDER BY {4} LIMIT {0}", top, field, GetTableName(tableInfo), where, orderby);
+                    reval.Sql = string.Format("SELECT {1} FROM {2} WHERE {3} ORDER BY {4} LIMIT {0}", top, field, tableName, where, orderby);
                 }
             }
             int n = 0;
@@ -162,6 +171,8 @@ namespace ZeroDbs.Sqlite
             }
             return reval;
         }
+
+
     }
 
 }

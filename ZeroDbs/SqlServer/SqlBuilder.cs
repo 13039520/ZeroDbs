@@ -15,7 +15,7 @@ namespace ZeroDbs.SqlServer
         }
         public override string GetTableName(DbDataTableInfo tableInfo)
         {
-            return string.Format("[{0}]", tableInfo.Name);
+            return string.Format("[{0}].[dbo].[{1}]", tableInfo.DbName, tableInfo.Name);
         }
         public override string GetColunmName(string colName)
         {
