@@ -219,166 +219,294 @@ namespace ZeroDbs.Common
 
         public string Insert<DbEntity>() where DbEntity : class, new()
         {
-            return Insert<DbEntity>(new string[0], null);
+            var tableInfo = this.GetTable<DbEntity>();
+            if (tableInfo.IsView)
+            {
+                throw new Exception("Target does not support update operation");
+            }
+            StringBuilder field = new StringBuilder();
+            StringBuilder value = new StringBuilder();
+            foreach (var col in tableInfo.Colunms)
+            {
+                if (col.IsIdentity) { continue; }
+                field.AppendFormat("{0},", GetColunmName(col.Name));
+                value.AppendFormat("@{0},", col.Name);
+            }
+            field.Remove(field.Length - 1, 1);
+            value.Remove(value.Length - 1, 1);
+
+            return String.Format("INSERT INTO {0}({1}) VALUES({2})", GetTableName(tableInfo), field, value);
         }
-        public string Insert<DbEntity>(string[] skipFieldNames) where DbEntity : class, new()
-        {
-            return Insert<DbEntity>(skipFieldNames, null);
-        }
-        public virtual string Insert<DbEntity>(string[] skipFieldNames, string appendWhere) where DbEntity : class, new()
+        public SqlInfo Insert<DbEntity>(DbEntity source) where DbEntity : class, new()
         {
             var tableInfo = this.GetTable<DbEntity>();
             if (tableInfo.IsView)
             {
-                throw new Exception("Does not support Insert operation on the view");
+                throw new Exception("Target does not support insert operation");
             }
-            if (skipFieldNames == null || skipFieldNames.Length < 1)
+            var ps = source.GetType().GetProperties().ToList();
+            SqlInfo reval = new SqlInfo();
+            StringBuilder field = new StringBuilder();
+            StringBuilder value = new StringBuilder();
+            foreach (var col in tableInfo.Colunms)
             {
-                var cs = tableInfo.Colunms.FindAll(o => o.IsIdentity);
-                if (cs != null && cs.Count > 0)
-                {
-                    skipFieldNames = cs.Select(o => o.Name).ToArray();
-                }
+                if (col.IsIdentity) { continue; }
+                var p = ps.Find(o => string.Equals(o.Name, col.Name, StringComparison.OrdinalIgnoreCase));
+                if (p == null) { continue; }
+                field.AppendFormat("{0},", GetColunmName(col.Name));
+                value.AppendFormat("@{0},", col.Name);
+                reval.Paras.Add(col.Name, p.GetValue(source, null));
             }
-            else
-            {
-                skipFieldNames = skipFieldNames.Distinct().ToArray();
-            }
-            if (tableInfo == null) { throw new Exception("tableInfo is null"); }
-            if (skipFieldNames == null) { skipFieldNames = new string[] { }; }
-
-            System.Reflection.PropertyInfo[] pi = typeof(DbEntity).GetProperties();
-            if (pi.Length < 1) { throw new Exception("Generic parameters are missing public properties"); }
-            Dictionary<string, System.Reflection.PropertyInfo> dic = new Dictionary<string, System.Reflection.PropertyInfo>(pi.Length);
-            string keep = "";
-            foreach (System.Reflection.PropertyInfo p in pi)
-            {
-                string name = p.Name.ToLower();
-                bool inSkipFieldNames = false;
-                for (var i = 0; i < skipFieldNames.Length; i++)
-                {
-                    if (string.Equals(skipFieldNames[i], name, StringComparison.OrdinalIgnoreCase))
-                    {
-                        inSkipFieldNames = true;
-                        break;
-                    }
-                }
-                if (!inSkipFieldNames)
-                {
-                    dic.Add(name, p);
-                    keep += name + ",";
-                }
-            }
-            string[] keepFieldNames = keep.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-            if (keepFieldNames.Length < 1)
-            {
-                throw new Exception("All fields are skipped");
-            }
-            System.Text.StringBuilder columnNames = new System.Text.StringBuilder();
-            System.Text.StringBuilder columnValues = new System.Text.StringBuilder();
-            foreach (string s in keepFieldNames)
-            {
-                string columnName = ("" + s).ToLower().Trim();
-                if (columnName.Length > 0 && dic.ContainsKey(columnName))
-                {
-                    columnNames.AppendFormat("{0},", GetColunmName(dic[columnName].Name));
-                    columnValues.AppendFormat("@{0},", dic[columnName].Name);
-                }
-            }
-            if (columnNames.Length < 1)
-            {
-                throw new Exception("The generated Insert command is not available");
-            }
-            columnNames.Remove(columnNames.Length - 1, 1);
-            columnValues.Remove(columnValues.Length - 1, 1);
-            if (!string.IsNullOrWhiteSpace(appendWhere))
-            {
-                appendWhere = " WHERE " + appendWhere.Trim();
-            }
-            else
-            {
-                appendWhere = "";
-            }
-            return string.Format("INSERT INTO {0}({1}) VALUES({2}){3}", GetTableName(tableInfo), columnNames, columnValues, appendWhere);
+            field.Remove(field.Length - 1, 1);
+            value.Remove(value.Length - 1, 1);
+            reval.Sql = String.Format("INSERT INTO {0}({1}) VALUES({2})", GetTableName(tableInfo), field, value);
+            return reval;
         }
-        public string Insert<DbEntity>(System.Collections.Specialized.NameValueCollection nvc) where DbEntity : class, new()
+        public SqlInfo InsertFromCustomEntity<DbEntity>(object source) where DbEntity : class, new()
         {
-            return Insert<DbEntity>(nvc, "");
-        }
-        public string Insert<DbEntity>(System.Collections.Specialized.NameValueCollection nvc, string appendWhere) where DbEntity : class, new()
-        {
-            List<System.Collections.Specialized.NameValueCollection> li = new List<System.Collections.Specialized.NameValueCollection>(1);
-            li.Add(nvc);
-            List<string> reval = Insert<DbEntity>(li, appendWhere);
-            return reval[0];
-        }
-        public List<string> Insert<DbEntity>(List<System.Collections.Specialized.NameValueCollection> nvcList) where DbEntity : class, new()
-        {
-            return Insert<DbEntity>(nvcList, "");
-        }
-        public virtual List<string> Insert<DbEntity>(List<System.Collections.Specialized.NameValueCollection> nvcList, string appendWhere) where DbEntity : class, new()
-        {
-            if (nvcList == null || nvcList.Count < 1) { throw new Exception("nvcList is null or contains 0 items"); }
-            if (nvcList.Count > 5000)
+            if (source == null)
             {
-                throw new Exception("The length of nvcList should not exceed 5000 items");
-            }
-            if (nvcList.Contains(null))
-            {
-                throw new Exception("nvcList contains null items");
+                throw new ArgumentNullException("entity");
             }
             var tableInfo = this.GetTable<DbEntity>();
             if (tableInfo.IsView)
             {
-                throw new Exception("Does not support Insert operation on the view");
+                throw new Exception("Target does not support insert operation");
             }
-
-            var identityKeys = tableInfo.Colunms.FindAll(o => o.IsIdentity);
-            
-            if (!string.IsNullOrEmpty(appendWhere))
+            var ps = source.GetType().GetProperties().ToList();
+            var dic = new Dictionary<System.Reflection.PropertyInfo, DbDataColumnInfo>();
+            for (int i = 0; i < ps.Count; i++)
             {
-                appendWhere = " WHERE "+appendWhere.Trim();
+                var col = tableInfo.Colunms.Find(o => string.Equals(o.Name, ps[i].Name, StringComparison.OrdinalIgnoreCase));
+                if (col == null)
+                {
+                    throw new Exception("The " + ps[i].Name + " field does not exist in the target table");
+                }
+                if (col.IsIdentity)
+                {
+                    continue;
+                }
+                dic.Add(ps[i], col);
             }
-            var tableName = GetTableName(tableInfo);
-
-            List<string> result = new List<string>();
-            List<System.Reflection.PropertyInfo> propertyInfoList = typeof(DbEntity).GetProperties().ToList();
-            int nvcListCount = nvcList.Count;
-            for (int i = 0; i < nvcListCount; i++)
+            if (dic.Count < 0)
             {
-                StringBuilder sqlInsertFields = new StringBuilder();
-                StringBuilder sqlInsertValues = new StringBuilder();
-                foreach (string key in nvcList[i].Keys)
-                {
-                    System.Reflection.PropertyInfo p = propertyInfoList.Find(delegate (System.Reflection.PropertyInfo temp) { return string.Equals(key, temp.Name, StringComparison.OrdinalIgnoreCase); });
-                    if (p != null)
-                    {
-                        if (identityKeys.Find(delegate (ZeroDbs.Common.DbDataColumnInfo temp) { return string.Equals(temp.Name, p.Name, StringComparison.OrdinalIgnoreCase); }) == null)
-                        {
-                            sqlInsertFields.AppendFormat("{0},", GetColunmName(p.Name));
-                            object TargetValue = Common.ValueConvert.StrToTargetType(nvcList[i][key], p.PropertyType);
-                            string ValueString = Common.ValueConvert.SqlValueStrByValue(TargetValue);
-                            sqlInsertValues.AppendFormat("{0},", ValueString);
-                        }
-                    }
-                }
-                if (sqlInsertFields.Length < 1 || sqlInsertValues.Length < 1) { continue; }
-
-                sqlInsertFields.Remove(sqlInsertFields.Length - 1, 1);
-                sqlInsertValues.Remove(sqlInsertValues.Length - 1, 1);
-
-                string sql = string.Format("INSERT INTO {0}({1}) VALUES({2}){3}", tableName, sqlInsertFields, sqlInsertValues, appendWhere);
-                if (!result.Contains(sql))
-                {
-                    result.Add(sql);
-                }
+                throw new Exception("Input source is missing available insert field");
             }
-            return result;
+            SqlInfo reval = new SqlInfo();
+            StringBuilder field = new StringBuilder();
+            StringBuilder value = new StringBuilder();
+            foreach (var key in dic.Keys)
+            {
+                var col = dic[key];
+                field.AppendFormat("{0},", GetColunmName(col.Name));
+                value.AppendFormat("@{0},", col.Name);
+                reval.Paras.Add(col.Name, key.GetValue(source, null));
+            }
+            field.Remove(field.Length - 1, 1);
+            value.Remove(value.Length - 1, 1);
+            reval.Sql = String.Format("INSERT INTO {0}({1}) VALUES({2})", GetTableName(tableInfo), field, value);
+
+            return reval;
+        }
+        public SqlInfo InsertFromDictionary<DbEntity>(Dictionary<string, object> source) where DbEntity : class, new()
+        {
+            if (source == null || source.Count < 1)
+            {
+                throw new ArgumentNullException("source");
+            }
+            var tableInfo = this.GetTable<DbEntity>();
+            if (tableInfo.IsView)
+            {
+                throw new Exception("Target does not support insert operation");
+            }
+            var cols = new List<DbDataColumnInfo>();
+            var values = new List<object>();
+            foreach (var key in source.Keys)
+            {
+                var col = tableInfo.Colunms.Find(o => string.Equals(o.Name, key));
+                if (col == null)
+                {
+                    throw new Exception("The " + key + " field does not exist in the target table");
+                }
+                if (col.IsIdentity)
+                {
+                    continue;
+                }
+                values.Add(source[key]);
+                cols.Add(col);
+            }
+            if (cols.Count < 0)
+            {
+                throw new Exception("Input source is missing available insert field");
+            }
+            SqlInfo reval = new SqlInfo();
+            StringBuilder field = new StringBuilder();
+            StringBuilder value = new StringBuilder();
+            for (int i = 0; i < values.Count; i++)
+            {
+                var col = cols[i];
+                field.AppendFormat("{0},", GetColunmName(col.Name));
+                value.AppendFormat("@{0},", col.Name);
+                reval.Paras.Add(col.Name, values[i]);
+            }
+            field.Remove(field.Length - 1, 1);
+            value.Remove(value.Length - 1, 1);
+            reval.Sql = String.Format("INSERT INTO {0}({1}) VALUES({2})", GetTableName(tableInfo), field, value);
+
+            return reval;
+        }
+        public SqlInfo InsertFromNameValueCollection<DbEntity>(System.Collections.Specialized.NameValueCollection source) where DbEntity : class, new()
+        {
+            if (source == null || source.Count < 1) { throw new ArgumentException("nvc"); }
+            var tableInfo = this.GetTable<DbEntity>();
+            if (tableInfo.IsView)
+            {
+                throw new Exception("Target does not support insert operation");
+            }
+            var ps = typeof(DbEntity).GetProperties().ToList();
+            var cols = new List<DbDataColumnInfo>();
+            var values = new List<object>();
+            foreach (var key in source.AllKeys)
+            {
+                var col = tableInfo.Colunms.Find(o => string.Equals(o.Name, key));
+                if (col == null)
+                {
+                    throw new Exception("The " + key + " field does not exist in the target table");
+                }
+                if (col.IsIdentity)
+                {
+                    continue;
+                }
+                var p = ps.Find(o => string.Equals(o.Name, key));
+                if (p == null)
+                {
+                    throw new Exception("Don't know the data type of field " + key);
+                }
+                values.Add(ValueConvert.StrToTargetType(source[key], p.PropertyType));
+                cols.Add(col);
+            }
+            if (cols.Count < 0)
+            {
+                throw new Exception("Input source is missing available insert field");
+            }
+            SqlInfo reval = new SqlInfo();
+            StringBuilder field = new StringBuilder();
+            StringBuilder value = new StringBuilder();
+            for (int i = 0; i < values.Count; i++)
+            {
+                var col = cols[i];
+                field.AppendFormat("{0},", GetColunmName(col.Name));
+                value.AppendFormat("@{0},", col.Name);
+                reval.Paras.Add(col.Name, values[i]);
+            }
+            field.Remove(field.Length - 1, 1);
+            value.Remove(value.Length - 1, 1);
+            reval.Sql = String.Format("INSERT INTO {0}({1}) VALUES({2})", GetTableName(tableInfo), field, value);
+
+            return reval;
         }
 
-        public SqlInfo UpdateFromCustomEntity<DbEntity>(object entity) where DbEntity : class, new()
+        public string Update<DbEntity>() where DbEntity : class, new()
+        {
+            var tableInfo = this.GetTable<DbEntity>();
+            if (tableInfo.IsView)
+            {
+                throw new Exception("Target does not support update operation");
+            }
+            StringBuilder set = new StringBuilder();
+            StringBuilder where = new StringBuilder();
+            foreach (var col in tableInfo.Colunms)
+            {
+                if (col.IsPrimaryKey)
+                {
+                    where.AppendFormat("{0}=@{1} AND ", GetColunmName(col.Name), col.Name);
+                }
+                else
+                {
+                    if (col.IsIdentity) { continue; }
+                    set.AppendFormat("{0}=@{1},", GetColunmName(col.Name), col.Name);
+                }
+            }
+            if (where.Length < 1)
+            {
+                throw new ArgumentNullException("The target table is missing a primary key");
+            }
+            set.Remove(set.Length - 1, 1);
+            where.Remove(where.Length - 5, 5);
+
+            return String.Format("UPDATE {0} SET {1} WHERE {2}", GetTableName(tableInfo), set, where);
+        }
+        public SqlInfo Update<DbEntity>(DbEntity entity) where DbEntity : class, new()
         {
             if (entity == null)
+            {
+                throw new ArgumentNullException("entity");
+            }
+            var tableInfo = this.GetTable<DbEntity>();
+            if (tableInfo.IsView)
+            {
+                throw new Exception("Target does not support update operation");
+            }
+            var pKeys = tableInfo.Colunms.FindAll(o => o.IsPrimaryKey);
+            if (pKeys.Count == 0)
+            {
+                throw new ArgumentNullException("The target table is missing a primary key");
+            }
+            var ps = entity.GetType().GetProperties().ToList();
+            var dic = new Dictionary<System.Reflection.PropertyInfo, DbDataColumnInfo>();
+            int keyCount = 0;
+            for (int i = 0; i < ps.Count; i++)
+            {
+                var col = tableInfo.Colunms.Find(o => string.Equals(o.Name, ps[i].Name, StringComparison.OrdinalIgnoreCase));
+                if (col == null)
+                {
+                    throw new Exception("The " + ps[i].Name + " field does not exist in the target table");
+                }
+                if (pKeys.Contains(col))
+                {
+                    keyCount++;
+                }
+                dic.Add(ps[i], col);
+            }
+            if (keyCount < pKeys.Count)
+            {
+                throw new Exception("Input source is missing fields other than primary key fields");
+            }
+            if (keyCount == ps.Count)
+            {
+                throw new Exception("Missing field that needs to be updated");
+            }
+
+            SqlInfo reval = new SqlInfo();
+            StringBuilder set = new StringBuilder();
+            StringBuilder where = new StringBuilder();
+            foreach (var key in dic.Keys)
+            {
+                var col = dic[key];
+                if (col.IsPrimaryKey)
+                {
+                    where.AppendFormat("{0}=@{1} AND ", GetColunmName(col.Name), col.Name);
+                }
+                else
+                {
+                    if (col.IsIdentity) { continue; }
+                    set.AppendFormat("{0}=@{1},", GetColunmName(col.Name), col.Name);
+                }
+                reval.Paras.Add(col.Name, key.GetValue(entity, null));
+            }
+            if (set.Length < 1)
+            {
+                throw new Exception("Missing field that needs to be updated");
+            }
+            set.Remove(set.Length - 1, 1);
+            where.Remove(where.Length - 5, 5);
+            reval.Sql = String.Format("UPDATE {0} SET {1} WHERE {2}", GetTableName(tableInfo), set, where);
+
+            return reval;
+        }
+        public SqlInfo UpdateFromCustomEntity<DbEntity>(object source) where DbEntity : class, new()
+        {
+            if (source == null)
             {
                 throw new ArgumentNullException("entity");
             }
@@ -392,7 +520,7 @@ namespace ZeroDbs.Common
             {
                 throw new ArgumentNullException("The target table is missing a primary key");
             }
-            var ps = entity.GetType().GetProperties().ToList();
+            var ps = source.GetType().GetProperties().ToList();
             var dic = new Dictionary<System.Reflection.PropertyInfo, DbDataColumnInfo>();
             int keyCount = 0;
             for(int i = 0; i < ps.Count; i++)
@@ -432,7 +560,7 @@ namespace ZeroDbs.Common
                     if (col.IsIdentity) { continue; }
                     set.AppendFormat("{0}=@{1},", GetColunmName(col.Name), col.Name);
                 }
-                reval.Paras.Add(col.Name, key.GetValue(entity, null));
+                reval.Paras.Add(col.Name, key.GetValue(source, null));
             }
             if (set.Length < 1)
             {
@@ -509,9 +637,9 @@ namespace ZeroDbs.Common
 
             return reval;
         }
-        public SqlInfo UpdateFromNameValueCollection<DbEntity>(System.Collections.Specialized.NameValueCollection nvc) where DbEntity : class, new()
+        public SqlInfo UpdateFromNameValueCollection<DbEntity>(System.Collections.Specialized.NameValueCollection source) where DbEntity : class, new()
         {
-            if (nvc == null || nvc.Count < 1) { throw new ArgumentException("nvc"); }
+            if (source == null || source.Count < 1) { throw new ArgumentException("source"); }
 
             var tableInfo = this.GetTable<DbEntity>();
             if (tableInfo.IsView)
@@ -528,7 +656,7 @@ namespace ZeroDbs.Common
             var cols = new List<DbDataColumnInfo>();
             var values = new List<object>();
             int keyCount = 0;
-            foreach (var key in nvc.AllKeys)
+            foreach (var key in source.AllKeys)
             {
                 var col = tableInfo.Colunms.Find(o => string.Equals(o.Name, key));
                 if (col == null)
@@ -544,14 +672,14 @@ namespace ZeroDbs.Common
                 {
                     keyCount++;
                 }
-                values.Add(ValueConvert.StrToTargetType(nvc[key], p.PropertyType));
+                values.Add(ValueConvert.StrToTargetType(source[key], p.PropertyType));
                 cols.Add(col);
             }
             if (keyCount < pKeys.Count)
             {
                 throw new Exception("Input source is missing fields other than primary key fields");
             }
-            if (keyCount == nvc.Count)
+            if (keyCount == source.Count)
             {
                 throw new Exception("Missing field that needs to be updated");
             }
@@ -579,106 +707,8 @@ namespace ZeroDbs.Common
 
             return reval;
         }
-        public string Update<DbEntity>() where DbEntity : class, new()
-        {
-            var tableInfo = this.GetTable<DbEntity>();
-            if (tableInfo.IsView)
-            {
-                throw new Exception("Target does not support update operation");
-            }
-            StringBuilder set = new StringBuilder();
-            StringBuilder where = new StringBuilder();
-            foreach (var col in tableInfo.Colunms)
-            {
-                if (col.IsPrimaryKey)
-                {
-                    where.AppendFormat("{0}=@{1} AND ", GetColunmName(col.Name), col.Name);
-                }
-                else
-                {
-                    if (col.IsIdentity) { continue; }
-                    set.AppendFormat("{0}=@{1},", GetColunmName(col.Name), col.Name);
-                }
-            }
-            if (where.Length < 1)
-            {
-                throw new ArgumentNullException("The target table is missing a primary key");
-            }
-            set.Remove(set.Length - 1, 1);
-            where.Remove(where.Length - 5, 5);
 
-            return String.Format("UPDATE {0} SET {1} WHERE {2}", GetTableName(tableInfo), set, where); ;
-        }
-        public SqlInfo Update<DbEntity>(DbEntity entity) where DbEntity : class, new()
-        {
-            if (entity == null)
-            {
-                throw new ArgumentNullException("entity");
-            }
-            var tableInfo = this.GetTable<DbEntity>();
-            if (tableInfo.IsView)
-            {
-                throw new Exception("Target does not support update operation");
-            }
-            var pKeys = tableInfo.Colunms.FindAll(o => o.IsPrimaryKey);
-            if (pKeys.Count == 0)
-            {
-                throw new ArgumentNullException("The target table is missing a primary key");
-            }
-            var ps = entity.GetType().GetProperties().ToList();
-            var dic = new Dictionary<System.Reflection.PropertyInfo, DbDataColumnInfo>();
-            int keyCount = 0;
-            for (int i = 0; i < ps.Count; i++)
-            {
-                var col = tableInfo.Colunms.Find(o => string.Equals(o.Name, ps[i].Name, StringComparison.OrdinalIgnoreCase));
-                if (col == null)
-                {
-                    throw new Exception("The " + ps[i].Name + " field does not exist in the target table");
-                }
-                if (pKeys.Contains(col))
-                {
-                    keyCount++;
-                }
-                dic.Add(ps[i], col);
-            }
-            if (keyCount < pKeys.Count)
-            {
-                throw new Exception("Input source is missing fields other than primary key fields");
-            }
-            if (keyCount == ps.Count)
-            {
-                throw new Exception("Missing field that needs to be updated");
-            }
-
-            SqlInfo reval = new SqlInfo();
-            StringBuilder set = new StringBuilder();
-            StringBuilder where = new StringBuilder();
-            foreach (var key in dic.Keys)
-            {
-                var col = dic[key];
-                if (col.IsPrimaryKey)
-                {
-                    where.AppendFormat("{0}=@{1} AND ", GetColunmName(col.Name), col.Name);
-                }
-                else
-                {
-                    if (col.IsIdentity) { continue; }
-                    set.AppendFormat("{0}=@{1},", GetColunmName(col.Name), col.Name);
-                }
-                reval.Paras.Add(col.Name, key.GetValue(entity, null));
-            }
-            if (set.Length < 1)
-            {
-                throw new Exception("Missing field that needs to be updated");
-            }
-            set.Remove(set.Length - 1, 1);
-            where.Remove(where.Length - 5, 5);
-            reval.Sql = String.Format("UPDATE {0} SET {1} WHERE {2}", GetTableName(tableInfo), set, where);
-
-            return reval;
-        }
-
-        public virtual SqlInfo Delete<DbEntity>(string where, params object[] paras) where DbEntity : class, new()
+        public SqlInfo Delete<DbEntity>(string where, params object[] paras) where DbEntity : class, new()
         {
             if (string.IsNullOrEmpty(where))
             {

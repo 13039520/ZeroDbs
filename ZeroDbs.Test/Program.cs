@@ -64,9 +64,39 @@ namespace ZeroDbs.Test
         }
         static void InsertTest()
         {
-            dbService.Update(new MyDbs.SqlServer001.tUser { Name = "user001_sqlserver", Email = "user001@domain.com", Password = "123456" });
-            dbService.Update(new MyDbs.MySql001.tUser { Name = "user001_mysql", Email = "user001@domain.com", Password = "123456" });
-            dbService.Update(new MyDbs.Sqlite001.tUser { Name = "user001_sqlite", Email = "user001@domain.com", Password = "123456" });
+            /*
+            dbService.Insert(new MyDbs.SqlServer001.tUser { Name = "user004_sqlserver", Email = "user004@domain.com", Password = "123456" });
+            dbService.Insert(new MyDbs.MySql001.tUser { Name = "user004_mysql", Email = "user004@domain.com", Password = "123456" });
+            dbService.Insert(new MyDbs.Sqlite001.tUser { Name = "user004_sqlite", Email = "user004@domain.com", Password = "123456" });
+            */
+
+            var entities1 = new System.Collections.Generic.List<MyDbs.SqlServer001.tUser>
+            {
+                new MyDbs.SqlServer001.tUser{Name ="user005_sqlserver", Email="user005@domain.com", Password="123456"},
+                new MyDbs.SqlServer001.tUser{Name ="user006_sqlserver", Email="user006@domain.com", Password="123456"},
+                new MyDbs.SqlServer001.tUser{Name ="user007_sqlserver", Email="user007@domain.com", Password="123456"},
+                new MyDbs.SqlServer001.tUser{Name ="user008_sqlserver", Email="user008@domain.com", Password="123456"},
+                new MyDbs.SqlServer001.tUser{Name ="user009_sqlserver", Email="user009@domain.com", Password="123456"}
+            };
+            dbService.Insert(entities1);
+            var entities2 = new System.Collections.Generic.List<MyDbs.MySql001.tUser>
+            {
+                new MyDbs.MySql001.tUser{Name ="user005_sqlserver", Email="user005@domain.com", Password="123456"},
+                new MyDbs.MySql001.tUser{Name ="user006_sqlserver", Email="user006@domain.com", Password="123456"},
+                new MyDbs.MySql001.tUser{Name ="user007_sqlserver", Email="user007@domain.com", Password="123456"},
+                new MyDbs.MySql001.tUser{Name ="user008_sqlserver", Email="user008@domain.com", Password="123456"},
+                new MyDbs.MySql001.tUser{Name ="user009_sqlserver", Email="user009@domain.com", Password="123456"}
+            };
+            dbService.Insert(entities2);
+            var entities3 = new System.Collections.Generic.List<MyDbs.Sqlite001.tUser>
+            {
+                new MyDbs.Sqlite001.tUser{Name ="user005_sqlserver", Email="user005@domain.com", Password="123456"},
+                new MyDbs.Sqlite001.tUser{Name ="user006_sqlserver", Email="user006@domain.com", Password="123456"},
+                new MyDbs.Sqlite001.tUser{Name ="user007_sqlserver", Email="user007@domain.com", Password="123456"},
+                new MyDbs.Sqlite001.tUser{Name ="user008_sqlserver", Email="user008@domain.com", Password="123456"},
+                new MyDbs.Sqlite001.tUser{Name ="user009_sqlserver", Email="user009@domain.com", Password="123456"}
+            };
+            dbService.Insert(entities3);
         }
         static void UpdateTest()
         {

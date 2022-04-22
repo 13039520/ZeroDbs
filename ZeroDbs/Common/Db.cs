@@ -38,8 +38,7 @@ namespace ZeroDbs.Common
             }
             else
             {
-                this.dbSqlBuilder = new SqlServer.SqlBuilder(this);
-                this.dbDataTypeMaping = new SqlServer.DbDataTypeMaping();
+                throw new Exception("Unsupported database type");
             }
         }
         public void FireZeroDbExecuteSqlEvent(ZeroDbs.Common.DbExecuteSqlEventArgs args)
@@ -258,7 +257,6 @@ namespace ZeroDbs.Common
             catch (Exception ex)
             {
                 cmd.Dispose();
-
                 throw ex;
             }
         }
@@ -285,12 +283,12 @@ namespace ZeroDbs.Common
 
         public int Insert<DbEntity>(DbEntity entity) where DbEntity : class, new()
         {
-            var sql = DbSqlBuilder.Insert<DbEntity>();
+            var sql = this.DbSqlBuilder.Insert<DbEntity>(entity);
             var cmd = this.GetDbCommand();
             try
             {
-                cmd.CommandText = sql;
-                cmd.ParametersFromEntity(entity);
+                cmd.CommandText = sql.Sql;
+                cmd.ParametersFromDictionary(sql.Paras);
                 var reval = cmd.ExecuteNonQuery();
                 cmd.Dispose();
                 return reval;
@@ -301,9 +299,9 @@ namespace ZeroDbs.Common
                 throw ex;
             }
         }
-        public int Insert<DbEntity>(List<DbEntity> entityList) where DbEntity : class, new()
+        public int Insert<DbEntity>(List<DbEntity> entities) where DbEntity : class, new()
         {
-            var sql = DbSqlBuilder.Insert<DbEntity>();
+            var sql = this.DbSqlBuilder.Insert<DbEntity>();
             var ts = this.GetDbTransactionScope(System.Data.IsolationLevel.ReadUncommitted);
             try
             {
@@ -311,13 +309,13 @@ namespace ZeroDbs.Common
                 ts.Execute((cmd) =>
                 {
                     cmd.CommandText = sql;
-                    foreach (var entity in entityList)
+                    foreach (var entity in entities)
                     {
                         cmd.ParametersFromEntity(entity);
                         reval += cmd.ExecuteNonQuery();
                     }
                 });
-                ts.Dispose();
+                ts.Complete(true);
                 return reval;
             }
             catch (Exception ex)
@@ -326,13 +324,14 @@ namespace ZeroDbs.Common
                 throw ex;
             }
         }
-        public int Insert<DbEntity>(System.Collections.Specialized.NameValueCollection nvc) where DbEntity : class, new()
+        public int InsertFromNameValueCollection<DbEntity>(System.Collections.Specialized.NameValueCollection source) where DbEntity : class, new()
         {
-            var sql = this.DbSqlBuilder.Insert<DbEntity>(nvc);
+            var sql = this.DbSqlBuilder.InsertFromNameValueCollection<DbEntity>(source);
             var cmd = this.GetDbCommand();
             try
             {
-                cmd.CommandText = sql;
+                cmd.CommandText = sql.Sql;
+                cmd.ParametersFromDictionary(sql.Paras);
                 var reval = cmd.ExecuteNonQuery();
                 cmd.Dispose();
                 return reval;
@@ -343,27 +342,39 @@ namespace ZeroDbs.Common
                 throw ex;
             }
         }
-        public int Insert<DbEntity>(List<System.Collections.Specialized.NameValueCollection> nvcList) where DbEntity : class, new()
+        public int InsertFromCustomEntity<DbEntity>(object source) where DbEntity : class, new()
         {
-            var sqlList = this.DbSqlBuilder.Insert<DbEntity>(nvcList);
-            var ts = this.GetDbTransactionScope(System.Data.IsolationLevel.ReadUncommitted);
+            var sql = this.DbSqlBuilder.InsertFromCustomEntity<DbEntity>(source);
+            var cmd = this.GetDbCommand();
             try
             {
-                int reval = 0;
-                ts.Execute((cmd) =>
-                {
-                    foreach (var sql in sqlList)
-                    {
-                        cmd.CommandText = sql;
-                        reval += cmd.ExecuteNonQuery();
-                    }
-                });
-                ts.Dispose();
+                cmd.CommandText = sql.Sql;
+                cmd.ParametersFromDictionary(sql.Paras);
+                var reval = cmd.ExecuteNonQuery();
+                cmd.Dispose();
                 return reval;
             }
             catch (Exception ex)
             {
-                ts.Dispose();
+                cmd.Dispose();
+                throw ex;
+            }
+        }
+        public int InsertFromDictionary<DbEntity>(Dictionary<string, object> source) where DbEntity : class, new()
+        {
+            var sql = this.DbSqlBuilder.InsertFromDictionary<DbEntity>(source);
+            var cmd = this.GetDbCommand();
+            try
+            {
+                cmd.CommandText = sql.Sql;
+                cmd.ParametersFromDictionary(sql.Paras);
+                var reval = cmd.ExecuteNonQuery();
+                cmd.Dispose();
+                return reval;
+            }
+            catch (Exception ex)
+            {
+                cmd.Dispose();
                 throw ex;
             }
         }
@@ -386,7 +397,7 @@ namespace ZeroDbs.Common
                 throw ex;
             }
         }
-        public int Update<DbEntity>(List<DbEntity> entityList) where DbEntity : class, new()
+        public int Update<DbEntity>(List<DbEntity> entities) where DbEntity : class, new()
         {
             var sql = this.DbSqlBuilder.Update<DbEntity>();
             var ts = this.GetDbTransactionScope(System.Data.IsolationLevel.ReadUncommitted);
@@ -396,13 +407,13 @@ namespace ZeroDbs.Common
                 ts.Execute((cmd) =>
                 {
                     cmd.CommandText = sql;
-                    foreach (var entity in entityList)
+                    foreach (var entity in entities)
                     {
                         cmd.ParametersFromEntity(entity);
                         reval += cmd.ExecuteNonQuery();
                     }
                 });
-                ts.Dispose();
+                ts.Complete(true);
                 return reval;
             }
             catch (Exception ex)
@@ -411,9 +422,9 @@ namespace ZeroDbs.Common
                 throw ex;
             }
         }
-        public int UpdateFromNameValueCollection<DbEntity>(System.Collections.Specialized.NameValueCollection nvc) where DbEntity : class, new()
+        public int UpdateFromNameValueCollection<DbEntity>(System.Collections.Specialized.NameValueCollection source) where DbEntity : class, new()
         {
-            var sql = this.DbSqlBuilder.UpdateFromNameValueCollection<DbEntity>(nvc);
+            var sql = this.DbSqlBuilder.UpdateFromNameValueCollection<DbEntity>(source);
             var cmd = this.GetDbCommand();
             try
             {
@@ -447,9 +458,9 @@ namespace ZeroDbs.Common
                 throw ex;
             }
         }
-        public int UpdateFromDictionary<DbEntity>(Dictionary<string, object> dic) where DbEntity : class, new()
+        public int UpdateFromDictionary<DbEntity>(Dictionary<string, object> source) where DbEntity : class, new()
         {
-            var sql = this.DbSqlBuilder.UpdateFromDictionary<DbEntity>(dic);
+            var sql = this.DbSqlBuilder.UpdateFromDictionary<DbEntity>(source);
             var cmd = this.GetDbCommand();
             try
             {

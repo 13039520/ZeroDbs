@@ -19,15 +19,16 @@ namespace ZeroDbs
         long Count<DbEntity>(string where, params object[] paras) where DbEntity : class, new();
 
         int Insert<DbEntity>(DbEntity entity) where DbEntity : class, new();
-        int Insert<DbEntity>(List<DbEntity> entityList) where DbEntity : class, new();
-        int Insert<DbEntity>(System.Collections.Specialized.NameValueCollection nvc) where DbEntity : class, new();
-        int Insert<DbEntity>(List<System.Collections.Specialized.NameValueCollection> nvcList) where DbEntity : class, new();
+        int Insert<DbEntity>(List<DbEntity> entities) where DbEntity : class, new();
+        int InsertFromNameValueCollection<DbEntity>(System.Collections.Specialized.NameValueCollection source) where DbEntity : class, new();
+        int InsertFromCustomEntity<DbEntity>(object source) where DbEntity : class, new();
+        int InsertFromDictionary<DbEntity>(Dictionary<string, object> source) where DbEntity : class, new();
 
         int Update<DbEntity>(DbEntity entity) where DbEntity : class, new();
-        int Update<DbEntity>(List<DbEntity> entityList) where DbEntity : class, new();
-        int UpdateFromNameValueCollection<DbEntity>(System.Collections.Specialized.NameValueCollection nvc) where DbEntity : class, new();
+        int Update<DbEntity>(List<DbEntity> entities) where DbEntity : class, new();
+        int UpdateFromNameValueCollection<DbEntity>(System.Collections.Specialized.NameValueCollection source) where DbEntity : class, new();
         int UpdateFromCustomEntity<DbEntity>(object source) where DbEntity : class, new();
-        int UpdateFromDictionary<DbEntity>(Dictionary<string, object> dic) where DbEntity : class, new();
+        int UpdateFromDictionary<DbEntity>(Dictionary<string, object> source) where DbEntity : class, new();
 
         int Delete<DbEntity>(string where, params object[] paras) where DbEntity : class, new();
 

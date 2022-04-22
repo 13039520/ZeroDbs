@@ -262,26 +262,30 @@ namespace ZeroDbs.Common
         {
             return GetDb<DbEntity>().Insert<DbEntity>(entity);
         }
-        public int Insert<DbEntity>(List<DbEntity> entityList) where DbEntity : class, new()
+        public int Insert<DbEntity>(List<DbEntity> entities) where DbEntity : class, new()
         {
-            return GetDb<DbEntity>().Insert<DbEntity>(entityList);
+            return GetDb<DbEntity>().Insert<DbEntity>(entities);
         }
-        public int Insert<DbEntity>(System.Collections.Specialized.NameValueCollection nvc) where DbEntity : class, new()
+        public int InsertFromNameValueCollection<DbEntity>(System.Collections.Specialized.NameValueCollection nvc) where DbEntity : class, new()
         {
-            return GetDb<DbEntity>().Insert<DbEntity>(nvc);
+            return GetDb<DbEntity>().InsertFromNameValueCollection<DbEntity>(nvc);
         }
-        public int Insert<DbEntity>(List<System.Collections.Specialized.NameValueCollection> nvcList) where DbEntity : class, new()
+        public int InsertFromCustomEntity<DbEntity>(object source) where DbEntity : class, new()
         {
-            return GetDb<DbEntity>().Insert<DbEntity>(nvcList);
+            return GetDb<DbEntity>().InsertFromCustomEntity<DbEntity>(source);
+        }
+        public int InsertFromDictionary<DbEntity>(Dictionary<string, object> dic) where DbEntity : class, new()
+        {
+            return GetDb<DbEntity>().InsertFromDictionary<DbEntity>(dic);
         }
 
         public int Update<DbEntity>(DbEntity entity) where DbEntity : class, new()
         {
             return GetDb<DbEntity>().Update<DbEntity>(entity);
         }
-        public int Update<DbEntity>(List<DbEntity> entityList) where DbEntity : class, new()
+        public int Update<DbEntity>(List<DbEntity> entities) where DbEntity : class, new()
         {
-            return GetDb<DbEntity>().Update<DbEntity>(entityList);
+            return GetDb<DbEntity>().Update<DbEntity>(entities);
         }
         public int UpdateFromNameValueCollection<DbEntity>(System.Collections.Specialized.NameValueCollection nvc) where DbEntity : class, new()
         {
