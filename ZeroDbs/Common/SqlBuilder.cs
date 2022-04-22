@@ -736,7 +736,19 @@ namespace ZeroDbs.Common
             return reval;
         }
 
-
+        public SqlInfo RawSql(string sql, params object[] paras)
+        {
+            SqlInfo reval = new SqlInfo();
+            reval.Sql = sql;
+            int n = 0;
+            int m = paras.Length;
+            while (n < m)
+            {
+                reval.Paras.Add(n.ToString(), paras[n]);
+                n++;
+            }
+            return reval;
+        }
 
     }
 }

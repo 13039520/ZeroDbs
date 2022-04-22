@@ -145,13 +145,11 @@ namespace ZeroDbs.Common
         public List<IntoEntity> Select<DbEntity, IntoEntity>(string where, string orderby, int top, params object[] paras) where DbEntity : class, new() where IntoEntity : class, new()
         {
             string[] fields = typeof(IntoEntity).GetProperties().Select(o => o.Name).ToArray();
-            var sql = DbSqlBuilder.Select<DbEntity>(where, orderby, top, fields, paras);
+            var info = DbSqlBuilder.Select<DbEntity>(where, orderby, top, fields, paras);
             var cmd = GetDbCommand();
             try
             {
-                cmd.CommandText = sql.Sql;
-                cmd.ParametersFromDictionary(sql.Paras);
-                List<IntoEntity> reval = cmd.ExecuteReader<IntoEntity>();
+                List<IntoEntity> reval = cmd.ExecuteQuery<IntoEntity>(info);
                 cmd.Dispose();
                 return reval;
             }
@@ -163,13 +161,11 @@ namespace ZeroDbs.Common
         }
         public List<DbEntity> Select<DbEntity>(string where, string orderby, int top, string[] fields, params object[] paras) where DbEntity : class, new()
         {
-            var sql = DbSqlBuilder.Select<DbEntity>(where, orderby, top, fields, paras);
+            var info = DbSqlBuilder.Select<DbEntity>(where, orderby, top, fields, paras);
             var cmd = GetDbCommand();
             try
             {
-                cmd.CommandText = sql.Sql;
-                cmd.ParametersFromDictionary(sql.Paras);
-                List<DbEntity> reval = cmd.ExecuteReader<DbEntity>();
+                List<DbEntity> reval = cmd.ExecuteQuery<DbEntity>(info);
                 cmd.Dispose();
                 return reval;
             }
@@ -192,7 +188,7 @@ namespace ZeroDbs.Common
         {
             string[] fields = typeof(IntoEntity).GetProperties().Select(o => o.Name).ToArray();
             var countSql = DbSqlBuilder.Count<DbEntity>(where, paras);
-            var sql = DbSqlBuilder.Page<DbEntity>(page, size, where, orderby, fields, uniqueField, paras);
+            var info = DbSqlBuilder.Page<DbEntity>(page, size, where, orderby, fields, uniqueField, paras);
             var cmd = this.GetDbCommand();
             try
             {
@@ -211,9 +207,7 @@ namespace ZeroDbs.Common
                     cmd.Dispose();
                     return new Common.PageData<IntoEntity> { Total = total, Items = new List<IntoEntity>() };
                 }
-                cmd.CommandText = sql.Sql;
-                cmd.ParametersFromDictionary(sql.Paras);
-                var reval = cmd.ExecuteReader<IntoEntity>();
+                var reval = cmd.ExecuteQuery<IntoEntity>(info);
                 cmd.Dispose();
 
                 return new Common.PageData<IntoEntity> { Total = total, Items = reval };
@@ -228,7 +222,7 @@ namespace ZeroDbs.Common
         public ZeroDbs.Common.PageData<DbEntity> Page<DbEntity>(long page, long size, string where, string orderby, string[] fields, string uniqueField, params object[] paras) where DbEntity : class, new()
         {
             var countSql = DbSqlBuilder.Count<DbEntity>(where,paras);
-            var sql = DbSqlBuilder.Page<DbEntity>(page, size, where, orderby, fields, uniqueField,paras);
+            var info = DbSqlBuilder.Page<DbEntity>(page, size, where, orderby, fields, uniqueField,paras);
             var cmd = this.GetDbCommand();
             try
             {
@@ -247,9 +241,7 @@ namespace ZeroDbs.Common
                     cmd.Dispose();
                     return new Common.PageData<DbEntity> { Total = total, Items = new List<DbEntity>() };
                 }
-                cmd.CommandText = sql.Sql;
-                cmd.ParametersFromDictionary(sql.Paras);
-                var reval = cmd.ExecuteReader<DbEntity>();
+                var reval = cmd.ExecuteQuery<DbEntity>(info);
                 cmd.Dispose();
 
                 return new Common.PageData<DbEntity> { Total = total, Items = reval };
@@ -263,12 +255,12 @@ namespace ZeroDbs.Common
 
         public long Count<DbEntity>(string where, params object[] paras) where DbEntity : class, new()
         {
-            var sql = DbSqlBuilder.Count<DbEntity>(where);
+            var info = DbSqlBuilder.Count<DbEntity>(where);
             var cmd = this.GetDbCommand();
             try
             {
-                cmd.CommandText = sql.Sql;
-                cmd.ParametersFromDictionary(sql.Paras);
+                cmd.CommandText = info.Sql;
+                cmd.ParametersFromDictionary(info.Paras);
                 var obj = cmd.ExecuteScalar();
                 var reval = Convert.ToInt64(obj);
                 cmd.Dispose();
@@ -283,13 +275,11 @@ namespace ZeroDbs.Common
 
         public int Insert<DbEntity>(DbEntity entity) where DbEntity : class, new()
         {
-            var sql = this.DbSqlBuilder.Insert<DbEntity>(entity);
+            var info = this.DbSqlBuilder.Insert<DbEntity>(entity);
             var cmd = this.GetDbCommand();
             try
             {
-                cmd.CommandText = sql.Sql;
-                cmd.ParametersFromDictionary(sql.Paras);
-                var reval = cmd.ExecuteNonQuery();
+                var reval = cmd.ExecuteNonQuery(info);
                 cmd.Dispose();
                 return reval;
             }
@@ -301,14 +291,14 @@ namespace ZeroDbs.Common
         }
         public int Insert<DbEntity>(List<DbEntity> entities) where DbEntity : class, new()
         {
-            var sql = this.DbSqlBuilder.Insert<DbEntity>();
+            var info = this.DbSqlBuilder.Insert<DbEntity>();
             var ts = this.GetDbTransactionScope(System.Data.IsolationLevel.ReadUncommitted);
             try
             {
                 int reval = 0;
                 ts.Execute((cmd) =>
                 {
-                    cmd.CommandText = sql;
+                    cmd.CommandText = info;
                     foreach (var entity in entities)
                     {
                         cmd.ParametersFromEntity(entity);
@@ -326,13 +316,11 @@ namespace ZeroDbs.Common
         }
         public int InsertFromNameValueCollection<DbEntity>(System.Collections.Specialized.NameValueCollection source) where DbEntity : class, new()
         {
-            var sql = this.DbSqlBuilder.InsertFromNameValueCollection<DbEntity>(source);
+            var info = this.DbSqlBuilder.InsertFromNameValueCollection<DbEntity>(source);
             var cmd = this.GetDbCommand();
             try
             {
-                cmd.CommandText = sql.Sql;
-                cmd.ParametersFromDictionary(sql.Paras);
-                var reval = cmd.ExecuteNonQuery();
+                var reval = cmd.ExecuteNonQuery(info);
                 cmd.Dispose();
                 return reval;
             }
@@ -344,13 +332,11 @@ namespace ZeroDbs.Common
         }
         public int InsertFromCustomEntity<DbEntity>(object source) where DbEntity : class, new()
         {
-            var sql = this.DbSqlBuilder.InsertFromCustomEntity<DbEntity>(source);
+            var info = this.DbSqlBuilder.InsertFromCustomEntity<DbEntity>(source);
             var cmd = this.GetDbCommand();
             try
             {
-                cmd.CommandText = sql.Sql;
-                cmd.ParametersFromDictionary(sql.Paras);
-                var reval = cmd.ExecuteNonQuery();
+                var reval = cmd.ExecuteNonQuery(info);
                 cmd.Dispose();
                 return reval;
             }
@@ -362,13 +348,11 @@ namespace ZeroDbs.Common
         }
         public int InsertFromDictionary<DbEntity>(Dictionary<string, object> source) where DbEntity : class, new()
         {
-            var sql = this.DbSqlBuilder.InsertFromDictionary<DbEntity>(source);
+            var info = this.DbSqlBuilder.InsertFromDictionary<DbEntity>(source);
             var cmd = this.GetDbCommand();
             try
             {
-                cmd.CommandText = sql.Sql;
-                cmd.ParametersFromDictionary(sql.Paras);
-                var reval = cmd.ExecuteNonQuery();
+                var reval = cmd.ExecuteNonQuery(info);
                 cmd.Dispose();
                 return reval;
             }
@@ -381,13 +365,11 @@ namespace ZeroDbs.Common
 
         public int Update<DbEntity>(DbEntity entity) where DbEntity : class, new()
         {
-            var sql = this.DbSqlBuilder.Update<DbEntity>();
+            var info = this.DbSqlBuilder.Update<DbEntity>();
             var cmd = this.GetDbCommand();
             try
             {
-                cmd.CommandText = sql;
-                cmd.ParametersFromEntity(entity);
-                var reval = cmd.ExecuteNonQuery();
+                var reval = cmd.ExecuteNonQuery(info);
                 cmd.Dispose();
                 return reval;
             }
@@ -399,14 +381,14 @@ namespace ZeroDbs.Common
         }
         public int Update<DbEntity>(List<DbEntity> entities) where DbEntity : class, new()
         {
-            var sql = this.DbSqlBuilder.Update<DbEntity>();
+            var info = this.DbSqlBuilder.Update<DbEntity>();
             var ts = this.GetDbTransactionScope(System.Data.IsolationLevel.ReadUncommitted);
             try
             {
                 int reval = 0;
                 ts.Execute((cmd) =>
                 {
-                    cmd.CommandText = sql;
+                    cmd.CommandText = info;
                     foreach (var entity in entities)
                     {
                         cmd.ParametersFromEntity(entity);
@@ -424,13 +406,11 @@ namespace ZeroDbs.Common
         }
         public int UpdateFromNameValueCollection<DbEntity>(System.Collections.Specialized.NameValueCollection source) where DbEntity : class, new()
         {
-            var sql = this.DbSqlBuilder.UpdateFromNameValueCollection<DbEntity>(source);
+            var info = this.DbSqlBuilder.UpdateFromNameValueCollection<DbEntity>(source);
             var cmd = this.GetDbCommand();
             try
             {
-                cmd.CommandText = sql.Sql;
-                cmd.ParametersFromDictionary(sql.Paras);
-                var reval = cmd.ExecuteNonQuery();
+                var reval = cmd.ExecuteNonQuery(info);
                 cmd.Dispose();
                 return reval;
             }
@@ -442,13 +422,11 @@ namespace ZeroDbs.Common
         }
         public int UpdateFromCustomEntity<DbEntity>(object source) where DbEntity : class, new()
         {
-            var sql = this.DbSqlBuilder.UpdateFromCustomEntity<DbEntity>(source);
+            var info = this.DbSqlBuilder.UpdateFromCustomEntity<DbEntity>(source);
             var cmd = this.GetDbCommand();
             try
             {
-                cmd.CommandText = sql.Sql;
-                cmd.ParametersFromDictionary(sql.Paras);
-                var reval = cmd.ExecuteNonQuery();
+                var reval = cmd.ExecuteNonQuery(info);
                 cmd.Dispose();
                 return reval;
             }
@@ -460,13 +438,11 @@ namespace ZeroDbs.Common
         }
         public int UpdateFromDictionary<DbEntity>(Dictionary<string, object> source) where DbEntity : class, new()
         {
-            var sql = this.DbSqlBuilder.UpdateFromDictionary<DbEntity>(source);
+            var info = this.DbSqlBuilder.UpdateFromDictionary<DbEntity>(source);
             var cmd = this.GetDbCommand();
             try
             {
-                cmd.CommandText = sql.Sql;
-                cmd.ParametersFromDictionary(sql.Paras);
-                var reval = cmd.ExecuteNonQuery();
+                var reval = cmd.ExecuteNonQuery(info);
                 cmd.Dispose();
                 return reval;
             }
@@ -479,13 +455,11 @@ namespace ZeroDbs.Common
 
         public int Delete<DbEntity>(string where, params object[] paras) where DbEntity : class, new()
         {
-            var sql = this.DbSqlBuilder.Delete<DbEntity>(where, paras);
+            var info = this.DbSqlBuilder.Delete<DbEntity>(where, paras);
             var cmd = this.GetDbCommand();
             try
             {
-                cmd.CommandText = sql.Sql;
-                cmd.ParametersFromDictionary(sql.Paras);
-                var reval = cmd.ExecuteNonQuery();
+                var reval = cmd.ExecuteNonQuery(info);
                 cmd.Dispose();
                 return reval;
             }

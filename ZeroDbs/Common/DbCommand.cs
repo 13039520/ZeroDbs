@@ -94,6 +94,28 @@ namespace ZeroDbs.Common
                 throw ex;
             }
         }
+        public int ExecuteNonQuery(string rawSql, params object[] paras)
+        {
+            var info = this.DbSqlBuilder.RawSql(rawSql, paras);
+            return this.ExecuteNonQuery(info);
+        }
+        public int ExecuteNonQuery(SqlInfo info)
+        {
+            this.commandText = info.Sql;
+            this.ParametersFromDictionary(info.Paras);
+            return this.ExecuteNonQuery();
+        }
+        public List<T> ExecuteQuery<T>(string rawSql, params object[] paras) where T : class, new()
+        {
+            var info = this.DbSqlBuilder.RawSql(rawSql, paras);
+            return this.ExecuteQuery<T>(info);
+        }
+        public List<T> ExecuteQuery<T>(SqlInfo info) where T : class, new()
+        {
+            this.commandText = info.Sql;
+            this.ParametersFromDictionary(info.Paras);
+            return this.ExecuteReader<T>();
+        }
         public List<T> ExecuteReader<T>(bool useEmit = true) where T : class, new()
         {
             List<string> sqlList = new List<string>();
@@ -240,6 +262,7 @@ namespace ZeroDbs.Common
                 throw ex;
             }
         }
+        
         public void ParametersFromEntity(object entity)
         {
             Parameters.Clear();

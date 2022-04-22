@@ -17,6 +17,10 @@ namespace ZeroDbs
         System.Data.Common.DbParameter CreateParameter(string parameterName, object value);
         System.Data.Common.DbParameter CreateParameter(string parameterName, System.Data.DbType dbType, int size, object value);
         int ExecuteNonQuery();
+        int ExecuteNonQuery(Common.SqlInfo info);
+        int ExecuteNonQuery(string rawSql, params object[] paras);
+        List<T> ExecuteQuery<T>(Common.SqlInfo info) where T : class, new();
+        List<T> ExecuteQuery<T>(string rawSql, params object[] paras) where T : class, new();
         List<T> ExecuteReader<T>(bool useEmit = true) where T : class, new();
         /// <summary>
         /// Used for reading large quantities of data
@@ -27,6 +31,7 @@ namespace ZeroDbs
         void ExecuteReader<T>(Common.DbExecuteReadOnebyOneAction<T> action, bool useEmit = true) where T : class, new();
         System.Data.IDataReader ExecuteReader();
         object ExecuteScalar();
+        
         void ParametersFromEntity(object entity);
         void ParametersFromParas(params object[] paras);
         void ParametersFromDictionary(Dictionary<string, object> dic);
