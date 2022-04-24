@@ -23,7 +23,7 @@ namespace ZeroDbs.Common
             var config = GetDbConfigInfo();
             lock (_lock)
             {
-                if (config.Dbs.Find(o => o.UseKey == dbKey) == null) { return false; }
+                if (config.Dbs.Find(o => o.Key == dbKey) == null) { return false; }
                 if (config.Dvs.Find(o => o.TableName == tableName) == null) { return false; }
                 config.Dvs.Add(new DbTableEntityMap { DbKey = dbKey, EntityKey = entityFullName, TableName = tableName, IsStandardMapping = false });
             }
@@ -116,15 +116,15 @@ namespace ZeroDbs.Common
                     }
                     key = key.Trim();
                     conn = conn.Trim();
-                    if (temp.Dbs.Find(o => string.Equals(o.UseKey, key, StringComparison.OrdinalIgnoreCase)) != null)
+                    if (temp.Dbs.Find(o => string.Equals(o.Key, key, StringComparison.OrdinalIgnoreCase)) != null)
                     {
                         continue;
                     }
                     temp.Dbs.Add(new DbInfo
                     {
                         ConnectionString = conn,
-                        UseKey = key,
-                        UseType = type1
+                        Key = key,
+                        Type = type1
                     });
                 }
                 if (temp.Dbs.Count < 1)
@@ -159,7 +159,7 @@ namespace ZeroDbs.Common
                     name = name.Trim();
                     entity = entity.Trim();
 
-                    if (temp.Dbs.Find(o => string.Equals(o.UseKey, key, StringComparison.OrdinalIgnoreCase)) == null)
+                    if (temp.Dbs.Find(o => string.Equals(o.Key, key, StringComparison.OrdinalIgnoreCase)) == null)
                     {
                         continue;
                     }

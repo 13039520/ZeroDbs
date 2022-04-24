@@ -128,7 +128,7 @@ namespace %NameSpace%
         private void Builder(Common.DbInfo db, List<Common.DbDataTableInfo> tables, Common.DbInfo dbInfo, string entityProjectRootDir, string targetProjectRootDir, string nameSpace, string entityTemplate = "")
         {
 
-            string entityFileSaveDir = System.IO.Path.Combine(entityProjectRootDir, dbInfo.UseKey);
+            string entityFileSaveDir = System.IO.Path.Combine(entityProjectRootDir, dbInfo.Key);
             string dbConfigFilePath = System.IO.Path.Combine(targetProjectRootDir, "ZeroDbConfig.xml");
             if (!System.IO.Directory.Exists(entityFileSaveDir))
             {
@@ -138,9 +138,9 @@ namespace %NameSpace%
             {
                 System.IO.Directory.CreateDirectory(targetProjectRootDir);
             }
-            if (!nameSpace.EndsWith("." + dbInfo.UseKey))
+            if (!nameSpace.EndsWith("." + dbInfo.Key))
             {
-                nameSpace += "." + dbInfo.UseKey;
+                nameSpace += "." + dbInfo.Key;
             }
             entityTemplate = string.IsNullOrEmpty(entityTemplate) ? template : entityTemplate;
             if (string.IsNullOrEmpty(entityTemplate))
@@ -183,18 +183,18 @@ namespace %NameSpace%
             {
                 nodeDvs = doc.CreateElement("dvs");
             }
-            System.Xml.XmlNode nodeDb = doc.SelectSingleNode(@"/zero/dbs/db[@dbKey='" + dbInfo.UseKey + "']");
+            System.Xml.XmlNode nodeDb = doc.SelectSingleNode(@"/zero/dbs/db[@dbKey='" + dbInfo.Key + "']");
             if (nodeDb == null)
             {
                 nodeDb = doc.CreateElement("db");
                 System.Xml.XmlAttribute attribute = doc.CreateAttribute("dbKey");
-                attribute.Value = dbInfo.UseKey;
+                attribute.Value = dbInfo.Key;
                 nodeDb.Attributes.Append(attribute);
                 attribute = doc.CreateAttribute("dbConnectionString");
                 attribute.Value = dbInfo.ConnectionString;
                 nodeDb.Attributes.Append(attribute);
                 attribute = doc.CreateAttribute("dbType");
-                attribute.Value = dbInfo.UseType.ToString();
+                attribute.Value = dbInfo.Type.ToString();
                 nodeDb.Attributes.Append(attribute);
                 nodeDbs.AppendChild(nodeDb);
             }
@@ -296,13 +296,13 @@ namespace %NameSpace%
                 System.IO.File.AppendAllText(filePath, claText, Encoding.UTF8);
 
                 #region -- ZeroDbConfig.xml: /zero/dvs/dv --
-                string xpath = @"/zero/dvs/dv[@entityKey='" + nameSpace + "." + className + "' and @dbKey='" + dbInfo.UseKey + "']";
+                string xpath = @"/zero/dvs/dv[@entityKey='" + nameSpace + "." + className + "' and @dbKey='" + dbInfo.Key + "']";
                 System.Xml.XmlNode nodeDv = doc.SelectSingleNode(xpath);
                 if (nodeDv == null)
                 {
                     nodeDv = doc.CreateElement("dv");
                     System.Xml.XmlAttribute attribute = doc.CreateAttribute("dbKey");
-                    attribute.Value = dbInfo.UseKey;
+                    attribute.Value = dbInfo.Key;
                     nodeDv.Attributes.Append(attribute);
 
                     attribute = doc.CreateAttribute("tableName");

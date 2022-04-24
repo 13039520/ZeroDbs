@@ -21,7 +21,7 @@ namespace ZeroDbs.Sqlite
         {
             if (!IsMappingToDbKey<T>())
             {
-                throw new Exception("类型" + typeof(T).FullName + "没有映射到" + Database.UseKey + "上");
+                throw new Exception("类型" + typeof(T).FullName + "没有映射到" + Database.Key + "上");
             }
 
             var key = typeof(T).FullName;
@@ -34,7 +34,7 @@ namespace ZeroDbs.Sqlite
             var cmd = this.GetDbCommand();
             try
             {
-                var dv = Common.DbMapping.GetDbConfigDataViewInfo<T>().Find(o => string.Equals(o.DbKey, Database.UseKey, StringComparison.OrdinalIgnoreCase));
+                var dv = Common.DbMapping.GetDbConfigDataViewInfo<T>().Find(o => string.Equals(o.DbKey, Database.Key, StringComparison.OrdinalIgnoreCase));
                 string getTableOrViewSql = "select * from sqlite_master where name='"+dv.TableName + "' and type IN('table','view')";
 
                 Common.DbDataTableInfo dbDataTableInfo = null;

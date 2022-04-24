@@ -6,8 +6,8 @@ namespace ZeroDbs.Common
 {
     public class DbInfo
     {
-        public string UseKey { get; set; }
+        public string Key { get; set; }
         public string ConnectionString { get; set; }
-        public DbType UseType { get; set; }
+        public DbType Type { get; set; }
     }
 }

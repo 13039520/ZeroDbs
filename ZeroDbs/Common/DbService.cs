@@ -36,30 +36,30 @@ namespace ZeroDbs.Common
                 return reval;
             }
             var info = list[0];
-            if (!_dbInstanceDic.ContainsKey(info.UseKey))
+            if (!_dbInstanceDic.ContainsKey(info.Key))
             {
                 lock (_lock)
                 {
                     #region -- code --
-                    if (!_dbInstanceDic.ContainsKey(info.UseKey))
+                    if (!_dbInstanceDic.ContainsKey(info.Key))
                     {
                         IDb db = DbFactory.Create(info, _dbExecuteSqlEvent);
                         if (db != null)
                         {
-                            _dbInstanceDic.Add(info.UseKey, db);
+                            _dbInstanceDic.Add(info.Key, db);
                             reval = db;
                         }
                     }
                     else
                     {
-                        reval = _dbInstanceDic[info.UseKey];
+                        reval = _dbInstanceDic[info.Key];
                     }
                     #endregion
                 }
             }
             else
             {
-                reval = _dbInstanceDic[info.UseKey];
+                reval = _dbInstanceDic[info.Key];
             }
             return reval;
         }
@@ -72,30 +72,30 @@ namespace ZeroDbs.Common
             {
                 foreach (var m in zeroConfigInfo.Dbs)
                 {
-                    if (!_dbInstanceDic.ContainsKey(m.UseKey))
+                    if (!_dbInstanceDic.ContainsKey(m.Key))
                     {
                         lock (_lock)
                         {
                             #region -- code --
-                            if (!_dbInstanceDic.ContainsKey(m.UseKey))
+                            if (!_dbInstanceDic.ContainsKey(m.Key))
                             {
                                 IDb db = DbFactory.Create(m, _dbExecuteSqlEvent);
                                 if (db != null)
                                 {
-                                    _dbInstanceDic.Add(m.UseKey, db);
-                                    dbs.Add(m.UseKey, db);
+                                    _dbInstanceDic.Add(m.Key, db);
+                                    dbs.Add(m.Key, db);
                                 }
                             }
                             else
                             {
-                                dbs.Add(m.UseKey, _dbInstanceDic[m.UseKey]);
+                                dbs.Add(m.Key, _dbInstanceDic[m.Key]);
                             }
                             #endregion
                         }
                     }
                     else
                     {
-                        dbs.Add(m.UseKey, _dbInstanceDic[m.UseKey]);
+                        dbs.Add(m.Key, _dbInstanceDic[m.Key]);
                     }
                 }
             }
@@ -108,30 +108,30 @@ namespace ZeroDbs.Common
             {
                 foreach (var m in dbConfigList)
                 {
-                    if (!_dbInstanceDic.ContainsKey(m.UseKey))
+                    if (!_dbInstanceDic.ContainsKey(m.Key))
                     {
                         lock (_lock)
                         {
                             #region -- code --
-                            if (!_dbInstanceDic.ContainsKey(m.UseKey))
+                            if (!_dbInstanceDic.ContainsKey(m.Key))
                             {
                                 IDb db = DbFactory.Create(m, _dbExecuteSqlEvent);
                                 if (db != null)
                                 {
-                                    _dbInstanceDic.Add(m.UseKey, db);
-                                    dbs.Add(m.UseKey, db);
+                                    _dbInstanceDic.Add(m.Key, db);
+                                    dbs.Add(m.Key, db);
                                 }
                             }
                             else
                             {
-                                dbs.Add(m.UseKey, _dbInstanceDic[m.UseKey]);
+                                dbs.Add(m.Key, _dbInstanceDic[m.Key]);
                             }
                             #endregion
                         }
                     }
                     else
                     {
-                        dbs.Add(m.UseKey, _dbInstanceDic[m.UseKey]);
+                        dbs.Add(m.Key, _dbInstanceDic[m.Key]);
                     }
                 }
             }
@@ -153,30 +153,30 @@ namespace ZeroDbs.Common
             {
                 return null;
             }
-            if (!_dbInstanceDic.ContainsKey(info.UseKey))
+            if (!_dbInstanceDic.ContainsKey(info.Key))
             {
                 lock (_lock)
                 {
                     #region -- code --
-                    if (!_dbInstanceDic.ContainsKey(info.UseKey))
+                    if (!_dbInstanceDic.ContainsKey(info.Key))
                     {
                         IDb db = DbFactory.Create(info, _dbExecuteSqlEvent);
                         if (db != null)
                         {
-                            _dbInstanceDic.Add(info.UseKey, db);
+                            _dbInstanceDic.Add(info.Key, db);
                             reval = db;
                         }
                     }
                     else
                     {
-                        reval = _dbInstanceDic[info.UseKey];
+                        reval = _dbInstanceDic[info.Key];
                     }
                     #endregion
                 }
             }
             else
             {
-                reval = _dbInstanceDic[info.UseKey];
+                reval = _dbInstanceDic[info.Key];
             }
             return reval;
         }

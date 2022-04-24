@@ -9,7 +9,7 @@ namespace ZeroDbs.Common
         public static IDb Create(Common.DbInfo dbConfig)
         {
             IDb db = null;
-            switch (dbConfig.UseType)
+            switch (dbConfig.Type)
             {
                 case DbType.SqlServer:
                     db = new SqlServer.Db(dbConfig);

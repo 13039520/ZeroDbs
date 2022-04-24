@@ -22,7 +22,7 @@ namespace ZeroDbs.Common
         public Db(Common.DbInfo database)
         {
             this.database = database;
-            switch (this.database.UseType)
+            switch (this.database.Type)
             {
                 case Common.DbType.SqlServer:
                     this.dbSqlBuilder = new SqlServer.SqlBuilder(this);
@@ -54,7 +54,7 @@ namespace ZeroDbs.Common
             {
                 return false;
             }
-            return null != temp.Find(o => string.Equals(o.UseKey, Database.UseKey, StringComparison.OrdinalIgnoreCase));
+            return null != temp.Find(o => string.Equals(o.Key, Database.Key, StringComparison.OrdinalIgnoreCase));
         }
 
         public virtual System.Data.Common.DbConnection GetDbConnection()
@@ -78,7 +78,7 @@ namespace ZeroDbs.Common
                 conn.Open();
             }
             var cmd = conn.CreateCommand();
-            return new ZeroDbs.Common.DbCommand(Database.UseKey, cmd, this.OnDbExecuteSqlEvent, this.DbSqlBuilder);
+            return new ZeroDbs.Common.DbCommand(Database.Key, cmd, this.OnDbExecuteSqlEvent, this.DbSqlBuilder);
         }
         public IDbCommand GetDbCommand(System.Data.Common.DbTransaction transaction)
         {
@@ -90,7 +90,7 @@ namespace ZeroDbs.Common
             cmd.Connection = transaction.Connection;
             cmd.Transaction = transaction;
 
-            return new ZeroDbs.Common.DbCommand(Database.UseKey, cmd, this.OnDbExecuteSqlEvent, this.DbSqlBuilder);
+            return new ZeroDbs.Common.DbCommand(Database.Key, cmd, this.OnDbExecuteSqlEvent, this.DbSqlBuilder);
         }
         public IDbTransactionScope GetDbTransactionScope(System.Data.IsolationLevel level, string identification = "", string groupId = "")
         {
@@ -120,7 +120,7 @@ namespace ZeroDbs.Common
         {
             if (!IsMappingToDbKey<DbEntity>())
             {
-                throw new Exception("类型" + typeof(DbEntity).FullName + "没有映射到" + Database.UseKey + "上");
+                throw new Exception("类型" + typeof(DbEntity).FullName + "没有映射到" + Database.Key + "上");
             }
             return GetDbCommand();
         }
@@ -128,7 +128,7 @@ namespace ZeroDbs.Common
         {
             if (!IsMappingToDbKey<DbEntity>())
             {
-                throw new Exception("类型" + typeof(DbEntity).FullName + "没有映射到" + Database.UseKey + "上");
+                throw new Exception("类型" + typeof(DbEntity).FullName + "没有映射到" + Database.Key + "上");
             }
             return GetDbTransactionScope(level, identification, groupId);
         }

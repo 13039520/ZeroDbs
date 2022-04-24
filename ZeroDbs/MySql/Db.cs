@@ -21,7 +21,7 @@ namespace ZeroDbs.MySql
         {
             if (!IsMappingToDbKey<DbEntity>())
             {
-                throw new Exception("类型" + typeof(DbEntity).FullName + "没有映射到" + Database.UseKey + "上");
+                throw new Exception("类型" + typeof(DbEntity).FullName + "没有映射到" + Database.Key + "上");
             }
 
             var key = typeof(DbEntity).FullName;
@@ -35,7 +35,7 @@ namespace ZeroDbs.MySql
             try
             {
                 var dbName = cmd.DbConnection.Database;
-                var dv = Common.DbMapping.GetDbConfigDataViewInfo<DbEntity>().Find(o => string.Equals(o.DbKey, Database.UseKey, StringComparison.OrdinalIgnoreCase));
+                var dv = Common.DbMapping.GetDbConfigDataViewInfo<DbEntity>().Find(o => string.Equals(o.DbKey, Database.Key, StringComparison.OrdinalIgnoreCase));
                 string getTableOrViewSql = "SELECT * FROM information_schema.TABLES WHERE TABLE_SCHEMA='" + dbName + "' AND TABLE_NAME='" + dv.TableName + "'";
 
                 Common.DbDataTableInfo dbDataTableInfo = null;

@@ -12,7 +12,7 @@ namespace ZeroDbs.Common
             var zeroConfigInfo = DbConfigReader.GetDbConfigInfo();
             if (zeroConfigInfo != null && zeroConfigInfo.Dbs != null && zeroConfigInfo.Dbs.Count > 0)
             {
-                return zeroConfigInfo.Dbs.Find(o => string.Equals(o.UseKey, dbKey, StringComparison.OrdinalIgnoreCase));
+                return zeroConfigInfo.Dbs.Find(o => string.Equals(o.Key, dbKey, StringComparison.OrdinalIgnoreCase));
             }
             return null;
         }
@@ -36,7 +36,7 @@ namespace ZeroDbs.Common
                 var reval = new List<DbInfo>();
                 foreach (var dbKey in dbKeys)
                 {
-                    var db = zeroConfigInfo.Dbs.Find(o => string.Equals(o.UseKey, dbKey, StringComparison.OrdinalIgnoreCase));
+                    var db = zeroConfigInfo.Dbs.Find(o => string.Equals(o.Key, dbKey, StringComparison.OrdinalIgnoreCase));
                     if (db != null)
                     {
                         reval.Add(db);
