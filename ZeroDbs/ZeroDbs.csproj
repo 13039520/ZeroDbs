@@ -8,9 +8,9 @@
     <AssemblyVersion>3.8.1.0</AssemblyVersion>
     <FileVersion>3.8.1.0</FileVersion>
     <Version>3.8.1.0</Version>
-    <Description>Database access library of .net4.0/netcoreapp3.1/5.0/6.0, Support SqlServer/MySql/Sqlite.</Description>
+    <Description>Database access library of .net40/.netcoreapp3.1/.net5/.net6, Support SqlServer/MySql/Sqlite.</Description>
     <PackageProjectUrl>https://github.com/13039520/ZeroDbs.git</PackageProjectUrl>
-    <PackageReleaseNotes>ZeroDbsNet40 merge to ZeroDbs</PackageReleaseNotes>
+    <PackageReleaseNotes>Interface adjustments and bug fixes</PackageReleaseNotes>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
   <ItemGroup>
