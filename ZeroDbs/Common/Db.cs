@@ -11,36 +11,36 @@ namespace ZeroDbs.Common
     /// </summary>
     public abstract class Db : IDb
     {
-        private IDataTypeMaping dbDataTypeMaping = null;
+        private IDataTypeMaping dataTypeMaping = null;
         private Common.DbInfo database = null;
-        private Common.SqlBuilder dbSqlBuilder = null;
+        private Common.SqlBuilder sqlBuilder = null;
         public Common.DbInfo Database { get { return database; } }
-        public Common.SqlBuilder DbSqlBuilder { get { return dbSqlBuilder; } }
-        public IDataTypeMaping DbDataTypeMaping { get { return dbDataTypeMaping; } }
+        public Common.SqlBuilder SqlBuilder { get { return sqlBuilder; } }
+        public IDataTypeMaping DataTypeMaping { get { return dataTypeMaping; } }
 
-        public event ZeroDbs.Common.DbExecuteSqlEvent OnDbExecuteSqlEvent = null;
+        public event DbExecuteSqlEvent OnDbExecuteSqlEvent = null;
         public Db(Common.DbInfo database)
         {
             this.database = database;
             switch (this.database.Type)
             {
                 case Common.DbType.SqlServer:
-                    this.dbSqlBuilder = new SqlServer.SqlBuilder(this);
-                    this.dbDataTypeMaping = new SqlServer.DbDataTypeMaping();
+                    this.sqlBuilder = new SqlServer.SqlBuilder(this);
+                    this.dataTypeMaping = new SqlServer.DbDataTypeMaping();
                     break;
                 case Common.DbType.MySql:
-                    this.dbSqlBuilder = new MySql.SqlBuilder(this);
-                    this.dbDataTypeMaping = new MySql.DbDataTypeMaping();
+                    this.sqlBuilder = new MySql.SqlBuilder(this);
+                    this.dataTypeMaping = new MySql.DbDataTypeMaping();
                     break;
                 case Common.DbType.Sqlite:
-                    this.dbSqlBuilder = new Sqlite.SqlBuilder(this);
-                    this.dbDataTypeMaping = new Sqlite.DbDataTypeMaping();
+                    this.sqlBuilder = new Sqlite.SqlBuilder(this);
+                    this.dataTypeMaping = new Sqlite.DbDataTypeMaping();
                     break;
                 default:
                     throw new Exception("Unsupported database type");
             }
         }
-        public void FireZeroDbExecuteSqlEvent(ZeroDbs.Common.DbExecuteSqlEventArgs args)
+        public void FireZeroDbExecuteSqlEvent(DbExecuteSqlEventArgs args)
         {
             if (this.OnDbExecuteSqlEvent != null)
             {
@@ -61,11 +61,11 @@ namespace ZeroDbs.Common
         {
             throw new NotImplementedException();
         }
-        public virtual ZeroDbs.Common.DbDataTableInfo GetTable<DbEntity>() where DbEntity : class, new()
+        public virtual DbDataTableInfo GetTable<DbEntity>() where DbEntity : class, new()
         {
             throw new NotImplementedException();
         }
-        public virtual List<ZeroDbs.Common.DbDataTableInfo> GetTables()
+        public virtual List<DbDataTableInfo> GetTables()
         {
             throw new NotImplementedException();
         }
@@ -78,7 +78,7 @@ namespace ZeroDbs.Common
                 conn.Open();
             }
             var cmd = conn.CreateCommand();
-            return new ZeroDbs.Common.DbCommand(Database.Key, cmd, this.OnDbExecuteSqlEvent, this.DbSqlBuilder);
+            return new DbCommand(Database.Key, cmd, this.OnDbExecuteSqlEvent, this.SqlBuilder);
         }
         public IDbCommand GetDbCommand(System.Data.Common.DbTransaction transaction)
         {
@@ -90,15 +90,15 @@ namespace ZeroDbs.Common
             cmd.Connection = transaction.Connection;
             cmd.Transaction = transaction;
 
-            return new ZeroDbs.Common.DbCommand(Database.Key, cmd, this.OnDbExecuteSqlEvent, this.DbSqlBuilder);
+            return new DbCommand(Database.Key, cmd, this.OnDbExecuteSqlEvent, this.SqlBuilder);
         }
         public IDbTransactionScope GetDbTransactionScope(System.Data.IsolationLevel level, string identification = "", string groupId = "")
         {
-            return new ZeroDbs.Common.DbTransactionScope(this, level, identification, groupId);
+            return new DbTransactionScope(this, level, identification, groupId);
         }
         public IDbTransactionScopeCollection GetDbTransactionScopeCollection()
         {
-            return new ZeroDbs.Common.DbTransactionScopeCollection();
+            return new DbTransactionScopeCollection();
         }
         
         public bool DbConnectionTest()
@@ -144,7 +144,7 @@ namespace ZeroDbs.Common
         public List<IntoEntity> Select<DbEntity, IntoEntity>(string where, string orderby, int top, params object[] paras) where DbEntity : class, new() where IntoEntity : class, new()
         {
             string[] fields = typeof(IntoEntity).GetProperties().Select(o => o.Name).ToArray();
-            var info = DbSqlBuilder.Select<DbEntity>(where, orderby, top, fields, paras);
+            var info = SqlBuilder.Select<DbEntity>(where, orderby, top, fields, paras);
             var cmd = GetDbCommand();
             try
             {
@@ -160,7 +160,7 @@ namespace ZeroDbs.Common
         }
         public List<DbEntity> Select<DbEntity>(string where, string orderby, int top, string[] fields, params object[] paras) where DbEntity : class, new()
         {
-            var info = DbSqlBuilder.Select<DbEntity>(where, orderby, top, fields, paras);
+            var info = SqlBuilder.Select<DbEntity>(where, orderby, top, fields, paras);
             var cmd = GetDbCommand();
             try
             {
@@ -186,8 +186,8 @@ namespace ZeroDbs.Common
         public Common.PageData<IntoEntity> Page<DbEntity, IntoEntity>(long page, long size, string where, string orderby, string uniqueField, params object[] paras) where DbEntity : class, new() where IntoEntity : class, new()
         {
             string[] fields = typeof(IntoEntity).GetProperties().Select(o => o.Name).ToArray();
-            var countSql = DbSqlBuilder.Count<DbEntity>(where, paras);
-            var info = DbSqlBuilder.Page<DbEntity>(page, size, where, orderby, fields, uniqueField, paras);
+            var countSql = SqlBuilder.Count<DbEntity>(where, paras);
+            var info = SqlBuilder.Page<DbEntity>(page, size, where, orderby, fields, uniqueField, paras);
             var cmd = this.GetDbCommand();
             try
             {
@@ -218,10 +218,10 @@ namespace ZeroDbs.Common
                 throw ex;
             }
         }
-        public ZeroDbs.Common.PageData<DbEntity> Page<DbEntity>(long page, long size, string where, string orderby, string[] fields, string uniqueField, params object[] paras) where DbEntity : class, new()
+        public PageData<DbEntity> Page<DbEntity>(long page, long size, string where, string orderby, string[] fields, string uniqueField, params object[] paras) where DbEntity : class, new()
         {
-            var countSql = DbSqlBuilder.Count<DbEntity>(where,paras);
-            var info = DbSqlBuilder.Page<DbEntity>(page, size, where, orderby, fields, uniqueField,paras);
+            var countSql = SqlBuilder.Count<DbEntity>(where,paras);
+            var info = SqlBuilder.Page<DbEntity>(page, size, where, orderby, fields, uniqueField,paras);
             var cmd = this.GetDbCommand();
             try
             {
@@ -254,7 +254,7 @@ namespace ZeroDbs.Common
 
         public long Count<DbEntity>(string where, params object[] paras) where DbEntity : class, new()
         {
-            var info = DbSqlBuilder.Count<DbEntity>(where);
+            var info = SqlBuilder.Count<DbEntity>(where);
             var cmd = this.GetDbCommand();
             try
             {
@@ -274,7 +274,7 @@ namespace ZeroDbs.Common
 
         public int Insert<DbEntity>(DbEntity entity) where DbEntity : class, new()
         {
-            var info = this.DbSqlBuilder.Insert<DbEntity>(entity);
+            var info = this.SqlBuilder.Insert<DbEntity>(entity);
             var cmd = this.GetDbCommand();
             try
             {
@@ -290,7 +290,7 @@ namespace ZeroDbs.Common
         }
         public int Insert<DbEntity>(List<DbEntity> entities) where DbEntity : class, new()
         {
-            var info = this.DbSqlBuilder.Insert<DbEntity>();
+            var info = this.SqlBuilder.Insert<DbEntity>();
             var ts = this.GetDbTransactionScope(System.Data.IsolationLevel.ReadUncommitted);
             try
             {
@@ -315,7 +315,7 @@ namespace ZeroDbs.Common
         }
         public int InsertFromNameValueCollection<DbEntity>(System.Collections.Specialized.NameValueCollection source) where DbEntity : class, new()
         {
-            var info = this.DbSqlBuilder.InsertFromNameValueCollection<DbEntity>(source);
+            var info = this.SqlBuilder.InsertFromNameValueCollection<DbEntity>(source);
             var cmd = this.GetDbCommand();
             try
             {
@@ -331,7 +331,7 @@ namespace ZeroDbs.Common
         }
         public int InsertFromCustomEntity<DbEntity>(object source) where DbEntity : class, new()
         {
-            var info = this.DbSqlBuilder.InsertFromCustomEntity<DbEntity>(source);
+            var info = this.SqlBuilder.InsertFromCustomEntity<DbEntity>(source);
             var cmd = this.GetDbCommand();
             try
             {
@@ -347,7 +347,7 @@ namespace ZeroDbs.Common
         }
         public int InsertFromDictionary<DbEntity>(Dictionary<string, object> source) where DbEntity : class, new()
         {
-            var info = this.DbSqlBuilder.InsertFromDictionary<DbEntity>(source);
+            var info = this.SqlBuilder.InsertFromDictionary<DbEntity>(source);
             var cmd = this.GetDbCommand();
             try
             {
@@ -364,7 +364,7 @@ namespace ZeroDbs.Common
 
         public int Update<DbEntity>(DbEntity entity) where DbEntity : class, new()
         {
-            var info = this.DbSqlBuilder.Update<DbEntity>();
+            var info = this.SqlBuilder.Update<DbEntity>();
             var cmd = this.GetDbCommand();
             try
             {
@@ -380,7 +380,7 @@ namespace ZeroDbs.Common
         }
         public int Update<DbEntity>(List<DbEntity> entities) where DbEntity : class, new()
         {
-            var info = this.DbSqlBuilder.Update<DbEntity>();
+            var info = this.SqlBuilder.Update<DbEntity>();
             var ts = this.GetDbTransactionScope(System.Data.IsolationLevel.ReadUncommitted);
             try
             {
@@ -405,7 +405,7 @@ namespace ZeroDbs.Common
         }
         public int UpdateFromNameValueCollection<DbEntity>(System.Collections.Specialized.NameValueCollection source) where DbEntity : class, new()
         {
-            var info = this.DbSqlBuilder.UpdateFromNameValueCollection<DbEntity>(source);
+            var info = this.SqlBuilder.UpdateFromNameValueCollection<DbEntity>(source);
             var cmd = this.GetDbCommand();
             try
             {
@@ -421,7 +421,7 @@ namespace ZeroDbs.Common
         }
         public int UpdateFromCustomEntity<DbEntity>(object source) where DbEntity : class, new()
         {
-            var info = this.DbSqlBuilder.UpdateFromCustomEntity<DbEntity>(source);
+            var info = this.SqlBuilder.UpdateFromCustomEntity<DbEntity>(source);
             var cmd = this.GetDbCommand();
             try
             {
@@ -437,7 +437,7 @@ namespace ZeroDbs.Common
         }
         public int UpdateFromDictionary<DbEntity>(Dictionary<string, object> source) where DbEntity : class, new()
         {
-            var info = this.DbSqlBuilder.UpdateFromDictionary<DbEntity>(source);
+            var info = this.SqlBuilder.UpdateFromDictionary<DbEntity>(source);
             var cmd = this.GetDbCommand();
             try
             {
@@ -454,7 +454,7 @@ namespace ZeroDbs.Common
 
         public int Delete<DbEntity>(string where, params object[] paras) where DbEntity : class, new()
         {
-            var info = this.DbSqlBuilder.Delete<DbEntity>(where, paras);
+            var info = this.SqlBuilder.Delete<DbEntity>(where, paras);
             var cmd = this.GetDbCommand();
             try
             {

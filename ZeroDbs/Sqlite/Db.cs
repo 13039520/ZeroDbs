@@ -81,12 +81,12 @@ namespace ZeroDbs.Sqlite
                     column.MaxLength = 0;
                     column.Byte = 0;
                     column.DecimalDigits = 0;
-                    column.DefaultValue = this.DbDataTypeMaping.GetDotNetDefaultValue(reader["dflt_value"].ToString(), reader["type"].ToString(), column.MaxLength);
+                    column.DefaultValue = this.DataTypeMaping.GetDotNetDefaultValue(reader["dflt_value"].ToString(), reader["type"].ToString(), column.MaxLength);
                     column.Description = reader["type"].ToString();
                     column.IsIdentity = IdentityNames.Contains(column.Name);
                     column.IsNullable = "0" == reader["notnull"].ToString();
                     column.IsPrimaryKey = "0" != reader["pk"].ToString();
-                    column.Type = this.DbDataTypeMaping.GetDotNetTypeString(reader["Type"].ToString(), column.MaxLength);
+                    column.Type = this.DataTypeMaping.GetDotNetTypeString(reader["Type"].ToString(), column.MaxLength);
 
                     dbDataTableInfo.Colunms.Add(column);
                 }
@@ -159,12 +159,12 @@ namespace ZeroDbs.Sqlite
                         column.MaxLength = 0;
                         column.Byte = 0;
                         column.DecimalDigits = 0;
-                        column.DefaultValue = this.DbDataTypeMaping.GetDotNetDefaultValue(reader["dflt_value"].ToString(), reader["type"].ToString(), column.MaxLength);
+                        column.DefaultValue = this.DataTypeMaping.GetDotNetDefaultValue(reader["dflt_value"].ToString(), reader["type"].ToString(), column.MaxLength);
                         column.Description = reader["type"].ToString();
                         column.IsIdentity = IdentityNames.Contains(column.Name);
                         column.IsNullable = "0" == reader["notnull"].ToString();
                         column.IsPrimaryKey = "0" != reader["pk"].ToString();
-                        column.Type = this.DbDataTypeMaping.GetDotNetTypeString(reader["Type"].ToString(), column.MaxLength);
+                        column.Type = this.DataTypeMaping.GetDotNetTypeString(reader["Type"].ToString(), column.MaxLength);
                         
 
                         m.Colunms.Add(column);

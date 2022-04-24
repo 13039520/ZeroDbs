@@ -7,8 +7,8 @@ namespace ZeroDbs
     public interface IDb: IDbOperator
     {
         Common.DbInfo Database { get; }
-        Common.SqlBuilder DbSqlBuilder { get; }
-        IDataTypeMaping DbDataTypeMaping { get; }
+        Common.SqlBuilder SqlBuilder { get; }
+        IDataTypeMaping DataTypeMaping { get; }
         event Common.DbExecuteSqlEvent OnDbExecuteSqlEvent;
         void FireZeroDbExecuteSqlEvent(Common.DbExecuteSqlEventArgs args);
         System.Data.Common.DbConnection GetDbConnection();

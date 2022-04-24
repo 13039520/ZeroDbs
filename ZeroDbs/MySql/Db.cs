@@ -91,13 +91,13 @@ namespace ZeroDbs.MySql
                     column.MaxLength = reader["CHARACTER_MAXIMUM_LENGTH"].ToString().Length > 0 ? Convert.ToInt64(reader["CHARACTER_MAXIMUM_LENGTH"]) : -1;
                     column.Byte = reader["CHARACTER_OCTET_LENGTH"].ToString().Length > 0 ? Convert.ToInt64(reader["CHARACTER_OCTET_LENGTH"]) : -1;
                     column.DecimalDigits = reader["NUMERIC_SCALE"].ToString().Length > 0 ? Convert.ToInt32(reader["NUMERIC_SCALE"]) : -1;
-                    column.DefaultValue = this.DbDataTypeMaping.GetDotNetDefaultValue(reader["COLUMN_DEFAULT"].ToString(), reader["DATA_TYPE"].ToString(), column.MaxLength);
+                    column.DefaultValue = this.DataTypeMaping.GetDotNetDefaultValue(reader["COLUMN_DEFAULT"].ToString(), reader["DATA_TYPE"].ToString(), column.MaxLength);
                     column.Description = reader["COLUMN_COMMENT"].ToString();
                     column.IsIdentity = reader["EXTRA"].ToString().ToLower() == "auto_increment";
                     column.IsNullable = reader["IS_NULLABLE"].ToString().ToLower() == "yes";
                     column.IsPrimaryKey = reader["COLUMN_KEY"].ToString().ToUpper() == "PRI";//COLUMN_KEY
                     column.Name = reader["COLUMN_NAME"].ToString();
-                    column.Type = this.DbDataTypeMaping.GetDotNetTypeString(reader["DATA_TYPE"].ToString(), column.MaxLength);
+                    column.Type = this.DataTypeMaping.GetDotNetTypeString(reader["DATA_TYPE"].ToString(), column.MaxLength);
 
                     dbDataTableInfo.Colunms.Add(column);
                 }
@@ -175,13 +175,13 @@ namespace ZeroDbs.MySql
                         column.MaxLength = reader["CHARACTER_MAXIMUM_LENGTH"].ToString().Length > 0 ? Convert.ToInt64(reader["CHARACTER_MAXIMUM_LENGTH"]) : -1;
                         column.Byte = reader["CHARACTER_OCTET_LENGTH"].ToString().Length > 0 ? Convert.ToInt64(reader["CHARACTER_OCTET_LENGTH"]) : -1;
                         column.DecimalDigits = reader["NUMERIC_SCALE"].ToString().Length > 0 ? Convert.ToInt32(reader["NUMERIC_SCALE"]) : -1;
-                        column.DefaultValue = this.DbDataTypeMaping.GetDotNetDefaultValue(reader["COLUMN_DEFAULT"].ToString(), reader["DATA_TYPE"].ToString(), column.MaxLength);
+                        column.DefaultValue = this.DataTypeMaping.GetDotNetDefaultValue(reader["COLUMN_DEFAULT"].ToString(), reader["DATA_TYPE"].ToString(), column.MaxLength);
                         column.Description = reader["COLUMN_COMMENT"].ToString();
                         column.IsIdentity = reader["EXTRA"].ToString().ToLower() == "auto_increment";
                         column.IsNullable = reader["IS_NULLABLE"].ToString().ToLower() == "yes";
                         column.IsPrimaryKey = reader["COLUMN_KEY"].ToString().ToUpper() == "PRI";//COLUMN_KEY
                         column.Name = reader["COLUMN_NAME"].ToString();
-                        column.Type = this.DbDataTypeMaping.GetDotNetTypeString(reader["DATA_TYPE"].ToString(), column.MaxLength);
+                        column.Type = this.DataTypeMaping.GetDotNetTypeString(reader["DATA_TYPE"].ToString(), column.MaxLength);
 
                         m.Colunms.Add(column);
                     }
