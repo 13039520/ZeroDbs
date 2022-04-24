@@ -1,70 +1,44 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 namespace ZeroDbs.Tools
 {
     public static class DataEntity
     {
-        public static T Get<T>(System.Collections.Specialized.NameValueCollection NameValueCollection)
+        public static T Get<T>(System.Collections.Specialized.NameValueCollection source)
             where T : class, new()
         {
-            T Result = (T)Activator.CreateInstance(typeof(T));
-            System.Reflection.PropertyInfo[] Properties = Result.GetType().GetProperties();
-            System.Collections.Hashtable MyHashtable = new System.Collections.Hashtable();
-            for (var i = 0; i < NameValueCollection.Keys.Count; i++)
+            Type type = typeof(T);
+            T reval = new T();
+            var ps = type.GetProperties().ToList();
+            for (var i = 0; i < source.Keys.Count; i++)
             {
-                var key = NameValueCollection.Keys[i].ToLower();
-                if (!MyHashtable.ContainsKey(key))
+                var key = source.Keys[i];
+                var p = ps.Find(o => string.Equals(o.Name, key, StringComparison.OrdinalIgnoreCase));
+                if (p != null)
                 {
-                    MyHashtable.Add(key, NameValueCollection[NameValueCollection.Keys[i]]);
+                    p.SetValue(reval, Common.ValueConvert.StrToTargetType(source[key], p.PropertyType), null);
                 }
             }
-            int HasPropertyCount = 0;
-            for (int j = 0; j < Properties.Length; j++)
-            {
-                string PropertyName = Properties[j].Name;
-                if (MyHashtable.Contains(PropertyName.ToLower()))
-                {
-                    HasPropertyCount++;
-                    Properties[j].SetValue(Result, Common.ValueConvert.StrToTargetType(MyHashtable[PropertyName.ToLower()].ToString(), Properties[j].PropertyType), null);
-                }
-            }
-            if (HasPropertyCount < 1)
-            {
-                Result = null;
-            }
-            return Result;
+            return reval;
         }
-        public static T Update<T>(T SourceEntity, System.Collections.Specialized.NameValueCollection NameValueCollection)
+        public static void Update<T>(T entity, System.Collections.Specialized.NameValueCollection source)
             where T : class, new()
         {
-            if (SourceEntity == null) { return SourceEntity; }
+            if (entity == null) { return; }
 
-            T Result = (T)Activator.CreateInstance(typeof(T));
-            System.Reflection.PropertyInfo[] Properties = Result.GetType().GetProperties();
-            System.Collections.Hashtable MyHashtable = new System.Collections.Hashtable();
-            for (var i = 0; i < NameValueCollection.Keys.Count; i++)
+            var ps = entity.GetType().GetProperties().ToList();
+            for (var i = 0; i < source.Keys.Count; i++)
             {
-                var key = NameValueCollection.Keys[i].ToLower();
-                if (!MyHashtable.ContainsKey(key))
+                var key = source.Keys[i];
+                var p = ps.Find(o => string.Equals(o.Name, key, StringComparison.OrdinalIgnoreCase));
+                if (p != null)
                 {
-                    MyHashtable.Add(key, NameValueCollection[NameValueCollection.Keys[i]]);
+                    p.SetValue(entity, Common.ValueConvert.StrToTargetType(source[key], p.PropertyType), null);
                 }
             }
-            for (int j = 0; j < Properties.Length; j++)
-            {
-                string PropertyName = Properties[j].Name;
-                if (MyHashtable.Contains(PropertyName.ToLower()))
-                {
-                    Properties[j].SetValue(Result, Common.ValueConvert.StrToTargetType(MyHashtable[PropertyName.ToLower()].ToString(), Properties[j].PropertyType), null);
-                }
-                else
-                {
-                    Properties[j].SetValue(Result, Properties[j].GetValue(SourceEntity, null), null);
-                }
-            }
-            return Result;
         }
 
     }
