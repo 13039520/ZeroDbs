@@ -5,8 +5,9 @@ using System.Text;
 
 namespace ZeroDbs.Common
 {
-    public enum DatabaseType
+    public enum DbType
     {
+        Unknow = 0,
         SqlServer = 1,
         MySql = 2,
         Sqlite = 3

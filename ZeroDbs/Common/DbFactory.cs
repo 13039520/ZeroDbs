@@ -6,24 +6,24 @@ namespace ZeroDbs.Common
 {
     public static class DbFactory
     {
-        public static IDb Create(Common.DatabaseInfo dbConfig)
+        public static IDb Create(Common.DbInfo dbConfig)
         {
             IDb db = null;
-            switch (dbConfig.dbType)
+            switch (dbConfig.UseType)
             {
-                case "SqlServer":
+                case DbType.SqlServer:
                     db = new SqlServer.Db(dbConfig);
                     break;
-                case "MySql":
+                case DbType.MySql:
                     db = new MySql.Db(dbConfig);
                     break;
-                case "Sqlite":
+                case DbType.Sqlite:
                     db = new Sqlite.Db(dbConfig);
                     break;
             }
             return db;
         }
-        public static IDb Create(Common.DatabaseInfo dbConfig, Common.DbExecuteSqlEvent dbExecuteSqlEvent)
+        public static IDb Create(Common.DbInfo dbConfig, Common.DbExecuteSqlEvent dbExecuteSqlEvent)
         {
             IDb db = Create(dbConfig);
             if(db!=null&& dbExecuteSqlEvent != null)

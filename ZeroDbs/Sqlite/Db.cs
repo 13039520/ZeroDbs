@@ -8,20 +8,20 @@ namespace ZeroDbs.Sqlite
 {
     internal class Db: Common.Db
     {
-        public Db(Common.DatabaseInfo database):base(database)
+        public Db(Common.DbInfo database):base(database)
         {
 
         }
 
         public override System.Data.Common.DbConnection GetDbConnection()
         {
-            return new SQLiteConnection(Database.dbConnectionString);
+            return new SQLiteConnection(Database.ConnectionString);
         }
         public override ZeroDbs.Common.DbDataTableInfo GetTable<T>()
         {
             if (!IsMappingToDbKey<T>())
             {
-                throw new Exception("类型" + typeof(T).FullName + "没有映射到" + Database.dbKey + "上");
+                throw new Exception("类型" + typeof(T).FullName + "没有映射到" + Database.UseKey + "上");
             }
 
             var key = typeof(T).FullName;
@@ -34,7 +34,7 @@ namespace ZeroDbs.Sqlite
             var cmd = this.GetDbCommand();
             try
             {
-                var dv = Common.DbMapping.GetDbConfigDataViewInfo<T>().Find(o => string.Equals(o.dbKey, Database.dbKey, StringComparison.OrdinalIgnoreCase));
+                var dv = Common.DbMapping.GetDbConfigDataViewInfo<T>().Find(o => string.Equals(o.dbKey, Database.UseKey, StringComparison.OrdinalIgnoreCase));
                 string getTableOrViewSql = "select * from sqlite_master where name='"+dv.tableName + "' and type IN('table','view')";
 
                 Common.DbDataTableInfo dbDataTableInfo = null;

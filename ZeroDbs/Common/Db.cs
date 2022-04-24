@@ -12,33 +12,32 @@ namespace ZeroDbs.Common
     public abstract class Db : IDb
     {
         private IDataTypeMaping dbDataTypeMaping = null;
-        private Common.DatabaseInfo database = null;
+        private Common.DbInfo database = null;
         private Common.SqlBuilder dbSqlBuilder = null;
-        public Common.DatabaseInfo Database { get { return database; } }
+        public Common.DbInfo Database { get { return database; } }
         public Common.SqlBuilder DbSqlBuilder { get { return dbSqlBuilder; } }
         public IDataTypeMaping DbDataTypeMaping { get { return dbDataTypeMaping; } }
 
         public event ZeroDbs.Common.DbExecuteSqlEvent OnDbExecuteSqlEvent = null;
-        public Db(Common.DatabaseInfo database)
+        public Db(Common.DbInfo database)
         {
             this.database = database;
-            if (string.Equals("SqlServer", database.dbType, StringComparison.OrdinalIgnoreCase))
+            switch (this.database.UseType)
             {
-                this.dbSqlBuilder = new SqlServer.SqlBuilder(this);
-                this.dbDataTypeMaping=new SqlServer.DbDataTypeMaping();
-            }else if (string.Equals("MySql", database.dbType, StringComparison.OrdinalIgnoreCase))
-            {
-                this.dbSqlBuilder = new MySql.SqlBuilder(this);
-                this.dbDataTypeMaping = new MySql.DbDataTypeMaping();
-            }
-            else if (string.Equals("Sqlite", database.dbType, StringComparison.OrdinalIgnoreCase))
-            {
-                this.dbSqlBuilder = new Sqlite.SqlBuilder(this);
-                this.dbDataTypeMaping = new Sqlite.DbDataTypeMaping();
-            }
-            else
-            {
-                throw new Exception("Unsupported database type");
+                case Common.DbType.SqlServer:
+                    this.dbSqlBuilder = new SqlServer.SqlBuilder(this);
+                    this.dbDataTypeMaping = new SqlServer.DbDataTypeMaping();
+                    break;
+                case Common.DbType.MySql:
+                    this.dbSqlBuilder = new MySql.SqlBuilder(this);
+                    this.dbDataTypeMaping = new MySql.DbDataTypeMaping();
+                    break;
+                case Common.DbType.Sqlite:
+                    this.dbSqlBuilder = new Sqlite.SqlBuilder(this);
+                    this.dbDataTypeMaping = new Sqlite.DbDataTypeMaping();
+                    break;
+                default:
+                    throw new Exception("Unsupported database type");
             }
         }
         public void FireZeroDbExecuteSqlEvent(ZeroDbs.Common.DbExecuteSqlEventArgs args)
@@ -50,12 +49,12 @@ namespace ZeroDbs.Common
         }
         protected bool IsMappingToDbKey<DbEntity>()
         {
-            var temp = Common.DbMapping.GetZeroDbConfigDatabaseInfo<DbEntity>();
+            var temp = Common.DbMapping.GetDbInfo<DbEntity>();
             if (temp == null || temp.Count < 1)
             {
                 return false;
             }
-            return null != temp.Find(o => string.Equals(o.dbKey, Database.dbKey, StringComparison.OrdinalIgnoreCase));
+            return null != temp.Find(o => string.Equals(o.UseKey, Database.UseKey, StringComparison.OrdinalIgnoreCase));
         }
 
         public virtual System.Data.Common.DbConnection GetDbConnection()
@@ -79,7 +78,7 @@ namespace ZeroDbs.Common
                 conn.Open();
             }
             var cmd = conn.CreateCommand();
-            return new ZeroDbs.Common.DbCommand(Database.dbKey, cmd, this.OnDbExecuteSqlEvent, this.DbSqlBuilder);
+            return new ZeroDbs.Common.DbCommand(Database.UseKey, cmd, this.OnDbExecuteSqlEvent, this.DbSqlBuilder);
         }
         public IDbCommand GetDbCommand(System.Data.Common.DbTransaction transaction)
         {
@@ -91,7 +90,7 @@ namespace ZeroDbs.Common
             cmd.Connection = transaction.Connection;
             cmd.Transaction = transaction;
 
-            return new ZeroDbs.Common.DbCommand(Database.dbKey, cmd, this.OnDbExecuteSqlEvent, this.DbSqlBuilder);
+            return new ZeroDbs.Common.DbCommand(Database.UseKey, cmd, this.OnDbExecuteSqlEvent, this.DbSqlBuilder);
         }
         public IDbTransactionScope GetDbTransactionScope(System.Data.IsolationLevel level, string identification = "", string groupId = "")
         {
@@ -121,7 +120,7 @@ namespace ZeroDbs.Common
         {
             if (!IsMappingToDbKey<DbEntity>())
             {
-                throw new Exception("类型" + typeof(DbEntity).FullName + "没有映射到" + Database.dbKey + "上");
+                throw new Exception("类型" + typeof(DbEntity).FullName + "没有映射到" + Database.UseKey + "上");
             }
             return GetDbCommand();
         }
@@ -129,7 +128,7 @@ namespace ZeroDbs.Common
         {
             if (!IsMappingToDbKey<DbEntity>())
             {
-                throw new Exception("类型" + typeof(DbEntity).FullName + "没有映射到" + Database.dbKey + "上");
+                throw new Exception("类型" + typeof(DbEntity).FullName + "没有映射到" + Database.UseKey + "上");
             }
             return GetDbTransactionScope(level, identification, groupId);
         }

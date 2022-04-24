@@ -8,20 +8,20 @@ namespace ZeroDbs.MySql
 {
     internal class Db: Common.Db
     {
-        public Db(Common.DatabaseInfo database): base(database)
+        public Db(Common.DbInfo database): base(database)
         {
 
         }
 
         public override System.Data.Common.DbConnection GetDbConnection()
         {
-            return new MySqlConnection(Database.dbConnectionString);
+            return new MySqlConnection(Database.ConnectionString);
         }
         public override ZeroDbs.Common.DbDataTableInfo GetTable<DbEntity>()
         {
             if (!IsMappingToDbKey<DbEntity>())
             {
-                throw new Exception("类型" + typeof(DbEntity).FullName + "没有映射到" + Database.dbKey + "上");
+                throw new Exception("类型" + typeof(DbEntity).FullName + "没有映射到" + Database.UseKey + "上");
             }
 
             var key = typeof(DbEntity).FullName;
@@ -35,7 +35,7 @@ namespace ZeroDbs.MySql
             try
             {
                 var dbName = cmd.DbConnection.Database;
-                var dv = Common.DbMapping.GetDbConfigDataViewInfo<DbEntity>().Find(o => string.Equals(o.dbKey, Database.dbKey, StringComparison.OrdinalIgnoreCase));
+                var dv = Common.DbMapping.GetDbConfigDataViewInfo<DbEntity>().Find(o => string.Equals(o.dbKey, Database.UseKey, StringComparison.OrdinalIgnoreCase));
                 string getTableOrViewSql = "SELECT * FROM information_schema.TABLES WHERE TABLE_SCHEMA='" + dbName + "' AND TABLE_NAME='" + dv.tableName + "'";
 
                 Common.DbDataTableInfo dbDataTableInfo = null;

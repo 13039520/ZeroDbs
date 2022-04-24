@@ -12,23 +12,23 @@ namespace ZeroDbs.SqlServer
 {
     internal class Db: Common.Db
     {
-        public Db(Common.DatabaseInfo database): base(database)
+        public Db(Common.DbInfo database): base(database)
         {
 
         }
         public override System.Data.Common.DbConnection GetDbConnection()
         {
 #if NET40
-            return new System.Data.SqlClient.SqlConnection(Database.dbConnectionString);
+            return new System.Data.SqlClient.SqlConnection(Database.ConnectionString);
 #else
-            return new  Microsoft.Data.SqlClient.SqlConnection(Database.dbConnectionString);
+            return new  Microsoft.Data.SqlClient.SqlConnection(Database.ConnectionString);
 #endif
         }
         public override Common.DbDataTableInfo GetTable<DbEntity>()
         {
             if (!IsMappingToDbKey<DbEntity>())
             {
-                throw new Exception("类型" + typeof(DbEntity).FullName + "没有映射到" + Database.dbKey + "上");
+                throw new Exception("类型" + typeof(DbEntity).FullName + "没有映射到" + Database.UseKey + "上");
             }
 
             string key = typeof(DbEntity).FullName;
@@ -41,7 +41,7 @@ namespace ZeroDbs.SqlServer
             var cmd = this.GetDbCommand();
             try
             {
-                var dv = Common.DbMapping.GetDbConfigDataViewInfo<DbEntity>().Find(o => string.Equals(o.dbKey, Database.dbKey, StringComparison.OrdinalIgnoreCase));
+                var dv = Common.DbMapping.GetDbConfigDataViewInfo<DbEntity>().Find(o => string.Equals(o.dbKey, Database.UseKey, StringComparison.OrdinalIgnoreCase));
                 string getTableOrViewSql = "SELECT A.[id],A.[type],A.[name],"
                     + "(SELECT TOP 1 ISNULL(value, '') FROM sys.extended_properties AS E LEFT JOIN (SELECT object_id,name AS name2 FROM sys.views UNION SELECT object_id,name AS name2 FROM sys.tables) AS T1 ON T1.object_id=major_id WHERE E.minor_id=0 AND E.name='MS_Description' AND name2=A.[name])"
                     + "AS [description]"

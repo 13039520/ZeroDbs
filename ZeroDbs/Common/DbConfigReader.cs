@@ -9,7 +9,7 @@ namespace ZeroDbs.Common
         private static Common.DbConfigInfo zeroConfigInfo = null;
         private static readonly string fileName = "ZeroDbConfig.xml";
         private static string filePath = string.Empty;
-        public static Common.DbConfigInfo GetZeroDbConfigInfo()
+        public static Common.DbConfigInfo GetDbConfigInfo()
         {
             return Read();
         }
@@ -20,10 +20,10 @@ namespace ZeroDbs.Common
             {
                 return false;
             }
-            var config = GetZeroDbConfigInfo();
+            var config = GetDbConfigInfo();
             lock (_lock)
             {
-                if (config.Dbs.Find(o => o.dbKey == dbKey) == null) { return false; }
+                if (config.Dbs.Find(o => o.UseKey == dbKey) == null) { return false; }
                 if (config.Dvs.Find(o => o.tableName == tableName) == null) { return false; }
                 config.Dvs.Add(new DbConfigDataviewInfo { dbKey = dbKey, entityKey = entityFullName, tableName = tableName, isStandardMapping = false });
             }
@@ -78,7 +78,7 @@ namespace ZeroDbs.Common
                 {
                     throw new Exception("缺少db配置");
                 }
-                temp.Dbs = new List<Common.DatabaseInfo>();
+                temp.Dbs = new List<Common.DbInfo>();
                 foreach(System.Xml.XmlNode node in xmlNodeList)
                 {
                     System.Xml.XmlAttribute dbKey = node.Attributes["dbKey"];
@@ -96,18 +96,19 @@ namespace ZeroDbs.Common
                         continue;
                         
                     }
+                    DbType type1 = DbType.Unknow;
                     type = type.Trim();
                     if(string.Equals(type, "SqlServer", StringComparison.OrdinalIgnoreCase))
                     {
-                        type = "SqlServer";
+                        type1 = DbType.SqlServer;
                     }
                     else if (string.Equals(type, "MySql", StringComparison.OrdinalIgnoreCase))
                     {
-                        type = "MySql";
+                        type1 = DbType.MySql;
                     }
                     else if (string.Equals(type, "Sqlite", StringComparison.OrdinalIgnoreCase))
                     {
-                        type = "Sqlite";
+                        type1 = DbType.Sqlite;
                     }
                     else
                     {
@@ -115,15 +116,15 @@ namespace ZeroDbs.Common
                     }
                     key = key.Trim();
                     conn = conn.Trim();
-                    if (temp.Dbs.Find(o => string.Equals(o.dbKey, key, StringComparison.OrdinalIgnoreCase)) != null)
+                    if (temp.Dbs.Find(o => string.Equals(o.UseKey, key, StringComparison.OrdinalIgnoreCase)) != null)
                     {
                         continue;
                     }
-                    temp.Dbs.Add(new Common.DatabaseInfo
+                    temp.Dbs.Add(new Common.DbInfo
                     {
-                        dbConnectionString = conn,
-                        dbKey = key,
-                        dbType = type
+                        ConnectionString = conn,
+                        UseKey = key,
+                        UseType = type1
                     });
                 }
                 if (temp.Dbs.Count < 1)
@@ -158,7 +159,7 @@ namespace ZeroDbs.Common
                     name = name.Trim();
                     entity = entity.Trim();
 
-                    if (temp.Dbs.Find(o => string.Equals(o.dbKey, key, StringComparison.OrdinalIgnoreCase)) == null)
+                    if (temp.Dbs.Find(o => string.Equals(o.UseKey, key, StringComparison.OrdinalIgnoreCase)) == null)
                     {
                         continue;
                     }

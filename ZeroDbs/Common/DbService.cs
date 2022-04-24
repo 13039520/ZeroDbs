@@ -30,36 +30,36 @@ namespace ZeroDbs.Common
             {
                 return reval;
             }
-            var list = DbMapping.GetZeroDbConfigDatabaseInfoByEntityFullName(entityFullName);
+            var list = DbMapping.GetDbInfoByEntityFullName(entityFullName);
             if (list == null || list.Count < 1)
             {
                 return reval;
             }
             var info = list[0];
-            if (!_dbInstanceDic.ContainsKey(info.dbKey))
+            if (!_dbInstanceDic.ContainsKey(info.UseKey))
             {
                 lock (_lock)
                 {
                     #region -- code --
-                    if (!_dbInstanceDic.ContainsKey(info.dbKey))
+                    if (!_dbInstanceDic.ContainsKey(info.UseKey))
                     {
                         IDb db = DbFactory.Create(info, _dbExecuteSqlEvent);
                         if (db != null)
                         {
-                            _dbInstanceDic.Add(info.dbKey, db);
+                            _dbInstanceDic.Add(info.UseKey, db);
                             reval = db;
                         }
                     }
                     else
                     {
-                        reval = _dbInstanceDic[info.dbKey];
+                        reval = _dbInstanceDic[info.UseKey];
                     }
                     #endregion
                 }
             }
             else
             {
-                reval = _dbInstanceDic[info.dbKey];
+                reval = _dbInstanceDic[info.UseKey];
             }
             return reval;
         }
@@ -67,71 +67,71 @@ namespace ZeroDbs.Common
         public Dictionary<string, IDb> GetDbs()
         {
             var dbs = new Dictionary<string, IDb>();
-            var zeroConfigInfo = Common.DbConfigReader.GetZeroDbConfigInfo();
+            var zeroConfigInfo = Common.DbConfigReader.GetDbConfigInfo();
             if (zeroConfigInfo != null && zeroConfigInfo.Dbs != null && zeroConfigInfo.Dbs.Count > 0)
             {
                 foreach (var m in zeroConfigInfo.Dbs)
                 {
-                    if (!_dbInstanceDic.ContainsKey(m.dbKey))
+                    if (!_dbInstanceDic.ContainsKey(m.UseKey))
                     {
                         lock (_lock)
                         {
                             #region -- code --
-                            if (!_dbInstanceDic.ContainsKey(m.dbKey))
+                            if (!_dbInstanceDic.ContainsKey(m.UseKey))
                             {
                                 IDb db = DbFactory.Create(m, _dbExecuteSqlEvent);
                                 if (db != null)
                                 {
-                                    _dbInstanceDic.Add(m.dbKey, db);
-                                    dbs.Add(m.dbKey, db);
+                                    _dbInstanceDic.Add(m.UseKey, db);
+                                    dbs.Add(m.UseKey, db);
                                 }
                             }
                             else
                             {
-                                dbs.Add(m.dbKey, _dbInstanceDic[m.dbKey]);
+                                dbs.Add(m.UseKey, _dbInstanceDic[m.UseKey]);
                             }
                             #endregion
                         }
                     }
                     else
                     {
-                        dbs.Add(m.dbKey, _dbInstanceDic[m.dbKey]);
+                        dbs.Add(m.UseKey, _dbInstanceDic[m.UseKey]);
                     }
                 }
             }
             return dbs;
         }
-        public Dictionary<string, IDb> GetDbs(List<DatabaseInfo> dbConfigList)
+        public Dictionary<string, IDb> GetDbs(List<DbInfo> dbConfigList)
         {
             var dbs = new Dictionary<string, IDb>();
             if (dbConfigList != null && dbConfigList.Count > 0)
             {
                 foreach (var m in dbConfigList)
                 {
-                    if (!_dbInstanceDic.ContainsKey(m.dbKey))
+                    if (!_dbInstanceDic.ContainsKey(m.UseKey))
                     {
                         lock (_lock)
                         {
                             #region -- code --
-                            if (!_dbInstanceDic.ContainsKey(m.dbKey))
+                            if (!_dbInstanceDic.ContainsKey(m.UseKey))
                             {
                                 IDb db = DbFactory.Create(m, _dbExecuteSqlEvent);
                                 if (db != null)
                                 {
-                                    _dbInstanceDic.Add(m.dbKey, db);
-                                    dbs.Add(m.dbKey, db);
+                                    _dbInstanceDic.Add(m.UseKey, db);
+                                    dbs.Add(m.UseKey, db);
                                 }
                             }
                             else
                             {
-                                dbs.Add(m.dbKey, _dbInstanceDic[m.dbKey]);
+                                dbs.Add(m.UseKey, _dbInstanceDic[m.UseKey]);
                             }
                             #endregion
                         }
                     }
                     else
                     {
-                        dbs.Add(m.dbKey, _dbInstanceDic[m.dbKey]);
+                        dbs.Add(m.UseKey, _dbInstanceDic[m.UseKey]);
                     }
                 }
             }
@@ -148,35 +148,35 @@ namespace ZeroDbs.Common
         public IDb GetDbByDbKey(string dbKey)
         {
             IDb reval = null;
-            var info = DbMapping.GetZeroDbConfigDatabaseInfo(dbKey);
+            var info = DbMapping.GetDbInfo(dbKey);
             if (info == null)
             {
                 return null;
             }
-            if (!_dbInstanceDic.ContainsKey(info.dbKey))
+            if (!_dbInstanceDic.ContainsKey(info.UseKey))
             {
                 lock (_lock)
                 {
                     #region -- code --
-                    if (!_dbInstanceDic.ContainsKey(info.dbKey))
+                    if (!_dbInstanceDic.ContainsKey(info.UseKey))
                     {
                         IDb db = DbFactory.Create(info, _dbExecuteSqlEvent);
                         if (db != null)
                         {
-                            _dbInstanceDic.Add(info.dbKey, db);
+                            _dbInstanceDic.Add(info.UseKey, db);
                             reval = db;
                         }
                     }
                     else
                     {
-                        reval = _dbInstanceDic[info.dbKey];
+                        reval = _dbInstanceDic[info.UseKey];
                     }
                     #endregion
                 }
             }
             else
             {
-                reval = _dbInstanceDic[info.dbKey];
+                reval = _dbInstanceDic[info.UseKey];
             }
             return reval;
         }

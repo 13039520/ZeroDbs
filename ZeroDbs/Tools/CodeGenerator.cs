@@ -32,7 +32,7 @@ namespace %NameSpace%
 }";
         public class SingleTableGeneratedEventArgs : EventArgs
         {
-            public Common.DatabaseInfo db { get; }
+            public Common.DbInfo db { get; }
             public Common.DbDataTableInfo table { get; }
             public string entityClassFullName { get; } 
             public string entityClassPath { get; }
@@ -40,7 +40,7 @@ namespace %NameSpace%
             public int tableNum { get; }
             public Config generatorConfig { get; }
 
-            public SingleTableGeneratedEventArgs(Common.DatabaseInfo db, Common.DbDataTableInfo table, Config generatorConfig, string entityClassFullName, string entityClassPath, int tableCount, int tableNum)
+            public SingleTableGeneratedEventArgs(Common.DbInfo db, Common.DbDataTableInfo table, Config generatorConfig, string entityClassFullName, string entityClassPath, int tableCount, int tableNum)
             {
                 this.db = db;
                 this.table = table;
@@ -67,11 +67,11 @@ namespace %NameSpace%
 
         public event SingleTableGeneratedHandler OnSingleTableGenerated;
         public Config GeneratorConfig { get; set; }
-        private List<Common.DatabaseInfo> _Dbs;
-        public List<Common.DatabaseInfo> Dbs { get { return _Dbs; } }
+        private List<Common.DbInfo> _Dbs;
+        public List<Common.DbInfo> Dbs { get { return _Dbs; } }
 
         public CodeGenerator() {
-            _Dbs = new List<Common.DatabaseInfo>();
+            _Dbs = new List<Common.DbInfo>();
         }
 
         public void Run()
@@ -115,7 +115,7 @@ namespace %NameSpace%
 
         }
 
-        private void Builder(List<Common.DatabaseInfo> dbsList, Config generatorConfig)
+        private void Builder(List<Common.DbInfo> dbsList, Config generatorConfig)
         {
             var dbs = new Common.DbService().GetDbs(dbsList);
             foreach (var key in dbs.Keys)
@@ -125,10 +125,10 @@ namespace %NameSpace%
                 Builder(db.Database, tables, db.Database, generatorConfig.EntityDir, generatorConfig.AppProjectDir, generatorConfig.EntityNamespace, generatorConfig.EntityTemplate);
             }
         }
-        private void Builder(Common.DatabaseInfo db, List<Common.DbDataTableInfo> tables, Common.DatabaseInfo dbInfo, string entityProjectRootDir, string targetProjectRootDir, string nameSpace, string entityTemplate = "")
+        private void Builder(Common.DbInfo db, List<Common.DbDataTableInfo> tables, Common.DbInfo dbInfo, string entityProjectRootDir, string targetProjectRootDir, string nameSpace, string entityTemplate = "")
         {
 
-            string entityFileSaveDir = System.IO.Path.Combine(entityProjectRootDir, dbInfo.dbKey);
+            string entityFileSaveDir = System.IO.Path.Combine(entityProjectRootDir, dbInfo.UseKey);
             string dbConfigFilePath = System.IO.Path.Combine(targetProjectRootDir, "ZeroDbConfig.xml");
             if (!System.IO.Directory.Exists(entityFileSaveDir))
             {
@@ -138,9 +138,9 @@ namespace %NameSpace%
             {
                 System.IO.Directory.CreateDirectory(targetProjectRootDir);
             }
-            if (!nameSpace.EndsWith("." + dbInfo.dbKey))
+            if (!nameSpace.EndsWith("." + dbInfo.UseKey))
             {
-                nameSpace += "." + dbInfo.dbKey;
+                nameSpace += "." + dbInfo.UseKey;
             }
             entityTemplate = string.IsNullOrEmpty(entityTemplate) ? template : entityTemplate;
             if (string.IsNullOrEmpty(entityTemplate))
@@ -183,18 +183,18 @@ namespace %NameSpace%
             {
                 nodeDvs = doc.CreateElement("dvs");
             }
-            System.Xml.XmlNode nodeDb = doc.SelectSingleNode(@"/zero/dbs/db[@dbKey='" + dbInfo.dbKey + "']");
+            System.Xml.XmlNode nodeDb = doc.SelectSingleNode(@"/zero/dbs/db[@dbKey='" + dbInfo.UseKey + "']");
             if (nodeDb == null)
             {
                 nodeDb = doc.CreateElement("db");
                 System.Xml.XmlAttribute attribute = doc.CreateAttribute("dbKey");
-                attribute.Value = dbInfo.dbKey;
+                attribute.Value = dbInfo.UseKey;
                 nodeDb.Attributes.Append(attribute);
                 attribute = doc.CreateAttribute("dbConnectionString");
-                attribute.Value = dbInfo.dbConnectionString;
+                attribute.Value = dbInfo.ConnectionString;
                 nodeDb.Attributes.Append(attribute);
                 attribute = doc.CreateAttribute("dbType");
-                attribute.Value = dbInfo.dbType;
+                attribute.Value = dbInfo.UseType.ToString();
                 nodeDb.Attributes.Append(attribute);
                 nodeDbs.AppendChild(nodeDb);
             }
@@ -296,13 +296,13 @@ namespace %NameSpace%
                 System.IO.File.AppendAllText(filePath, claText, Encoding.UTF8);
 
                 #region -- ZeroDbConfig.xml: /zero/dvs/dv --
-                string xpath = @"/zero/dvs/dv[@entityKey='" + nameSpace + "." + className + "' and @dbKey='" + dbInfo.dbKey + "']";
+                string xpath = @"/zero/dvs/dv[@entityKey='" + nameSpace + "." + className + "' and @dbKey='" + dbInfo.UseKey + "']";
                 System.Xml.XmlNode nodeDv = doc.SelectSingleNode(xpath);
                 if (nodeDv == null)
                 {
                     nodeDv = doc.CreateElement("dv");
                     System.Xml.XmlAttribute attribute = doc.CreateAttribute("dbKey");
-                    attribute.Value = dbInfo.dbKey;
+                    attribute.Value = dbInfo.UseKey;
                     nodeDv.Attributes.Append(attribute);
 
                     attribute = doc.CreateAttribute("tableName");

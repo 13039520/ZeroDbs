@@ -28,23 +28,23 @@ namespace ZeroDbs.Test
             Console.WriteLine("正在生成……");
 
             ZeroDbs.Tools.CodeGenerator generator = new Tools.CodeGenerator();
-            generator.Dbs.Add(new ZeroDbs.Common.DatabaseInfo
+            generator.Dbs.Add(new ZeroDbs.Common.DbInfo
             {
-                dbConnectionString = "Data Source=.;Initial Catalog=ZeroTestDb;User ID=sa;Password=123456;TrustServerCertificate=True;",
-                dbKey = "SqlServer001",
-                dbType = "SqlServer"
+                ConnectionString = "Data Source=.;Initial Catalog=ZeroTestDb;User ID=sa;Password=123456;TrustServerCertificate=True;",
+                UseKey = "SqlServer001",
+                UseType = Common.DbType.SqlServer
             });
-            generator.Dbs.Add(new ZeroDbs.Common.DatabaseInfo
+            generator.Dbs.Add(new ZeroDbs.Common.DbInfo
             {
-                dbConnectionString = "Host=localhost;Port=3306;Database=zerotestdb;User ID=root;Password=123456;",
-                dbKey = "MySql001",
-                dbType = "MySql"
+                ConnectionString = "Host=localhost;Port=3306;Database=zerotestdb;User ID=root;Password=123456;",
+                UseKey = "MySql001",
+                UseType = Common.DbType.MySql
             });
-            generator.Dbs.Add(new ZeroDbs.Common.DatabaseInfo
+            generator.Dbs.Add(new ZeroDbs.Common.DbInfo
             {
-                dbConnectionString = "Data Source=D:\\Program Files\\SQLiteStudio\\ZeroTestDb.db3;version=3;datetimeformat=CurrentCulture",
-                dbKey = "Sqlite001",
-                dbType = "Sqlite"
+                ConnectionString = "Data Source=D:\\Program Files\\SQLiteStudio\\ZeroTestDb.db3;version=3;datetimeformat=CurrentCulture",
+                UseKey = "Sqlite001",
+                UseType = Common.DbType.Sqlite
             });
             generator.GeneratorConfig = new ZeroDbs.Tools.CodeGenerator.Config
             {

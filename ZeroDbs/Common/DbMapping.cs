@@ -7,23 +7,23 @@ namespace ZeroDbs.Common
 {
     static class DbMapping
     {
-        public static DatabaseInfo GetZeroDbConfigDatabaseInfo(string dbKey)
+        public static DbInfo GetDbInfo(string dbKey)
         {
-            var zeroConfigInfo = DbConfigReader.GetZeroDbConfigInfo();
+            var zeroConfigInfo = DbConfigReader.GetDbConfigInfo();
             if (zeroConfigInfo != null && zeroConfigInfo.Dbs != null && zeroConfigInfo.Dbs.Count > 0)
             {
-                return zeroConfigInfo.Dbs.Find(o => string.Equals(o.dbKey, dbKey, StringComparison.OrdinalIgnoreCase));
+                return zeroConfigInfo.Dbs.Find(o => string.Equals(o.UseKey, dbKey, StringComparison.OrdinalIgnoreCase));
             }
             return null;
         }
-        public static List<DatabaseInfo> GetZeroDbConfigDatabaseInfo<T>()
+        public static List<DbInfo> GetDbInfo<T>()
         {
-            return GetZeroDbConfigDatabaseInfoByEntityFullName(typeof(T).FullName);
+            return GetDbInfoByEntityFullName(typeof(T).FullName);
         }
-        public static List<DatabaseInfo> GetZeroDbConfigDatabaseInfoByEntityFullName(string entityFullName)
+        public static List<DbInfo> GetDbInfoByEntityFullName(string entityFullName)
         {
             if (string.IsNullOrEmpty(entityFullName)) { return null; }
-            var zeroConfigInfo = DbConfigReader.GetZeroDbConfigInfo();
+            var zeroConfigInfo = DbConfigReader.GetDbConfigInfo();
             if (zeroConfigInfo != null && zeroConfigInfo.Dbs != null && zeroConfigInfo.Dvs.Count > 0)
             {
                 var entityKey = entityFullName;
@@ -33,10 +33,10 @@ namespace ZeroDbs.Common
                     return null;
                 }
                 var dbKeys = info1.Select(o => o.dbKey).Distinct().ToArray();
-                var reval = new List<DatabaseInfo>();
+                var reval = new List<DbInfo>();
                 foreach (var dbKey in dbKeys)
                 {
-                    var db = zeroConfigInfo.Dbs.Find(o => string.Equals(o.dbKey, dbKey, StringComparison.OrdinalIgnoreCase));
+                    var db = zeroConfigInfo.Dbs.Find(o => string.Equals(o.UseKey, dbKey, StringComparison.OrdinalIgnoreCase));
                     if (db != null)
                     {
                         reval.Add(db);
@@ -48,7 +48,7 @@ namespace ZeroDbs.Common
         }
         public static List<DbConfigDataviewInfo> GetDbConfigDataViewInfo<T>()
         {
-            var zeroConfigInfo = DbConfigReader.GetZeroDbConfigInfo();
+            var zeroConfigInfo = DbConfigReader.GetDbConfigInfo();
             if (zeroConfigInfo != null && zeroConfigInfo.Dbs != null && zeroConfigInfo.Dvs.Count > 0)
             {
                 var entityKey = typeof(T).FullName;
@@ -59,7 +59,7 @@ namespace ZeroDbs.Common
         }
         public static bool IsStandardMapping<T>()
         {
-            var zeroConfigInfo = DbConfigReader.GetZeroDbConfigInfo();
+            var zeroConfigInfo = DbConfigReader.GetDbConfigInfo();
             if (zeroConfigInfo != null && zeroConfigInfo.Dbs != null && zeroConfigInfo.Dvs.Count > 0)
             {
                 var entityKey = typeof(T).FullName;
