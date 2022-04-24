@@ -7,6 +7,6 @@ namespace ZeroDbs.Common
     public class DbConfigInfo
     {
         public List<DbInfo> Dbs { get; set; }
-        public List<DbConfigDataviewInfo> Dvs { get; set; }
+        public List<DbTableEntityMap> Dvs { get; set; }
     }
 }

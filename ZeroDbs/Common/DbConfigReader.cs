@@ -6,15 +6,15 @@ namespace ZeroDbs.Common
 {
     public class DbConfigReader
     {
-        private static Common.DbConfigInfo zeroConfigInfo = null;
+        private static DbConfigInfo zeroConfigInfo = null;
         private static readonly string fileName = "ZeroDbConfig.xml";
         private static string filePath = string.Empty;
-        public static Common.DbConfigInfo GetDbConfigInfo()
+        public static DbConfigInfo GetDbConfigInfo()
         {
             return Read();
         }
         private static object _lock = new object();
-        public static bool AddZeroDbMapping(string entityFullName, string dbKey, string tableName)
+        public static bool AddTableMapping(string entityFullName, string dbKey, string tableName)
         {
             if (string.IsNullOrEmpty(entityFullName) || string.IsNullOrEmpty(dbKey) || string.IsNullOrEmpty(tableName))
             {
@@ -24,12 +24,12 @@ namespace ZeroDbs.Common
             lock (_lock)
             {
                 if (config.Dbs.Find(o => o.UseKey == dbKey) == null) { return false; }
-                if (config.Dvs.Find(o => o.tableName == tableName) == null) { return false; }
-                config.Dvs.Add(new DbConfigDataviewInfo { dbKey = dbKey, entityKey = entityFullName, tableName = tableName, isStandardMapping = false });
+                if (config.Dvs.Find(o => o.TableName == tableName) == null) { return false; }
+                config.Dvs.Add(new DbTableEntityMap { DbKey = dbKey, EntityKey = entityFullName, TableName = tableName, IsStandardMapping = false });
             }
             return true;
         }
-        private static Common.DbConfigInfo Read()
+        private static DbConfigInfo Read()
         {
             if (zeroConfigInfo == null)
             {
@@ -37,7 +37,7 @@ namespace ZeroDbs.Common
                 {
                     if (zeroConfigInfo == null)
                     {
-                        Common.DbConfigInfo temp = ReadFile();
+                        DbConfigInfo temp = ReadFile();
                         if (temp != null)
                         {
                             zeroConfigInfo = temp;
@@ -47,9 +47,9 @@ namespace ZeroDbs.Common
             }
             return zeroConfigInfo;
         }
-        private static Common.DbConfigInfo ReadFile()
+        private static DbConfigInfo ReadFile()
         {
-            Common.DbConfigInfo temp = new Common.DbConfigInfo();
+            DbConfigInfo temp = new DbConfigInfo();
             if (string.IsNullOrEmpty(filePath))
             {
                 var dir = AppDomain.CurrentDomain.BaseDirectory;
@@ -78,7 +78,7 @@ namespace ZeroDbs.Common
                 {
                     throw new Exception("缺少db配置");
                 }
-                temp.Dbs = new List<Common.DbInfo>();
+                temp.Dbs = new List<DbInfo>();
                 foreach(System.Xml.XmlNode node in xmlNodeList)
                 {
                     System.Xml.XmlAttribute dbKey = node.Attributes["dbKey"];
@@ -120,7 +120,7 @@ namespace ZeroDbs.Common
                     {
                         continue;
                     }
-                    temp.Dbs.Add(new Common.DbInfo
+                    temp.Dbs.Add(new DbInfo
                     {
                         ConnectionString = conn,
                         UseKey = key,
@@ -132,7 +132,7 @@ namespace ZeroDbs.Common
                     return null;
                 }
                 xmlNodeList = xmlDocument.SelectNodes(@"/zero/dvs/dv");
-                temp.Dvs = new List<Common.DbConfigDataviewInfo>();
+                temp.Dvs = new List<DbTableEntityMap>();
                 if (xmlNodeList == null || xmlNodeList.Count < 1)
                 {
                     return temp;
@@ -163,16 +163,16 @@ namespace ZeroDbs.Common
                     {
                         continue;
                     }
-                    if (temp.Dvs.Find(o => string.Equals(o.entityKey, entity, StringComparison.OrdinalIgnoreCase)) != null)
+                    if (temp.Dvs.Find(o => string.Equals(o.EntityKey, entity, StringComparison.OrdinalIgnoreCase)) != null)
                     {
                         continue;
                     }
-                    temp.Dvs.Add(new Common.DbConfigDataviewInfo
+                    temp.Dvs.Add(new DbTableEntityMap
                     {
-                        dbKey = key,
-                        tableName = name,
-                        entityKey = entity,
-                        isStandardMapping = true
+                        DbKey = key,
+                        TableName = name,
+                        EntityKey = entity,
+                        IsStandardMapping = true
                     });
                 }
             }

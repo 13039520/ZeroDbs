@@ -35,8 +35,8 @@ namespace ZeroDbs.MySql
             try
             {
                 var dbName = cmd.DbConnection.Database;
-                var dv = Common.DbMapping.GetDbConfigDataViewInfo<DbEntity>().Find(o => string.Equals(o.dbKey, Database.UseKey, StringComparison.OrdinalIgnoreCase));
-                string getTableOrViewSql = "SELECT * FROM information_schema.TABLES WHERE TABLE_SCHEMA='" + dbName + "' AND TABLE_NAME='" + dv.tableName + "'";
+                var dv = Common.DbMapping.GetDbConfigDataViewInfo<DbEntity>().Find(o => string.Equals(o.DbKey, Database.UseKey, StringComparison.OrdinalIgnoreCase));
+                string getTableOrViewSql = "SELECT * FROM information_schema.TABLES WHERE TABLE_SCHEMA='" + dbName + "' AND TABLE_NAME='" + dv.TableName + "'";
 
                 Common.DbDataTableInfo dbDataTableInfo = null;
 
@@ -77,7 +77,7 @@ namespace ZeroDbs.MySql
 
                 if (dbDataTableInfo == null)
                 {
-                    throw new Exception("查询" + dv.tableName + "的表信息不成功");
+                    throw new Exception("查询" + dv.TableName + "的表信息不成功");
                 }
 
                 string getColumnInfoSql = "SELECT * FROM information_schema.COLUMNS WHERE table_schema='" + dbDataTableInfo.DbName + "' AND table_name='" + dbDataTableInfo.Name + "'"; ;

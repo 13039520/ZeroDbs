@@ -34,8 +34,8 @@ namespace ZeroDbs.Sqlite
             var cmd = this.GetDbCommand();
             try
             {
-                var dv = Common.DbMapping.GetDbConfigDataViewInfo<T>().Find(o => string.Equals(o.dbKey, Database.UseKey, StringComparison.OrdinalIgnoreCase));
-                string getTableOrViewSql = "select * from sqlite_master where name='"+dv.tableName + "' and type IN('table','view')";
+                var dv = Common.DbMapping.GetDbConfigDataViewInfo<T>().Find(o => string.Equals(o.DbKey, Database.UseKey, StringComparison.OrdinalIgnoreCase));
+                string getTableOrViewSql = "select * from sqlite_master where name='"+dv.TableName + "' and type IN('table','view')";
 
                 Common.DbDataTableInfo dbDataTableInfo = null;
                 List<string> IdentityNames = new List<string>();
@@ -67,10 +67,10 @@ namespace ZeroDbs.Sqlite
 
                 if (dbDataTableInfo == null)
                 {
-                    throw new Exception("查询" + dv.tableName + "的表信息不成功");
+                    throw new Exception("查询" + dv.TableName + "的表信息不成功");
                 }
 
-                string getColumnInfoSql = "PRAGMA table_info(" + dv.tableName + ")";
+                string getColumnInfoSql = "PRAGMA table_info(" + dv.TableName + ")";
                 cmd.IsCheckCommandText = false;
                 cmd.CommandText = getColumnInfoSql;
                 reader = cmd.ExecuteReader();

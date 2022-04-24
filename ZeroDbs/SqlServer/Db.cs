@@ -41,12 +41,12 @@ namespace ZeroDbs.SqlServer
             var cmd = this.GetDbCommand();
             try
             {
-                var dv = Common.DbMapping.GetDbConfigDataViewInfo<DbEntity>().Find(o => string.Equals(o.dbKey, Database.UseKey, StringComparison.OrdinalIgnoreCase));
+                var dv = Common.DbMapping.GetDbConfigDataViewInfo<DbEntity>().Find(o => string.Equals(o.DbKey, Database.UseKey, StringComparison.OrdinalIgnoreCase));
                 string getTableOrViewSql = "SELECT A.[id],A.[type],A.[name],"
                     + "(SELECT TOP 1 ISNULL(value, '') FROM sys.extended_properties AS E LEFT JOIN (SELECT object_id,name AS name2 FROM sys.views UNION SELECT object_id,name AS name2 FROM sys.tables) AS T1 ON T1.object_id=major_id WHERE E.minor_id=0 AND E.name='MS_Description' AND name2=A.[name])"
                     + "AS [description]"
                     + " FROM [sysobjects] AS A"
-                    + " WHERE [name]='" + dv.tableName + "' AND ([type] = 'U' OR [type]= 'V')  ORDER BY [type],[name]";
+                    + " WHERE [name]='" + dv.TableName + "' AND ([type] = 'U' OR [type]= 'V')  ORDER BY [type],[name]";
 
                 Common.DbDataTableInfo dbDataTableInfo = null;
 
@@ -79,7 +79,7 @@ namespace ZeroDbs.SqlServer
 
                 if (dbDataTableInfo == null)
                 {
-                    throw new Exception("查询" + dv.tableName + "的表信息不成功");
+                    throw new Exception("查询" + dv.TableName + "的表信息不成功");
                 }
 
                 string getColumnInfoSql = "SELECT C.Name AS [Name],DbEntity.Name AS [Type],"
@@ -98,7 +98,7 @@ namespace ZeroDbs.SqlServer
                     + "INNER JOIN systypes DbEntity ON C.xusertype = DbEntity.xusertype "
                     + "LEFT JOIN sys.extended_properties ETP ON ETP.major_id=C.id AND ETP.minor_id=C.colid AND ETP.name='MS_Description' "
                     + "LEFT JOIN syscomments CM ON C.cdefault=CM.id"
-                    + " WHERE C.Id=object_id('" + dv.tableName + "')";
+                    + " WHERE C.Id=object_id('" + dv.TableName + "')";
 
                 List<string> sqlList2 = new List<string>();
                 sqlList2.Add(getColumnInfoSql);

@@ -27,12 +27,12 @@ namespace ZeroDbs.Common
             if (zeroConfigInfo != null && zeroConfigInfo.Dbs != null && zeroConfigInfo.Dvs.Count > 0)
             {
                 var entityKey = entityFullName;
-                var info1 = zeroConfigInfo.Dvs.FindAll(o => string.Equals(o.entityKey, entityKey, StringComparison.OrdinalIgnoreCase));
+                var info1 = zeroConfigInfo.Dvs.FindAll(o => string.Equals(o.EntityKey, entityKey, StringComparison.OrdinalIgnoreCase));
                 if (info1 == null || info1.Count < 1)
                 {
                     return null;
                 }
-                var dbKeys = info1.Select(o => o.dbKey).Distinct().ToArray();
+                var dbKeys = info1.Select(o => o.DbKey).Distinct().ToArray();
                 var reval = new List<DbInfo>();
                 foreach (var dbKey in dbKeys)
                 {
@@ -46,13 +46,13 @@ namespace ZeroDbs.Common
             }
             return null;
         }
-        public static List<DbConfigDataviewInfo> GetDbConfigDataViewInfo<T>()
+        public static List<DbTableEntityMap> GetDbConfigDataViewInfo<T>()
         {
             var zeroConfigInfo = DbConfigReader.GetDbConfigInfo();
             if (zeroConfigInfo != null && zeroConfigInfo.Dbs != null && zeroConfigInfo.Dvs.Count > 0)
             {
                 var entityKey = typeof(T).FullName;
-                var info1 = zeroConfigInfo.Dvs.FindAll(o => string.Equals(o.entityKey, entityKey, StringComparison.OrdinalIgnoreCase));
+                var info1 = zeroConfigInfo.Dvs.FindAll(o => string.Equals(o.EntityKey, entityKey, StringComparison.OrdinalIgnoreCase));
                 return info1;
             }
             return null;
@@ -63,12 +63,12 @@ namespace ZeroDbs.Common
             if (zeroConfigInfo != null && zeroConfigInfo.Dbs != null && zeroConfigInfo.Dvs.Count > 0)
             {
                 var entityKey = typeof(T).FullName;
-                var info1 = zeroConfigInfo.Dvs.Find(o => string.Equals(o.entityKey, entityKey, StringComparison.OrdinalIgnoreCase));
+                var info1 = zeroConfigInfo.Dvs.Find(o => string.Equals(o.EntityKey, entityKey, StringComparison.OrdinalIgnoreCase));
                 if (info1 == null)
                 {
                     return false;
                 }
-                return info1.isStandardMapping;
+                return info1.IsStandardMapping;
             }
             return false;
         }

@@ -216,7 +216,7 @@ namespace ZeroDbs.Common
         }
         public bool AddZeroDbMapping(string entityFullName, string dbKey, string tableName)
         {
-            return DbConfigReader.AddZeroDbMapping(entityFullName, dbKey, tableName);
+            return DbConfigReader.AddTableMapping(entityFullName, dbKey, tableName);
         }
 
 
