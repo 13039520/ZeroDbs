@@ -141,6 +141,10 @@ namespace ZeroDbs.Common
             return reval;
         }
 
+        public SqlInfo Select<DbEntity>(ListQuery query) where DbEntity : class, new()
+        {
+            return Select<DbEntity>(query.Where, query.Orderby, query.Top, query.Fields, query.Paras);
+        }
         public virtual SqlInfo Select<DbEntity>(string where, string orderby, int top, string[] fields, params object[] paras) where DbEntity : class, new()
         {
             SqlInfo reval = new SqlInfo();

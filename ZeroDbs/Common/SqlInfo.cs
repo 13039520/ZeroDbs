@@ -11,5 +11,6 @@ namespace ZeroDbs.Common
         private Dictionary<string, object> _Paras = new Dictionary<string, object>();
         public string Sql { get; set; }
         public Dictionary<string, object> Paras { get { return _Paras; } }
+
     }
 }

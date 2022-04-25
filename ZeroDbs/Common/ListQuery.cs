@@ -19,5 +19,37 @@ namespace ZeroDbs.Common
         public string Orderby { get { return _Orderby; } set { _Orderby = value; } }
         public string[] Fields { get { return _Fields; } set { _Fields = value; } }
         public object[] Paras { get { return _Paras; } set { _Paras = value; } }
+
+        public ListQuery UseWhere(string where)
+        {
+            this._Where = where;
+            return this;
+        }
+        public ListQuery UseTop(int top)
+        {
+            this._Top = top;
+            return this;
+        }
+        public ListQuery UseFields(params string[] paras)
+        {
+            this._Fields = paras;
+            return this;
+        }
+        public ListQuery UseOrderby(string orderby)
+        {
+            this._Orderby = orderby;
+            return this;
+        }
+        public ListQuery UseParas(params object[] paras)
+        {
+            this._Paras = paras;
+            return this;
+        }
+
+        public static ListQuery Builder()
+        {
+            return new ListQuery();
+        }
+
     }
 }
