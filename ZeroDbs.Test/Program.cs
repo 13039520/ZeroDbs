@@ -136,13 +136,13 @@ namespace ZeroDbs.Test
                 Fields = new string[0],
                 UniqueField = ""
             };
-            var page1 = dbService.Page<MyDbs.SqlServer001.tUser>(query);
+            var page1 = dbService.Page<MyDbs.SqlServer001.tUser,MyEntity>(query);
             Console.WriteLine("MyDbs.SqlServer001.tUser:");
             if (page1.Total > 0)
             {
-                foreach (MyDbs.SqlServer001.tUser m in page1.Items)
+                foreach (MyEntity m in page1.Items)
                 {
-                    Console.WriteLine("{0}\t{1}\t{2}\t{3}", m.ID, m.Name, m.Email, m.CreateTime);
+                    Console.WriteLine("{0}\t{1}\t{2}\t{3}", m.ID, m.Name, "", m.CreateTime);
                 }
             }
             else
@@ -187,7 +187,7 @@ namespace ZeroDbs.Test
                 Orderby = "ID DESC",
                 Top = 10
             };
-            var list1 = dbService.Select<MyDbs.SqlServer001.tUser>(listQuery);
+            var list1 = dbService.Select<MyDbs.SqlServer001.tUser, MyEntity>(listQuery);
             Console.WriteLine("MyDbs.SqlServer001.tUser:");
             if (list1.Count > 0)
             {

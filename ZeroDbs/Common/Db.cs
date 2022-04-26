@@ -181,7 +181,7 @@ namespace ZeroDbs.Common
         }
         public Common.PageData<IntoEntity> Page<DbEntity, IntoEntity>(Common.PageQuery query) where DbEntity : class, new() where IntoEntity : class, new()
         {
-            return Page<IntoEntity, IntoEntity>(query.Page, query.Size, query.Where, query.Orderby, query.UniqueField, query.Paras);
+            return Page<DbEntity, IntoEntity>(query.Page, query.Size, query.Where, query.Orderby, query.UniqueField, query.Paras);
         }
         public Common.PageData<IntoEntity> Page<DbEntity, IntoEntity>(long page, long size, string where, string orderby, string uniqueField, params object[] paras) where DbEntity : class, new() where IntoEntity : class, new()
         {
@@ -364,7 +364,7 @@ namespace ZeroDbs.Common
 
         public int Update<DbEntity>(DbEntity entity) where DbEntity : class, new()
         {
-            var info = this.SqlBuilder.Update<DbEntity>();
+            var info = this.SqlBuilder.Update<DbEntity>(entity);
             var cmd = this.GetDbCommand();
             try
             {

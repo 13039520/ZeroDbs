@@ -32,9 +32,23 @@ namespace ZeroDbs.MySql
             long endIndex = startIndex + size;
             StringBuilder sql = new StringBuilder();
             StringBuilder fieldStr = new StringBuilder();
+            bool needCheck = true;
+            if (fields == null || fields.Length < 1)
+            {
+                needCheck = false;
+                fields = tableInfo.Colunms.FindAll(o => o.MaxLength < 1000).Select(o => o.Name).ToArray();
+            }
             for (int i = 0; i < fields.Length; i++)
             {
-                if (!string.IsNullOrEmpty(fields[i]))
+                if (needCheck)
+                {
+                    var col = tableInfo.Colunms.Find(o => string.Equals(o.Name, fields[i], StringComparison.OrdinalIgnoreCase));
+                    if (col != null)
+                    {
+                        fieldStr.AppendFormat("{0},", GetColunmName(col.Name));
+                    }
+                }
+                else
                 {
                     fieldStr.AppendFormat("{0},", GetColunmName(fields[i]));
                 }
@@ -101,41 +115,36 @@ namespace ZeroDbs.MySql
         {
             Common.SqlInfo reval = new Common.SqlInfo();
             var tableInfo = this.GetTable<DbEntity>();
-            string[] fieldArray = tableInfo.Colunms.Select(o => o.Name).ToArray();
-            if (fields != null && fields.Length > 0)
-            {
-                int i = 0;
-                List<string> temp = new List<string>();
-                while (i < fields.Length)
-                {
-                    int j = 0;
-                    while (j < fieldArray.Length)
-                    {
-                        if (string.Equals(fields[i], fieldArray[j], StringComparison.OrdinalIgnoreCase))
-                        {
-                            temp.Add(fieldArray[j]);
-                            break;
-                        }
-                        j++;
-                    }
-                    i++;
-                }
-                fields = temp.Distinct().ToArray();
-                if (fields.Length > 0)
-                {
-                    fieldArray = fields;
-                }
-            }
             StringBuilder field = new StringBuilder();
-            foreach (string s in fieldArray)
+            bool needCheck = true;
+            if (fields == null || fields.Length < 1)
             {
-                field.AppendFormat("{0},", GetColunmName(s));
+                needCheck = false;
+                fields = tableInfo.Colunms.FindAll(o => o.MaxLength < 1000).Select(o => o.Name).ToArray();
             }
-            if (field.Length < 1)
+            for (int i = 0; i < fields.Length; i++)
             {
-                throw new Exception("The resulting return field is invalid");
+                if (needCheck)
+                {
+                    var col = tableInfo.Colunms.Find(o => string.Equals(o.Name, fields[i], StringComparison.OrdinalIgnoreCase));
+                    if (col != null)
+                    {
+                        field.AppendFormat("{0},", GetColunmName(col.Name));
+                    }
+                }
+                else
+                {
+                    field.AppendFormat("{0},", GetColunmName(fields[i]));
+                }
             }
-            field.Remove(field.Length - 1, 1);
+            if (field.Length > 0)
+            {
+                field.Remove(field.Length - 1, 1);
+            }
+            else
+            {
+                field.Append("*");
+            }
             if (string.IsNullOrEmpty(where))
             {
                 where = "1>0";
