@@ -12,8 +12,7 @@ namespace ZeroDbs.Test
         {
             dbService = new ZeroDbs.Common.DbService(new Common.DbExecuteHandler((obj, e) => {
                 Console.ForegroundColor = ConsoleColor.Blue;
-                Console.WriteLine("TransactionInfo={0}&Sql={1}", e.TransactionInfo, e.ExecuteSql);
-                Console.WriteLine("DbKey={0}&TransactionInfo={1}&Message={2}", e.DbKey, e.TransactionInfo, e.Message);
+                Console.WriteLine("DbKey={0}&Trans={1}&Sql=\r\n{2}\r\n&Message={3}", e.DbKey, e.TransactionInfo, e.ExecuteSql, e.Message);
                 Console.ResetColor();
             }));
             //CodeGenerator();
