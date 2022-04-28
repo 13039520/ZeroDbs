@@ -141,14 +141,14 @@ namespace ZeroDbs.Common
         {
             return Select<DbEntity>(query.Where, query.Orderby, query.Top, query.Fields, query.Paras);
         }
-        public List<IntoEntity> Select<DbEntity, IntoEntity>(string where, string orderby, int top, params object[] paras) where DbEntity : class, new() where IntoEntity : class, new()
+        public List<OutType> Select<DbEntity, OutType>(string where, string orderby, int top, params object[] paras) where DbEntity : class, new() where OutType : class, new()
         {
-            string[] fields = typeof(IntoEntity).GetProperties().Select(o => o.Name).ToArray();
+            string[] fields = typeof(OutType).GetProperties().Select(o => o.Name).ToArray();
             var info = SqlBuilder.Select<DbEntity>(where, orderby, top, fields, paras);
             var cmd = GetDbCommand();
             try
             {
-                List<IntoEntity> reval = cmd.ExecuteQuery<IntoEntity>(info);
+                List<OutType> reval = cmd.ExecuteQuery<OutType>(info);
                 cmd.Dispose();
                 return reval;
             }
@@ -179,13 +179,13 @@ namespace ZeroDbs.Common
         {
             return Page<DbEntity>(query.Page, query.Size, query.Where, query.Orderby, query.Fields, query.UniqueField, query.Paras);
         }
-        public Common.PageData<IntoEntity> Page<DbEntity, IntoEntity>(Common.PageQuery query) where DbEntity : class, new() where IntoEntity : class, new()
+        public Common.PageData<OutType> Page<DbEntity, OutType>(Common.PageQuery query) where DbEntity : class, new() where OutType : class, new()
         {
-            return Page<DbEntity, IntoEntity>(query.Page, query.Size, query.Where, query.Orderby, query.UniqueField, query.Paras);
+            return Page<DbEntity, OutType>(query.Page, query.Size, query.Where, query.Orderby, query.UniqueField, query.Paras);
         }
-        public Common.PageData<IntoEntity> Page<DbEntity, IntoEntity>(long page, long size, string where, string orderby, string uniqueField, params object[] paras) where DbEntity : class, new() where IntoEntity : class, new()
+        public Common.PageData<OutType> Page<DbEntity, OutType>(long page, long size, string where, string orderby, string uniqueField, params object[] paras) where DbEntity : class, new() where OutType : class, new()
         {
-            string[] fields = typeof(IntoEntity).GetProperties().Select(o => o.Name).ToArray();
+            string[] fields = typeof(OutType).GetProperties().Select(o => o.Name).ToArray();
             var countSql = SqlBuilder.Count<DbEntity>(where, paras);
             var info = SqlBuilder.Page<DbEntity>(page, size, where, orderby, fields, uniqueField, paras);
             var cmd = this.GetDbCommand();
@@ -198,18 +198,18 @@ namespace ZeroDbs.Common
                 if (total < 1)
                 {
                     cmd.Dispose();
-                    return new Common.PageData<IntoEntity> { Total = total, Items = new List<IntoEntity>() };
+                    return new Common.PageData<OutType> { Total = total, Items = new List<OutType>() };
                 }
                 long pages = total % size == 0 ? total / size : (total / size + 1);
                 if (page > pages)
                 {
                     cmd.Dispose();
-                    return new Common.PageData<IntoEntity> { Total = total, Items = new List<IntoEntity>() };
+                    return new Common.PageData<OutType> { Total = total, Items = new List<OutType>() };
                 }
-                var reval = cmd.ExecuteQuery<IntoEntity>(info);
+                var reval = cmd.ExecuteQuery<OutType>(info);
                 cmd.Dispose();
 
-                return new Common.PageData<IntoEntity> { Total = total, Items = reval };
+                return new Common.PageData<OutType> { Total = total, Items = reval };
             }
             catch (Exception ex)
             {

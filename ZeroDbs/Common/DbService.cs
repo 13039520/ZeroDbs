@@ -228,26 +228,26 @@ namespace ZeroDbs.Common
         {
             return GetDb<DbEntity>().Select<DbEntity>(query);
         }
-        public List<IntoEntity> Select<DbEntity, IntoEntity>(string where, string orderby, int top, params object[] paras) where DbEntity : class, new() where IntoEntity : class, new()
+        public List<OutType> Select<DbEntity, OutType>(string where, string orderby, int top, params object[] paras) where DbEntity : class, new() where OutType : class, new()
         {
-            return GetDb<DbEntity>().Select<DbEntity, IntoEntity>(where, orderby, top, paras);
+            return GetDb<DbEntity>().Select<DbEntity, OutType>(where, orderby, top, paras);
         }
         public List<DbEntity> Select<DbEntity>(string where, string orderby, int top, string[] fields, params object[] paras) where DbEntity : class, new()
         {
             return GetDb<DbEntity>().Select<DbEntity>(where, orderby, top, fields, paras);
         }
 
-        public Common.PageData<IntoEntity> Page<DbEntity, IntoEntity>(PageQuery query) where DbEntity : class, new() where IntoEntity : class, new()
+        public Common.PageData<OutType> Page<DbEntity, OutType>(PageQuery query) where DbEntity : class, new() where OutType : class, new()
         {
-            return GetDb<DbEntity>().Page<DbEntity, IntoEntity>(query);
+            return GetDb<DbEntity>().Page<DbEntity, OutType>(query);
         }
         public Common.PageData<DbEntity> Page<DbEntity>(PageQuery query) where DbEntity : class, new()
         {
             return GetDb<DbEntity>().Page<DbEntity>(query);
         }
-        public Common.PageData<IntoEntity> Page<DbEntity, IntoEntity>(long page, long size, string where, string orderby, string uniqueField, params object[] paras) where DbEntity : class, new() where IntoEntity : class, new()
+        public Common.PageData<OutType> Page<DbEntity, OutType>(long page, long size, string where, string orderby, string uniqueField, params object[] paras) where DbEntity : class, new() where OutType : class, new()
         {
-            return GetDb<DbEntity>().Page<DbEntity, IntoEntity>(page, size, where, orderby, uniqueField, paras);
+            return GetDb<DbEntity>().Page<DbEntity, OutType>(page, size, where, orderby, uniqueField, paras);
         }
         public Common.PageData<DbEntity> Page<DbEntity>(long page, long size, string where, string orderby, string[] fields, string uniqueField, params object[] paras) where DbEntity : class, new()
         {
