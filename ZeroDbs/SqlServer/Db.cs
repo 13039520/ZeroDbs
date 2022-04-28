@@ -12,7 +12,7 @@ namespace ZeroDbs.SqlServer
 {
     internal class Db: Common.Db
     {
-        public Db(Common.DbInfo database): base(database)
+        public Db(IDbInfo database): base(database)
         {
 
         }
@@ -24,7 +24,7 @@ namespace ZeroDbs.SqlServer
             return new  Microsoft.Data.SqlClient.SqlConnection(Database.ConnectionString);
 #endif
         }
-        public override Common.DbDataTableInfo GetTable<DbEntity>()
+        public override ITableInfo GetTable<DbEntity>()
         {
             if (!IsMappingToDbKey<DbEntity>())
             {
@@ -48,13 +48,13 @@ namespace ZeroDbs.SqlServer
                     + " FROM [sysobjects] AS A"
                     + " WHERE [name]='" + dv.TableName + "' AND ([type] = 'U' OR [type]= 'V')  ORDER BY [type],[name]";
 
-                Common.DbDataTableInfo dbDataTableInfo = null;
+                Common.TableInfo dbDataTableInfo = null;
 
                 cmd.CommandText = getTableOrViewSql;
                 var reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    dbDataTableInfo = new Common.DbDataTableInfo();
+                    dbDataTableInfo = new Common.TableInfo();
                     dbDataTableInfo.DbName = cmd.DbConnection.Database;
                     dbDataTableInfo.Name = reader["name"].ToString();
                     string type = (reader["type"].ToString()).Trim();
@@ -72,7 +72,7 @@ namespace ZeroDbs.SqlServer
                         }
                     }
                     dbDataTableInfo.Description = description;
-                    dbDataTableInfo.Colunms = new List<Common.DbDataColumnInfo>();
+                    dbDataTableInfo.Colunms = new List<IColumnInfo>();
                 }
                 reader.Close();
                 reader.Dispose();
@@ -107,7 +107,7 @@ namespace ZeroDbs.SqlServer
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    ZeroDbs.Common.DbDataColumnInfo column = new ZeroDbs.Common.DbDataColumnInfo();
+                    ZeroDbs.Common.ColumnInfo column = new ZeroDbs.Common.ColumnInfo();
                     column.MaxLength = Convert.ToInt64(reader["MaxLength"]);
                     column.Byte = Convert.ToInt64(reader["Byte"]);
                     column.DecimalDigits = Convert.ToInt32(reader["DecimalDigits"]);
@@ -137,7 +137,7 @@ namespace ZeroDbs.SqlServer
                 throw ex;
             }
         }
-        public override List<ZeroDbs.Common.DbDataTableInfo> GetTables()
+        public override List<ITableInfo> GetTables()
         {
             var cmd = this.GetDbCommand();
             try
@@ -150,13 +150,13 @@ namespace ZeroDbs.SqlServer
                     + " FROM[sysobjects] AS A"
                     + " WHERE([type] = 'U' OR [type]= 'V')  ORDER BY [type],[name]";
                
-                List<ZeroDbs.Common.DbDataTableInfo> List = new List<ZeroDbs.Common.DbDataTableInfo>();
+                List<ITableInfo> List = new List<ITableInfo>();
                 
                 cmd.CommandText = getAllTableAndViewSql;
                 var reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    ZeroDbs.Common.DbDataTableInfo m = new Common.DbDataTableInfo();
+                    ZeroDbs.Common.TableInfo m = new Common.TableInfo();
                     m.DbName = dbName;
                     m.Name = reader["name"].ToString();
                     string type = (reader["type"].ToString()).Trim();
@@ -174,13 +174,13 @@ namespace ZeroDbs.SqlServer
                         }
                     }
                     m.Description = description;
-                    m.Colunms = new List<Common.DbDataColumnInfo>();
+                    m.Colunms = new List<IColumnInfo>();
                     List.Add(m);
                 }
                 reader.Close();
                 reader.Dispose();
 
-                foreach (ZeroDbs.Common.DbDataTableInfo m in List)
+                foreach (ZeroDbs.Common.TableInfo m in List)
                 {
                     string sql = "SELECT C.Name AS [Name],DbEntity.Name AS [Type],"
                     + "CONVERT(bit,C.IsNullable) AS [IsNullable],"
@@ -204,7 +204,7 @@ namespace ZeroDbs.SqlServer
                     reader = cmd.ExecuteReader();
                     while (reader.Read())
                     {
-                        ZeroDbs.Common.DbDataColumnInfo column = new ZeroDbs.Common.DbDataColumnInfo();
+                        ZeroDbs.Common.ColumnInfo column = new ZeroDbs.Common.ColumnInfo();
                         column.MaxLength = Convert.ToInt64(reader["MaxLength"]);
                         column.Byte = Convert.ToInt64(reader["Byte"]);
                         column.DecimalDigits = Convert.ToInt32(reader["DecimalDigits"]);
@@ -223,7 +223,6 @@ namespace ZeroDbs.SqlServer
                 }
 
                 cmd.Dispose();
-
                 return List;
             }
             catch (Exception ex)

@@ -10,10 +10,10 @@ namespace ZeroDbs.Test
         static ZeroDbs.IDbService dbService = null;
         static void Main(string[] args)
         {
-            dbService = new ZeroDbs.Common.DbService(new Common.DbExecuteSqlEvent((obj, e) => {
+            dbService = new ZeroDbs.Common.DbService(new Common.DbExecuteHandler((obj, e) => {
                 Console.ForegroundColor = ConsoleColor.Blue;
-                Console.WriteLine(string.Join(Environment.NewLine, e.ExecuteSql));
-                Console.WriteLine("DbKey={0}&Message={1}", e.DbKey, e.Message);
+                Console.WriteLine("TransactionInfo={0}&Sql={1}", e.TransactionInfo, e.ExecuteSql);
+                Console.WriteLine("DbKey={0}&TransactionInfo={1}&Message={2}", e.DbKey, e.TransactionInfo, e.Message);
                 Console.ResetColor();
             }));
             //CodeGenerator();

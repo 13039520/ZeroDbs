@@ -12,14 +12,14 @@ namespace ZeroDbs.Common
     public abstract class Db : IDb
     {
         private IDataTypeMaping dataTypeMaping = null;
-        private Common.DbInfo database = null;
+        private IDbInfo database = null;
         private Common.SqlBuilder sqlBuilder = null;
-        public Common.DbInfo Database { get { return database; } }
+        public IDbInfo Database { get { return database; } }
         public Common.SqlBuilder SqlBuilder { get { return sqlBuilder; } }
         public IDataTypeMaping DataTypeMaping { get { return dataTypeMaping; } }
 
-        public event DbExecuteSqlEvent OnDbExecuteSqlEvent = null;
-        public Db(Common.DbInfo database)
+        public event DbExecuteHandler OnDbExecuteSqlEvent = null;
+        public Db(IDbInfo database)
         {
             this.database = database;
             switch (this.database.Type)
@@ -40,7 +40,7 @@ namespace ZeroDbs.Common
                     throw new Exception("Unsupported database type");
             }
         }
-        public void FireZeroDbExecuteSqlEvent(DbExecuteSqlEventArgs args)
+        public void FireZeroDbExecuteSqlEvent(DbExecuteArgs args)
         {
             if (this.OnDbExecuteSqlEvent != null)
             {
@@ -61,11 +61,11 @@ namespace ZeroDbs.Common
         {
             throw new NotImplementedException();
         }
-        public virtual DbDataTableInfo GetTable<DbEntity>() where DbEntity : class, new()
+        public virtual ITableInfo GetTable<DbEntity>() where DbEntity : class, new()
         {
             throw new NotImplementedException();
         }
-        public virtual List<DbDataTableInfo> GetTables()
+        public virtual List<ITableInfo> GetTables()
         {
             throw new NotImplementedException();
         }

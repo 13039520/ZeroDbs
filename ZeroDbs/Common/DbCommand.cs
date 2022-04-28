@@ -9,34 +9,39 @@ namespace ZeroDbs.Common
         private readonly System.Data.Common.DbCommand dbCommand = null;
         private int commandTimeout = 15;
         private string commandText = "";
+        private string transactionInfo = "";
         private System.Data.CommandType commandType = System.Data.CommandType.Text;
         private string dbKey = "";
         private bool isCheckCommandText = true;
-        private Common.SqlBuilder dbSqlBuilder = null;
+        private Common.SqlBuilder sqlBuilder = null;
+        private bool hasDbExecuteHandler = false;
 
+        public string TransactionInfo { get { return transactionInfo; } set { transactionInfo = value; } }
         public string CommandText { get { return commandText; } set { commandText = value; } }
         public int CommandTimeout { get { return commandTimeout; } set { commandTimeout = value; } }
         public bool IsCheckCommandText { get { return isCheckCommandText; } set { isCheckCommandText = value; } }
         public System.Data.Common.DbParameterCollection Parameters { get { return dbCommand.Parameters; } }
         public System.Data.CommandType CommandType { get { return commandType; } set { commandType = value; } }
         public System.Data.Common.DbConnection DbConnection { get { return dbCommand.Connection; } }
-        public Common.SqlBuilder DbSqlBuilder { get { return dbSqlBuilder; } }
+        public Common.SqlBuilder SqlBuilder { get { return sqlBuilder; } }
         public string DbKey { get { return dbKey; } }
 
-        private event DbExecuteSqlEvent OnExecuteSqlEvent;
-        protected void FireExecuteSql(Common.DbExecuteSqlEventArgs e)
+        private event DbExecuteHandler OnDbExecute;
+        protected void FireExecuteSql(DbExecuteSqlType type, string msg = "OK")
         {
-            if (OnExecuteSqlEvent != null)
+            try
             {
-                OnExecuteSqlEvent(this, e);
+                OnDbExecute(this, new DbExecuteArgs(dbKey,commandText,transactionInfo,type,msg));
             }
+            catch { }
         }
-        public DbCommand(string dbKey, System.Data.Common.DbCommand dbCommand, Common.DbExecuteSqlEvent onExecuteSqlEvent, Common.SqlBuilder dbSqlBuilder)
+        public DbCommand(string dbKey, System.Data.Common.DbCommand dbCommand, DbExecuteHandler dbExecuteHandler, SqlBuilder sqlBuilder)
         {
-            this.OnExecuteSqlEvent = onExecuteSqlEvent;
+            this.OnDbExecute = dbExecuteHandler;
             this.dbKey = dbKey;
             this.dbCommand = dbCommand;
-            this.dbSqlBuilder = dbSqlBuilder;
+            this.sqlBuilder = sqlBuilder;
+            this.hasDbExecuteHandler = dbExecuteHandler != null;
         }
         public System.Data.Common.DbParameter CreateParameter()
         {
@@ -60,8 +65,6 @@ namespace ZeroDbs.Common
         }
         public int ExecuteNonQuery()
         {
-            List<string> sqlList = new List<string>();
-            sqlList.Add(CommandText);
             try
             {
                 if (IsCheckCommandText && CommandType == System.Data.CommandType.Text)
@@ -77,26 +80,25 @@ namespace ZeroDbs.Common
                 dbCommand.CommandText = CommandText;
                 dbCommand.CommandTimeout = CommandTimeout;
                 dbCommand.CommandType = CommandType;
-                FireExecuteSql(new DbExecuteSqlEventArgs(
-                    DbKey,
-                    sqlList,
-                    DbExecuteSqlType.NONQUERY,
-                    "OK"));
+                if (hasDbExecuteHandler)
+                {
+                    FireExecuteSql(DbExecuteSqlType.NONQUERY);
+                }
+                
                 return dbCommand.ExecuteNonQuery();
             }
             catch (Exception ex)
             {
-                FireExecuteSql(new DbExecuteSqlEventArgs(
-                    DbKey,
-                    sqlList,
-                    DbExecuteSqlType.NONQUERY,
-                    ex.Message));
+                if (hasDbExecuteHandler)
+                {
+                    FireExecuteSql(DbExecuteSqlType.NONQUERY,ex.Message);
+                }
                 throw ex;
             }
         }
         public int ExecuteNonQuery(string rawSql, params object[] paras)
         {
-            var info = this.DbSqlBuilder.RawSql(rawSql, paras);
+            var info = this.SqlBuilder.RawSql(rawSql, paras);
             return this.ExecuteNonQuery(info);
         }
         public int ExecuteNonQuery(SqlInfo info)
@@ -107,7 +109,7 @@ namespace ZeroDbs.Common
         }
         public List<T> ExecuteQuery<T>(string rawSql, params object[] paras) where T : class, new()
         {
-            var info = this.DbSqlBuilder.RawSql(rawSql, paras);
+            var info = this.SqlBuilder.RawSql(rawSql, paras);
             return this.ExecuteQuery<T>(info);
         }
         public List<T> ExecuteQuery<T>(SqlInfo info) where T : class, new()
@@ -118,8 +120,6 @@ namespace ZeroDbs.Common
         }
         public List<T> ExecuteReader<T>(bool useEmit = true) where T : class, new()
         {
-            List<string> sqlList = new List<string>();
-            sqlList.Add(CommandText);
             try
             {
                 if (IsCheckCommandText && CommandType == System.Data.CommandType.Text)
@@ -134,27 +134,23 @@ namespace ZeroDbs.Common
                 dbCommand.CommandTimeout = CommandTimeout;
                 dbCommand.CommandType = CommandType;
                 System.Data.Common.DbDataReader dr = dbCommand.ExecuteReader();
-                FireExecuteSql(new DbExecuteSqlEventArgs(
-                    DbKey,
-                    sqlList,
-                    DbExecuteSqlType.QUERY,
-                    "OK"));
+                if (hasDbExecuteHandler)
+                {
+                    FireExecuteSql(DbExecuteSqlType.QUERY);
+                }
                 return useEmit ? DbDataReaderToEntity<T>.EntityListByEmit(dr) : DbDataReaderToEntity<T>.EntityList(dr);
             }
             catch (Exception ex)
             {
-                FireExecuteSql(new DbExecuteSqlEventArgs(
-                    DbKey,
-                    sqlList,
-                    DbExecuteSqlType.QUERY,
-                    ex.Message));
+                if (hasDbExecuteHandler)
+                {
+                    FireExecuteSql(DbExecuteSqlType.QUERY, ex.Message);
+                }
                 throw ex;
             }
         }
         public void ExecuteReader<T>(Common.DbExecuteReadOnebyOneAction<T> action, bool useEmit = true) where T : class, new()
         {
-            List<string> sqlList = new List<string>();
-            sqlList.Add(CommandText);
             try
             {
                 if (IsCheckCommandText && CommandType == System.Data.CommandType.Text)
@@ -169,11 +165,10 @@ namespace ZeroDbs.Common
                 dbCommand.CommandTimeout = CommandTimeout;
                 dbCommand.CommandType = CommandType;
                 System.Data.Common.DbDataReader dr = dbCommand.ExecuteReader();
-                FireExecuteSql(new DbExecuteSqlEventArgs(
-                    DbKey,
-                    sqlList,
-                    DbExecuteSqlType.QUERY,
-                    "OK"));
+                if (hasDbExecuteHandler)
+                {
+                    FireExecuteSql(DbExecuteSqlType.QUERY);
+                }
                 if (useEmit)
                 {
                     DbDataReaderToEntity<T>.EntityListByEmit(dr, action);
@@ -185,18 +180,15 @@ namespace ZeroDbs.Common
             }
             catch (Exception ex)
             {
-                FireExecuteSql(new DbExecuteSqlEventArgs(
-                    DbKey,
-                    sqlList,
-                    DbExecuteSqlType.QUERY,
-                    ex.Message));
+                if (hasDbExecuteHandler)
+                {
+                    FireExecuteSql(DbExecuteSqlType.QUERY, ex.Message);
+                }
                 throw ex;
             }
         }
         public System.Data.IDataReader ExecuteReader()
         {
-            List<string> sqlList = new List<string>();
-            sqlList.Add(CommandText);
             try
             {
                 if (IsCheckCommandText && CommandType == System.Data.CommandType.Text)
@@ -211,27 +203,23 @@ namespace ZeroDbs.Common
                 dbCommand.CommandTimeout = CommandTimeout;
                 dbCommand.CommandType = CommandType;
                 System.Data.Common.DbDataReader dr = dbCommand.ExecuteReader();
-                FireExecuteSql(new DbExecuteSqlEventArgs(
-                    DbKey,
-                    sqlList,
-                    DbExecuteSqlType.QUERY,
-                    "OK"));
+                if (hasDbExecuteHandler)
+                {
+                    FireExecuteSql(DbExecuteSqlType.QUERY);
+                }
                 return dr;
             }
             catch (Exception ex)
             {
-                FireExecuteSql(new DbExecuteSqlEventArgs(
-                    DbKey,
-                    sqlList,
-                    DbExecuteSqlType.QUERY,
-                    ex.Message));
+                if (hasDbExecuteHandler)
+                {
+                    FireExecuteSql(DbExecuteSqlType.QUERY, ex.Message);
+                }
                 throw ex;
             }
         }
         public object ExecuteScalar()
         {
-            List<string> sqlList = new List<string>();
-            sqlList.Add(CommandText);
             try
             {
                 if (IsCheckCommandText && CommandType == System.Data.CommandType.Text)
@@ -245,20 +233,18 @@ namespace ZeroDbs.Common
                 dbCommand.CommandText = CommandText;
                 dbCommand.CommandTimeout = CommandTimeout;
                 dbCommand.CommandType = CommandType;
-                FireExecuteSql(new DbExecuteSqlEventArgs(
-                    DbKey,
-                    sqlList,
-                    DbExecuteSqlType.QUERY,
-                    "OK"));
+                if (hasDbExecuteHandler)
+                {
+                    FireExecuteSql(DbExecuteSqlType.QUERY);
+                }
                 return dbCommand.ExecuteScalar();
             }
             catch (Exception ex)
             {
-                FireExecuteSql(new DbExecuteSqlEventArgs(
-                    dbCommand.Connection.ConnectionString,
-                    sqlList,
-                    DbExecuteSqlType.QUERY,
-                    ex.Message));
+                if (hasDbExecuteHandler)
+                {
+                    FireExecuteSql(DbExecuteSqlType.QUERY, ex.Message);
+                }
                 throw ex;
             }
         }

@@ -13,6 +13,7 @@ namespace ZeroDbs.Common
         string _Identification = DateTime.Now.ToString("HHmmssfff");
         string _GroupId = DateTime.Now.ToString("yyyyMMdd");
         string executeExceptionMsg = string.Empty;
+        string transactionInfo = string.Empty;
         public string Identification { get { return _Identification; } }
         public string GroupId { get { return _GroupId; } }
         IDb db = null;
@@ -34,10 +35,11 @@ namespace ZeroDbs.Common
             {
                 this._GroupId = groupId;
             }
+            this.transactionInfo = string.Format("{0}({1})", this.Identification, this.GroupId);
             timer = new System.Threading.Timer(new System.Threading.TimerCallback(timerCallback));
             timer.Change(5000, 1000);
         }
-        private void FireEvent(DbExecuteSqlEventArgs args)
+        private void FireEvent(DbExecuteArgs args)
         {
             db.FireZeroDbExecuteSqlEvent(args);
         }
@@ -49,6 +51,7 @@ namespace ZeroDbs.Common
             {
                 try
                 {
+                    this.dbCommand.TransactionInfo = this.transactionInfo;
                     transactionDelegate(this.dbCommand);
                     //此处不能提交事务：
                     //1.单个DbTransactionScope让调用者触发Complete
@@ -79,24 +82,24 @@ namespace ZeroDbs.Common
                     if (isSuccess)
                     {
                         this.dbTransaction.Commit();
-                        FireEvent(new DbExecuteSqlEventArgs(db.Database.Key, new List<string>(), DbExecuteSqlType.TRANSACTION, "事务" + this.Identification + "(" + this.GroupId + ")已经提交"));
+                        FireEvent(new DbExecuteArgs(db.Database.Key, "", transactionInfo, DbExecuteSqlType.TRANSACTION, "TRANSACTION Commit"));
                     }
                     else
                     {
                         this.dbTransaction.Rollback();
                         if (string.IsNullOrEmpty(executeExceptionMsg))
                         {
-                            FireEvent(new DbExecuteSqlEventArgs(db.Database.Key, new List<string>(), DbExecuteSqlType.TRANSACTION, "事务" + this.Identification + "(" + this.GroupId + ")已经回滚"));
+                            FireEvent(new DbExecuteArgs(db.Database.Key, "", transactionInfo, DbExecuteSqlType.TRANSACTION, "TRANSACTION Rollback"));
                         }
                         else
                         {
-                            FireEvent(new DbExecuteSqlEventArgs(db.Database.Key, new List<string>(), DbExecuteSqlType.TRANSACTION, "事务" + this.Identification + "(" + this.GroupId + ")已经回滚(" + executeExceptionMsg + ")"));
+                            FireEvent(new DbExecuteArgs(db.Database.Key, "", transactionInfo, DbExecuteSqlType.TRANSACTION, "TRANSACTION Rollback(" + executeExceptionMsg + ")"));
                         }
                     }
                 }
                 else
                 {
-                    FireEvent(new DbExecuteSqlEventArgs(db.Database.Key, new List<string>(), DbExecuteSqlType.TRANSACTION, "事务" + this.Identification + "(" + this.GroupId + ")已经执行过Complete()"));
+                    FireEvent(new DbExecuteArgs(db.Database.Key, "", transactionInfo, DbExecuteSqlType.TRANSACTION, "TRANSACTION Complete"));
                 }
             }
             Dispose();

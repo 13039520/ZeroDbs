@@ -6,11 +6,11 @@ namespace ZeroDbs
 {
     public interface IDb: IDbOperator
     {
-        Common.DbInfo Database { get; }
+        IDbInfo Database { get; }
         Common.SqlBuilder SqlBuilder { get; }
         IDataTypeMaping DataTypeMaping { get; }
-        event Common.DbExecuteSqlEvent OnDbExecuteSqlEvent;
-        void FireZeroDbExecuteSqlEvent(Common.DbExecuteSqlEventArgs args);
+        event Common.DbExecuteHandler OnDbExecuteSqlEvent;
+        void FireZeroDbExecuteSqlEvent(Common.DbExecuteArgs args);
         System.Data.Common.DbConnection GetDbConnection();
         /// <summary>
         /// 获取成功之后数据库连接已经打开，结束之后一定要Dispose()
@@ -19,8 +19,8 @@ namespace ZeroDbs
         IDbCommand GetDbCommand();
         IDbCommand GetDbCommand(System.Data.Common.DbTransaction transaction);
         IDbTransactionScope GetDbTransactionScope(System.Data.IsolationLevel level, string identification = "", string groupId = "");
-        Common.DbDataTableInfo GetTable<DbEntity>() where DbEntity : class, new();
-        List<Common.DbDataTableInfo> GetTables();
+        ITableInfo GetTable<DbEntity>() where DbEntity : class, new();
+        List<ITableInfo> GetTables();
         bool DbConnectionTest();
     }
 }

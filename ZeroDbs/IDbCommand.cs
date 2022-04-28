@@ -6,13 +6,14 @@ namespace ZeroDbs
 {
     public interface IDbCommand : IDisposable
     {
+        string TransactionInfo { get; set; }
         string CommandText { get; set; }
         int CommandTimeout { get; set; }
         bool IsCheckCommandText { get; set; }
         System.Data.Common.DbParameterCollection Parameters { get; }
         System.Data.CommandType CommandType { get; set; }
         System.Data.Common.DbConnection DbConnection { get; }
-        Common.SqlBuilder DbSqlBuilder { get; }
+        Common.SqlBuilder SqlBuilder { get; }
         System.Data.Common.DbParameter CreateParameter();
         System.Data.Common.DbParameter CreateParameter(string parameterName, object value);
         System.Data.Common.DbParameter CreateParameter(string parameterName, System.Data.DbType dbType, int size, object value);

@@ -32,15 +32,15 @@ namespace %NameSpace%
 }";
         public class SingleTableGeneratedEventArgs : EventArgs
         {
-            public Common.DbInfo db { get; }
-            public Common.DbDataTableInfo table { get; }
+            public IDbInfo db { get; }
+            public ITableInfo table { get; }
             public string entityClassFullName { get; } 
             public string entityClassPath { get; }
             public int tableCount { get; }
             public int tableNum { get; }
             public Config generatorConfig { get; }
 
-            public SingleTableGeneratedEventArgs(Common.DbInfo db, Common.DbDataTableInfo table, Config generatorConfig, string entityClassFullName, string entityClassPath, int tableCount, int tableNum)
+            public SingleTableGeneratedEventArgs(IDbInfo db, ITableInfo table, Config generatorConfig, string entityClassFullName, string entityClassPath, int tableCount, int tableNum)
             {
                 this.db = db;
                 this.table = table;
@@ -67,11 +67,11 @@ namespace %NameSpace%
 
         public event SingleTableGeneratedHandler OnSingleTableGenerated;
         public Config GeneratorConfig { get; set; }
-        private List<Common.DbInfo> _Dbs;
-        public List<Common.DbInfo> Dbs { get { return _Dbs; } }
+        private List<IDbInfo> _Dbs;
+        public List<IDbInfo> Dbs { get { return _Dbs; } }
 
         public CodeGenerator() {
-            _Dbs = new List<Common.DbInfo>();
+            _Dbs = new List<IDbInfo>();
         }
 
         public void Run()
@@ -115,7 +115,7 @@ namespace %NameSpace%
 
         }
 
-        private void Builder(List<Common.DbInfo> dbsList, Config generatorConfig)
+        private void Builder(List<IDbInfo> dbsList, Config generatorConfig)
         {
             var dbs = new Common.DbService().GetDbs(dbsList);
             foreach (var key in dbs.Keys)
@@ -125,7 +125,7 @@ namespace %NameSpace%
                 Builder(db.Database, tables, db.Database, generatorConfig.EntityDir, generatorConfig.AppProjectDir, generatorConfig.EntityNamespace, generatorConfig.EntityTemplate);
             }
         }
-        private void Builder(Common.DbInfo db, List<Common.DbDataTableInfo> tables, Common.DbInfo dbInfo, string entityProjectRootDir, string targetProjectRootDir, string nameSpace, string entityTemplate = "")
+        private void Builder(IDbInfo db, List<ITableInfo> tables, IDbInfo dbInfo, string entityProjectRootDir, string targetProjectRootDir, string nameSpace, string entityTemplate = "")
         {
 
             string entityFileSaveDir = System.IO.Path.Combine(entityProjectRootDir, dbInfo.Key);

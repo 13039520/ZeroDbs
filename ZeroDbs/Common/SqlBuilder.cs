@@ -19,7 +19,7 @@ namespace ZeroDbs.Common
             this.db = db;
         }
 
-        public Common.DbDataTableInfo GetTable<DbEntity>() where DbEntity : class, new()
+        public ITableInfo GetTable<DbEntity>() where DbEntity : class, new()
         {
             var reval = this.db.GetTable<DbEntity>();
             if(reval!= null)
@@ -28,7 +28,7 @@ namespace ZeroDbs.Common
             }
             throw new Exception("类型" + typeof(DbEntity).FullName + "没有映射到" + ZeroDb.Database.Key + "上");
         }
-        public virtual string[] GetUniqueFieldName(Common.DbDataTableInfo tableInfo)
+        public virtual string[] GetUniqueFieldName(ITableInfo tableInfo)
         {
             var keys = tableInfo.Colunms.FindAll(o => o.IsPrimaryKey);
             if (keys != null && keys.Count > 0)
@@ -42,7 +42,7 @@ namespace ZeroDbs.Common
             }
             return new string[0];
         }
-        public virtual string GetTableName(ZeroDbs.Common.DbDataTableInfo tableInfo)
+        public virtual string GetTableName(ITableInfo tableInfo)
         {
             return tableInfo.Name;
         }
@@ -283,7 +283,7 @@ namespace ZeroDbs.Common
                 throw new Exception("Target does not support insert operation");
             }
             var ps = source.GetType().GetProperties().ToList();
-            var dic = new Dictionary<System.Reflection.PropertyInfo, DbDataColumnInfo>();
+            var dic = new Dictionary<System.Reflection.PropertyInfo, IColumnInfo>();
             for (int i = 0; i < ps.Count; i++)
             {
                 var col = tableInfo.Colunms.Find(o => string.Equals(o.Name, ps[i].Name, StringComparison.OrdinalIgnoreCase));
@@ -328,7 +328,7 @@ namespace ZeroDbs.Common
             {
                 throw new Exception("Target does not support insert operation");
             }
-            var cols = new List<DbDataColumnInfo>();
+            var cols = new List<IColumnInfo>();
             var values = new List<object>();
             foreach (var key in source.Keys)
             {
@@ -373,7 +373,7 @@ namespace ZeroDbs.Common
                 throw new Exception("Target does not support insert operation");
             }
             var ps = typeof(DbEntity).GetProperties().ToList();
-            var cols = new List<DbDataColumnInfo>();
+            var cols = new List<IColumnInfo>();
             var values = new List<object>();
             foreach (var key in source.AllKeys)
             {
@@ -462,7 +462,7 @@ namespace ZeroDbs.Common
                 throw new ArgumentNullException("The target table is missing a primary key");
             }
             var ps = entity.GetType().GetProperties().ToList();
-            var dic = new Dictionary<System.Reflection.PropertyInfo, DbDataColumnInfo>();
+            var dic = new Dictionary<System.Reflection.PropertyInfo, IColumnInfo>();
             int keyCount = 0;
             for (int i = 0; i < ps.Count; i++)
             {
@@ -530,7 +530,7 @@ namespace ZeroDbs.Common
                 throw new ArgumentNullException("The target table is missing a primary key");
             }
             var ps = source.GetType().GetProperties().ToList();
-            var dic = new Dictionary<System.Reflection.PropertyInfo, DbDataColumnInfo>();
+            var dic = new Dictionary<System.Reflection.PropertyInfo, IColumnInfo>();
             int keyCount = 0;
             for(int i = 0; i < ps.Count; i++)
             {
@@ -598,7 +598,7 @@ namespace ZeroDbs.Common
                 throw new ArgumentNullException("The target table is missing a primary key");
             }
             List<object> values = new List<object>(source.Count);
-            List<DbDataColumnInfo> cols = new List<DbDataColumnInfo>();
+            List<IColumnInfo> cols = new List<IColumnInfo>();
             int keyCount = 0;
             foreach (var key in source.Keys)
             {
@@ -662,7 +662,7 @@ namespace ZeroDbs.Common
             }
 
             var ps = typeof(DbEntity).GetProperties().ToList();
-            var cols = new List<DbDataColumnInfo>();
+            var cols = new List<IColumnInfo>();
             var values = new List<object>();
             int keyCount = 0;
             foreach (var key in source.AllKeys)

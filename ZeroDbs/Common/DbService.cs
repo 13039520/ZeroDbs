@@ -7,7 +7,7 @@ namespace ZeroDbs.Common
     public class DbService : IDbService
     {
         IStrCommon _StrCommon = null;
-        DbExecuteSqlEvent _dbExecuteSqlEvent = null;
+        DbExecuteHandler _dbExecuteHandler = null;
         static Dictionary<string, IDb> _dbInstanceDic = new Dictionary<string, IDb>();
         static object _lock = new object();
 
@@ -18,9 +18,9 @@ namespace ZeroDbs.Common
         {
             _StrCommon = new Common.StrCommon();
         }
-        public DbService(DbExecuteSqlEvent dbExecuteSqlEvent)
+        public DbService(DbExecuteHandler handler)
         {
-            _dbExecuteSqlEvent = dbExecuteSqlEvent != null ? dbExecuteSqlEvent : null;
+            _dbExecuteHandler = handler != null ? handler : null;
             _StrCommon = new Common.StrCommon();
         }
         private IDb GetDbByEntityFullName(string entityFullName)
@@ -43,7 +43,7 @@ namespace ZeroDbs.Common
                     #region -- code --
                     if (!_dbInstanceDic.ContainsKey(info.Key))
                     {
-                        IDb db = DbFactory.Create(info, _dbExecuteSqlEvent);
+                        IDb db = DbFactory.Create(info, _dbExecuteHandler);
                         if (db != null)
                         {
                             _dbInstanceDic.Add(info.Key, db);
@@ -79,7 +79,7 @@ namespace ZeroDbs.Common
                             #region -- code --
                             if (!_dbInstanceDic.ContainsKey(m.Key))
                             {
-                                IDb db = DbFactory.Create(m, _dbExecuteSqlEvent);
+                                IDb db = DbFactory.Create(m, _dbExecuteHandler);
                                 if (db != null)
                                 {
                                     _dbInstanceDic.Add(m.Key, db);
@@ -101,7 +101,7 @@ namespace ZeroDbs.Common
             }
             return dbs;
         }
-        public Dictionary<string, IDb> GetDbs(List<DbInfo> dbConfigList)
+        public Dictionary<string, IDb> GetDbs(List<IDbInfo> dbConfigList)
         {
             var dbs = new Dictionary<string, IDb>();
             if (dbConfigList != null && dbConfigList.Count > 0)
@@ -115,7 +115,7 @@ namespace ZeroDbs.Common
                             #region -- code --
                             if (!_dbInstanceDic.ContainsKey(m.Key))
                             {
-                                IDb db = DbFactory.Create(m, _dbExecuteSqlEvent);
+                                IDb db = DbFactory.Create(m, _dbExecuteHandler);
                                 if (db != null)
                                 {
                                     _dbInstanceDic.Add(m.Key, db);
@@ -160,7 +160,7 @@ namespace ZeroDbs.Common
                     #region -- code --
                     if (!_dbInstanceDic.ContainsKey(info.Key))
                     {
-                        IDb db = DbFactory.Create(info, _dbExecuteSqlEvent);
+                        IDb db = DbFactory.Create(info, _dbExecuteHandler);
                         if (db != null)
                         {
                             _dbInstanceDic.Add(info.Key, db);

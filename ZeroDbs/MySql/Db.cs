@@ -8,7 +8,7 @@ namespace ZeroDbs.MySql
 {
     internal class Db: Common.Db
     {
-        public Db(Common.DbInfo database): base(database)
+        public Db(IDbInfo database): base(database)
         {
 
         }
@@ -17,7 +17,7 @@ namespace ZeroDbs.MySql
         {
             return new MySqlConnection(Database.ConnectionString);
         }
-        public override ZeroDbs.Common.DbDataTableInfo GetTable<DbEntity>()
+        public override ITableInfo GetTable<DbEntity>()
         {
             if (!IsMappingToDbKey<DbEntity>())
             {
@@ -38,14 +38,14 @@ namespace ZeroDbs.MySql
                 var dv = Common.DbMapping.GetDbConfigDataViewInfo<DbEntity>().Find(o => string.Equals(o.DbKey, Database.Key, StringComparison.OrdinalIgnoreCase));
                 string getTableOrViewSql = "SELECT * FROM information_schema.TABLES WHERE TABLE_SCHEMA='" + dbName + "' AND TABLE_NAME='" + dv.TableName + "'";
 
-                Common.DbDataTableInfo dbDataTableInfo = null;
+                Common.TableInfo dbDataTableInfo = null;
 
                 cmd.CommandText = getTableOrViewSql;
                 var reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    dbDataTableInfo = new Common.DbDataTableInfo();
-                    ZeroDbs.Common.DbDataTableInfo m = new Common.DbDataTableInfo();
+                    dbDataTableInfo = new Common.TableInfo();
+                    ZeroDbs.Common.TableInfo m = new Common.TableInfo();
                     bool isTable = (reader["TABLE_TYPE"].ToString() != "VIEW");
                     string tableName = reader["TABLE_NAME"].ToString();
                     string description = reader["TABLE_COMMENT"].ToString();
@@ -70,7 +70,7 @@ namespace ZeroDbs.MySql
                     dbDataTableInfo.IsView = isTable ? false : true;
                     dbDataTableInfo.Description = description;
                     dbDataTableInfo.DbName = dbName;
-                    dbDataTableInfo.Colunms = new List<Common.DbDataColumnInfo>();
+                    dbDataTableInfo.Colunms = new List<IColumnInfo>();
                 }
                 reader.Close();
                 reader.Dispose();
@@ -86,7 +86,7 @@ namespace ZeroDbs.MySql
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    ZeroDbs.Common.DbDataColumnInfo column = new ZeroDbs.Common.DbDataColumnInfo();
+                    ZeroDbs.Common.ColumnInfo column = new ZeroDbs.Common.ColumnInfo();
 
                     column.MaxLength = reader["CHARACTER_MAXIMUM_LENGTH"].ToString().Length > 0 ? Convert.ToInt64(reader["CHARACTER_MAXIMUM_LENGTH"]) : -1;
                     column.Byte = reader["CHARACTER_OCTET_LENGTH"].ToString().Length > 0 ? Convert.ToInt64(reader["CHARACTER_OCTET_LENGTH"]) : -1;
@@ -117,7 +117,7 @@ namespace ZeroDbs.MySql
                 throw ex;
             }
         }
-        public override List<ZeroDbs.Common.DbDataTableInfo> GetTables()
+        public override List<ITableInfo> GetTables()
         {
             var cmd = this.GetDbCommand();
             try
@@ -125,13 +125,13 @@ namespace ZeroDbs.MySql
                 var dbName = cmd.DbConnection.Database;
                 string getAllTableAndViewSql = "SELECT * FROM information_schema.TABLES WHERE TABLE_SCHEMA='" + dbName + "'";
 
-                List<ZeroDbs.Common.DbDataTableInfo> List = new List<ZeroDbs.Common.DbDataTableInfo>();
+                List<ITableInfo> List = new List<ITableInfo>();
 
                 cmd.CommandText = getAllTableAndViewSql;
                 var reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    ZeroDbs.Common.DbDataTableInfo m = new Common.DbDataTableInfo();
+                    ZeroDbs.Common.TableInfo m = new Common.TableInfo();
                     bool isTable = (reader["TABLE_TYPE"].ToString() != "VIEW");
                     string tableName = reader["TABLE_NAME"].ToString();
                     string description = reader["TABLE_COMMENT"].ToString();
@@ -156,13 +156,13 @@ namespace ZeroDbs.MySql
                     m.IsView = isTable ? false : true;
                     m.Description = description;
                     m.DbName = dbName;
-                    m.Colunms = new List<Common.DbDataColumnInfo>();
+                    m.Colunms = new List<IColumnInfo>();
                     List.Add(m);
                 }
                 reader.Close();
                 reader.Dispose();
 
-                foreach (ZeroDbs.Common.DbDataTableInfo m in List)
+                foreach (ITableInfo m in List)
                 {
                     string sql = "SELECT * FROM information_schema.COLUMNS WHERE table_schema='"+ m.DbName + "' AND table_name='"+m.Name+"'";
 
@@ -170,7 +170,7 @@ namespace ZeroDbs.MySql
                     reader = cmd.ExecuteReader();
                     while (reader.Read())
                     {
-                        ZeroDbs.Common.DbDataColumnInfo column = new ZeroDbs.Common.DbDataColumnInfo();
+                        ZeroDbs.Common.ColumnInfo column = new ZeroDbs.Common.ColumnInfo();
 
                         column.MaxLength = reader["CHARACTER_MAXIMUM_LENGTH"].ToString().Length > 0 ? Convert.ToInt64(reader["CHARACTER_MAXIMUM_LENGTH"]) : -1;
                         column.Byte = reader["CHARACTER_OCTET_LENGTH"].ToString().Length > 0 ? Convert.ToInt64(reader["CHARACTER_OCTET_LENGTH"]) : -1;

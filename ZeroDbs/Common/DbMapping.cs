@@ -52,8 +52,16 @@ namespace ZeroDbs.Common
             if (zeroConfigInfo != null && zeroConfigInfo.Dbs != null && zeroConfigInfo.Dvs.Count > 0)
             {
                 var entityKey = typeof(T).FullName;
-                var info1 = zeroConfigInfo.Dvs.FindAll(o => string.Equals(o.EntityKey, entityKey, StringComparison.OrdinalIgnoreCase));
-                return info1;
+                return zeroConfigInfo.Dvs.FindAll(o => string.Equals(o.EntityKey, entityKey, StringComparison.OrdinalIgnoreCase));
+            }
+            return null;
+        }
+        public static List<DbTableEntityMap> GetDbConfigDataViewInfo(string dbKey)
+        {
+            var zeroConfigInfo = DbConfigReader.GetDbConfigInfo();
+            if (zeroConfigInfo != null && zeroConfigInfo.Dbs != null && zeroConfigInfo.Dvs.Count > 0)
+            {
+                return zeroConfigInfo.Dvs.FindAll(o => string.Equals(o.DbKey, dbKey, StringComparison.OrdinalIgnoreCase));
             }
             return null;
         }

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ZeroDbs.Common
 {
-    public class DbInfo
+    public class DbInfo: IDbInfo
     {
         public string Key { get; set; }
         public string ConnectionString { get; set; }

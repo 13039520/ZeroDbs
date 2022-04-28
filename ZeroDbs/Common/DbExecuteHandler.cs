@@ -4,5 +4,5 @@ using System.Text;
 
 namespace ZeroDbs.Common
 {
-    public delegate void DbExecuteSqlEvent(object sender, DbExecuteSqlEventArgs e);
+    public delegate void DbExecuteHandler(object sender, DbExecuteArgs e);
 }

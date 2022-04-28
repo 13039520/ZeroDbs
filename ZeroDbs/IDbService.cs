@@ -7,7 +7,7 @@ namespace ZeroDbs
     public interface IDbService: IDbOperator
     {
         Dictionary<string, IDb> GetDbs();
-        Dictionary<string, IDb> GetDbs(List<Common.DbInfo> dbConfigList);
+        Dictionary<string, IDb> GetDbs(List<IDbInfo> dbConfigList);
         IDb GetDb<DbEntity>() where DbEntity : class, new();
         IDb GetDb(string entityFullName);
         IDb GetDbByDbKey(string dbKey);

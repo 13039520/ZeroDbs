@@ -12,7 +12,7 @@ namespace ZeroDbs.Sqlite
         {
 
         }
-        public override string GetTableName(Common.DbDataTableInfo tableInfo)
+        public override string GetTableName(ITableInfo tableInfo)
         {
             return string.Format("[{0}]", tableInfo.Name);
         }

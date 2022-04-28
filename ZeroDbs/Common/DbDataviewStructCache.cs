@@ -9,43 +9,45 @@ namespace ZeroDbs.Common
         class StructCache
         {
             public DateTime CacheTime { get; set; }
-            public Common.DbDataTableInfo CacheData { get; set; }
+            public ITableInfo CacheData { get; set; }
         }
-        static readonly int CacheMinutes = 60 * 24;
+        static object _lock = new object();
         static Dictionary<string, StructCache> CacheDic = new Dictionary<string, StructCache>();
-        public static Common.DbDataTableInfo Get(string key)
+        public static ITableInfo Get(string key)
         {
             if (string.IsNullOrEmpty(key))
             {
-                throw new Exception("key不能为空");
+                throw new Exception("key is null or empty");
             }
             key = key.ToLower();
             if (CacheDic.ContainsKey(key))
             {
-                var obj = CacheDic[key];
-                if ((DateTime.Now - obj.CacheTime).TotalMinutes < CacheMinutes)
-                {
-                    return obj.CacheData;
-                }
-                CacheDic.Remove(key);
-                return obj.CacheData;
+                return CacheDic[key].CacheData;
             }
             return null;
         }
-        public static void Set(string key, Common.DbDataTableInfo value)
+        public static void Set(string key, ITableInfo value)
         {
             if (string.IsNullOrEmpty(key))
             {
-                throw new Exception("key不能为空");
+                throw new Exception("key is null or empty");
+            }
+            if (value == null)
+            {
+                throw new Exception("value is null");
             }
             key = key.ToLower();
-            if (CacheDic.ContainsKey(key))
+            lock (_lock)
             {
-                CacheDic[key] = new StructCache { CacheTime = DateTime.Now, CacheData = value };
-            }
-            else
-            {
-                CacheDic.Add(key, new StructCache { CacheTime = DateTime.Now, CacheData = value });
+                if (CacheDic.ContainsKey(key))
+                {
+                    CacheDic[key].CacheData = value;
+                    CacheDic[key].CacheTime = DateTime.Now;
+                }
+                else
+                {
+                    CacheDic.Add(key, new StructCache { CacheTime = DateTime.Now, CacheData = value });
+                }
             }
         }
 
