@@ -10,19 +10,11 @@ namespace ZeroDbs.Common
     public delegate void ZeroEntityPropertyEmitSetter(object instance, object value);
     public class EntityPropertyEmitSetter
     {
-        /// <summary>
-        /// 属性信息
-        /// </summary>
         public PropertyInfo Info { get; set; }
-        /// <summary>
-        /// Set方法委托
-        /// </summary>
         public ZeroEntityPropertyEmitSetter Setter { get; set; }
+        static object _lock = new object();
         static readonly Dictionary<Type, EntityPropertyEmitSetter[]> Cache = new Dictionary<Type, EntityPropertyEmitSetter[]>();
 
-        /// <summary>
-        /// 获取一个类中的所有公开实例属性和它们的Set方法委托
-        /// </summary>
         public static EntityPropertyEmitSetter[] GetProperties(Type type)
         {
             EntityPropertyEmitSetter[] arr;
@@ -40,7 +32,17 @@ namespace ZeroDbs.Common
                 op.Setter = CreateSetter(op.Info, delegateType);
                 arr[i] = op;
             }
-            Cache.Add(type, arr);
+            lock (_lock)
+            {
+                if (Cache.ContainsKey(type))
+                {
+                    Cache[type] = arr;
+                }
+                else
+                {
+                    Cache.Add(type, arr);
+                }
+            }
             return arr;
         }
         static ZeroEntityPropertyEmitSetter CreateSetter(PropertyInfo property, Type delegateType)
@@ -53,17 +55,14 @@ namespace ZeroDbs.Common
             il.Emit(OpCodes.Ldarg_1);
             if (property.PropertyType.IsValueType)
             {
-                // 如果是值类型，拆箱
                 il.Emit(OpCodes.Unbox_Any, property.PropertyType);
             }
             else
             {
-                // 如果是引用类型，转换
                 il.Emit(OpCodes.Castclass, property.PropertyType);
             }
             il.Emit(OpCodes.Callvirt, property.GetSetMethod());
             il.Emit(OpCodes.Ret);
-            //=== IL ===
             return (ZeroEntityPropertyEmitSetter)dm.CreateDelegate(delegateType);
         }
 
