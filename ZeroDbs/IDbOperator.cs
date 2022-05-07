@@ -17,6 +17,8 @@ namespace ZeroDbs
         Common.PageData<OutType> Page<DbEntity, OutType>(long page, long size, string where, string orderby, string uniqueField, params object[] paras) where DbEntity : class, new() where OutType : class, new();
 
         long Count<DbEntity>(string where, params object[] paras) where DbEntity : class, new();
+        long MaxIdentityPrimaryKeyValue<DbEntity>() where DbEntity : class, new();
+        long MaxIdentityPrimaryKeyValue<DbEntity>(string where, params object[] paras) where DbEntity : class, new();
 
         int Insert<DbEntity>(DbEntity entity) where DbEntity : class, new();
         int Insert<DbEntity>(List<DbEntity> entities) where DbEntity : class, new();

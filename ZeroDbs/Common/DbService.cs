@@ -257,7 +257,14 @@ namespace ZeroDbs.Common
         {
             return GetDb<DbEntity>().Count<DbEntity>(where, paras);
         }
-
+        public long MaxIdentityPrimaryKeyValue<DbEntity>() where DbEntity : class, new()
+        {
+            return GetDb<DbEntity>().MaxIdentityPrimaryKeyValue<DbEntity>();
+        }
+        public long MaxIdentityPrimaryKeyValue<DbEntity>(string where, params object[] paras) where DbEntity : class, new()
+        {
+            return GetDb<DbEntity>().MaxIdentityPrimaryKeyValue<DbEntity>(where, paras);
+        }
         public int Insert<DbEntity>(DbEntity entity) where DbEntity : class, new()
         {
             return GetDb<DbEntity>().Insert<DbEntity>(entity);

@@ -271,6 +271,32 @@ namespace ZeroDbs.Common
                 throw ex;
             }
         }
+        public long MaxIdentityPrimaryKeyValue<DbEntity>() where DbEntity : class, new()
+        {
+            return MaxIdentityPrimaryKeyValue<DbEntity>("");
+        }
+        public long MaxIdentityPrimaryKeyValue<DbEntity>(string where, params object[] paras) where DbEntity : class, new()
+        {
+            var info = this.SqlBuilder.MaxIdentityPrimaryKeyValue<DbEntity>(where,paras);
+            var cmd = this.GetDbCommand();
+            try
+            {
+                cmd.CommandText = info.Sql;
+                cmd.ParametersFromDictionary(info.Paras);
+                var reval = cmd.ExecuteScalar();
+                cmd.Dispose();
+                if (reval is null || reval is DBNull)
+                {
+                    return 0;
+                }
+                return Convert.ToInt64(reval);
+            }
+            catch (Exception ex)
+            {
+                cmd.Dispose();
+                throw ex;
+            }
+        }
 
         public int Insert<DbEntity>(DbEntity entity) where DbEntity : class, new()
         {

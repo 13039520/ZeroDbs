@@ -66,6 +66,33 @@ namespace ZeroDbs.Common
             return reval;
         }
 
+        public SqlInfo MaxIdentityPrimaryKeyValue<DbEntity>() where DbEntity : class, new()
+        {
+            return MaxIdentityPrimaryKeyValue<DbEntity>("");
+        }
+        public virtual SqlInfo MaxIdentityPrimaryKeyValue<DbEntity>(string where, params object[] paras) where DbEntity : class, new()
+        {
+            var tableInfo = this.GetTable<DbEntity>();
+            var col = tableInfo.Colunms.Find(o => o.IsPrimaryKey && o.IsIdentity);
+            if (col == null)
+            {
+                throw new Exception("The target is missing an identity primary key field");
+            }
+            if (!string.IsNullOrEmpty(where))
+            {
+                where = string.Format(" WHERE {0}",where);
+            }
+            SqlInfo reval= new SqlInfo { Sql = string.Format("SELECT MAX({0}) FROM {1}{2}", GetColunmName(col.Name), GetTableName(tableInfo), where) };
+            int n = 0;
+            int m = paras.Length;
+            while (n < m)
+            {
+                reval.Paras.Add(n.ToString(), paras[n]);
+                n++;
+            }
+            return reval;
+        }
+
         public virtual SqlInfo Page<DbEntity>(long page, long size, string where, string orderby, string[] fields, string uniqueField = "", params object[] paras) where DbEntity : class, new()
         {
             var tableInfo = this.ZeroDb.GetTable<DbEntity>();

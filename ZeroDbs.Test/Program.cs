@@ -228,6 +228,19 @@ namespace ZeroDbs.Test
             /**/
             #endregion
 
+            var a = dbService.MaxIdentityPrimaryKeyValue<MyDbs.SqlServer001.tUser>();
+            Console.WriteLine("MyDbs.SqlServer001.tUser.MaxIdentityPrimaryKeyValue={0}", a);
+            a = dbService.MaxIdentityPrimaryKeyValue<MyDbs.SqlServer001.tUser>("ID<@0", 5);
+            Console.WriteLine("MyDbs.SqlServer001.tUser.MaxIdentityPrimaryKeyValue(ID<5)={0}", a);
+            a = dbService.MaxIdentityPrimaryKeyValue<MyDbs.MySql001.tUser>();
+            Console.WriteLine("MyDbs.MySql001.tUser.MaxIdentityPrimaryKeyValue={0}", a);
+            a = dbService.MaxIdentityPrimaryKeyValue<MyDbs.MySql001.tUser>("ID<@0", 5);
+            Console.WriteLine("MyDbs.MySql001.tUser.MaxIdentityPrimaryKeyValue(ID<5)={0}", a);
+            a = dbService.MaxIdentityPrimaryKeyValue<MyDbs.Sqlite001.tUser>();
+            Console.WriteLine("MyDbs.Sqlite001.tUser.MaxIdentityPrimaryKeyValue={0}", a);
+            a = dbService.MaxIdentityPrimaryKeyValue<MyDbs.Sqlite001.tUser>("ID<@0", 5);
+            Console.WriteLine("MyDbs.Sqlite001.tUser.MaxIdentityPrimaryKeyValue(ID<5)={0}", a);
+
         }
         class MyEntity
         {
