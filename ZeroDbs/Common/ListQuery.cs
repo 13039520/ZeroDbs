@@ -30,9 +30,9 @@ namespace ZeroDbs.Common
             this._Top = top;
             return this;
         }
-        public ListQuery UseFields(params string[] paras)
+        public ListQuery UseFields(params string[] fields)
         {
-            this._Fields = paras;
+            this._Fields = fields;
             return this;
         }
         public ListQuery UseOrderby(string orderby)
