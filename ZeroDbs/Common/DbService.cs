@@ -288,23 +288,43 @@ namespace ZeroDbs.Common
 
         public int Update<DbEntity>(DbEntity entity) where DbEntity : class, new()
         {
-            return GetDb<DbEntity>().Update<DbEntity>(entity);
+            return Update<DbEntity>(entity, "");
+        }
+        public int Update<DbEntity>(DbEntity entity, string appendWhere, params object[] paras) where DbEntity : class, new()
+        {
+            return GetDb<DbEntity>().Update<DbEntity>(entity, appendWhere, paras);
         }
         public int Update<DbEntity>(List<DbEntity> entities) where DbEntity : class, new()
         {
-            return GetDb<DbEntity>().Update<DbEntity>(entities);
+            return Update<DbEntity>(entities, "");
         }
-        public int UpdateFromNameValueCollection<DbEntity>(System.Collections.Specialized.NameValueCollection nvc) where DbEntity : class, new()
+        public int Update<DbEntity>(List<DbEntity> entities, string appendWhere, params object[] paras) where DbEntity : class, new()
         {
-            return GetDb<DbEntity>().UpdateFromNameValueCollection<DbEntity>(nvc);
+            return GetDb<DbEntity>().Update<DbEntity>(entities, appendWhere, paras);
+        }
+        public int UpdateFromNameValueCollection<DbEntity>(System.Collections.Specialized.NameValueCollection source) where DbEntity : class, new()
+        {
+            return UpdateFromCustomEntity<DbEntity>(source, "");
+        }
+        public int UpdateFromNameValueCollection<DbEntity>(System.Collections.Specialized.NameValueCollection source, string appendWhere, params object[] paras) where DbEntity : class, new()
+        {
+            return GetDb<DbEntity>().UpdateFromNameValueCollection<DbEntity>(source, appendWhere, paras);
         }
         public int UpdateFromCustomEntity<DbEntity>(object source) where DbEntity : class, new()
         {
-            return GetDb<DbEntity>().UpdateFromCustomEntity<DbEntity>(source);
+            return UpdateFromCustomEntity<DbEntity>(source, "");
+        }
+        public int UpdateFromCustomEntity<DbEntity>(object source, string appendWhere, params object[] paras) where DbEntity : class, new()
+        {
+            return GetDb<DbEntity>().UpdateFromCustomEntity<DbEntity>(source, appendWhere, paras);
         }
         public int UpdateFromDictionary<DbEntity>(Dictionary<string, object> dic) where DbEntity : class, new()
         {
-            return GetDb<DbEntity>().UpdateFromDictionary<DbEntity>(dic);
+            return UpdateFromDictionary<DbEntity>(dic, "");
+        }
+        public int UpdateFromDictionary<DbEntity>(Dictionary<string, object> dic, string appendWhere, params object[] paras) where DbEntity : class, new()
+        {
+            return GetDb<DbEntity>().UpdateFromDictionary<DbEntity>(dic, appendWhere, paras);
         }
 
         public int Delete<DbEntity>(string where, params object[] paras) where DbEntity : class, new()

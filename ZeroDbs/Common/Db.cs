@@ -390,7 +390,11 @@ namespace ZeroDbs.Common
 
         public int Update<DbEntity>(DbEntity entity) where DbEntity : class, new()
         {
-            var info = this.SqlBuilder.Update<DbEntity>(entity);
+            return Update<DbEntity>(entity, "");
+        }
+        public int Update<DbEntity>(DbEntity entity, string appendWhere, params object[] paras) where DbEntity : class, new()
+        {
+            var info = this.SqlBuilder.Update<DbEntity>(entity, appendWhere, paras);
             var cmd = this.GetDbCommand();
             try
             {
@@ -406,18 +410,22 @@ namespace ZeroDbs.Common
         }
         public int Update<DbEntity>(List<DbEntity> entities) where DbEntity : class, new()
         {
-            var info = this.SqlBuilder.Update<DbEntity>();
+            return Update<DbEntity>(entities, "");
+        }
+        public int Update<DbEntity>(List<DbEntity> entities, string appendWhere, params object[] paras) where DbEntity : class, new()
+        {
+            if(entities == null || entities.Count < 1) { return 0; }
+            var info = this.SqlBuilder.Update<DbEntity>(entities[0], appendWhere, paras);
             var ts = this.GetDbTransactionScope(System.Data.IsolationLevel.ReadUncommitted);
             try
             {
                 int reval = 0;
                 ts.Execute((cmd) =>
                 {
-                    cmd.CommandText = info;
-                    foreach (var entity in entities)
+                    reval += cmd.ExecuteNonQuery(info);
+                    for (int i = 1; i < entities.Count; i++)
                     {
-                        cmd.ParametersFromEntity(entity);
-                        reval += cmd.ExecuteNonQuery();
+                        reval += cmd.ExecuteNonQuery(this.SqlBuilder.Update<DbEntity>(entities[i], appendWhere, paras));
                     }
                 });
                 ts.Complete(true);
@@ -431,7 +439,11 @@ namespace ZeroDbs.Common
         }
         public int UpdateFromNameValueCollection<DbEntity>(System.Collections.Specialized.NameValueCollection source) where DbEntity : class, new()
         {
-            var info = this.SqlBuilder.UpdateFromNameValueCollection<DbEntity>(source);
+            return UpdateFromNameValueCollection<DbEntity>(source, "");
+        }
+        public int UpdateFromNameValueCollection<DbEntity>(System.Collections.Specialized.NameValueCollection source, string appendWhere, params object[] paras) where DbEntity : class, new()
+        {
+            var info = this.SqlBuilder.UpdateFromNameValueCollection<DbEntity>(source, appendWhere, paras);
             var cmd = this.GetDbCommand();
             try
             {
@@ -447,7 +459,11 @@ namespace ZeroDbs.Common
         }
         public int UpdateFromCustomEntity<DbEntity>(object source) where DbEntity : class, new()
         {
-            var info = this.SqlBuilder.UpdateFromCustomEntity<DbEntity>(source);
+            return UpdateFromCustomEntity<DbEntity>(source, "");
+        }
+        public int UpdateFromCustomEntity<DbEntity>(object source, string appendWhere, params object[] paras) where DbEntity : class, new()
+        {
+            var info = this.SqlBuilder.UpdateFromCustomEntity<DbEntity>(source, appendWhere, paras);
             var cmd = this.GetDbCommand();
             try
             {
@@ -463,7 +479,11 @@ namespace ZeroDbs.Common
         }
         public int UpdateFromDictionary<DbEntity>(Dictionary<string, object> source) where DbEntity : class, new()
         {
-            var info = this.SqlBuilder.UpdateFromDictionary<DbEntity>(source);
+            return UpdateFromDictionary<DbEntity>(source, "");
+        }
+        public int UpdateFromDictionary<DbEntity>(Dictionary<string, object> source, string appendWhere, params object[] paras) where DbEntity : class, new()
+        {
+            var info = this.SqlBuilder.UpdateFromDictionary<DbEntity>(source, appendWhere, paras);
             var cmd = this.GetDbCommand();
             try
             {

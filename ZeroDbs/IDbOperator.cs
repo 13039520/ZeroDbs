@@ -27,10 +27,15 @@ namespace ZeroDbs
         int InsertFromDictionary<DbEntity>(Dictionary<string, object> source) where DbEntity : class, new();
 
         int Update<DbEntity>(DbEntity entity) where DbEntity : class, new();
+        int Update<DbEntity>(DbEntity entity, string appendWhere, params object[] paras) where DbEntity : class, new();
         int Update<DbEntity>(List<DbEntity> entities) where DbEntity : class, new();
+        int Update<DbEntity>(List<DbEntity> entities, string appendWhere, params object[] paras) where DbEntity : class, new();
         int UpdateFromNameValueCollection<DbEntity>(System.Collections.Specialized.NameValueCollection source) where DbEntity : class, new();
+        int UpdateFromNameValueCollection<DbEntity>(System.Collections.Specialized.NameValueCollection source, string appendWhere, params object[] paras) where DbEntity : class, new();
         int UpdateFromCustomEntity<DbEntity>(object source) where DbEntity : class, new();
+        int UpdateFromCustomEntity<DbEntity>(object source, string appendWhere, params object[] paras) where DbEntity : class, new();
         int UpdateFromDictionary<DbEntity>(Dictionary<string, object> source) where DbEntity : class, new();
+        int UpdateFromDictionary<DbEntity>(Dictionary<string, object> source, string appendWhere, params object[] paras) where DbEntity : class, new();
 
         int Delete<DbEntity>(string where, params object[] paras) where DbEntity : class, new();
 

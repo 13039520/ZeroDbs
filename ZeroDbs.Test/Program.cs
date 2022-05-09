@@ -17,14 +17,14 @@ namespace ZeroDbs.Test
             }));
             //CodeGenerator();
             //InsertTest();
-            //UpdateTest();
+            UpdateTest();
             QueryTest();
         }
 
 
         static void CodeGenerator()
         {
-            Console.WriteLine("正在生成……");
+            Console.WriteLine("start generating");
 
             ZeroDbs.Tools.CodeGenerator generator = new Tools.CodeGenerator();
             generator.Dbs.Add(new ZeroDbs.Common.DbInfo
@@ -59,7 +59,7 @@ namespace ZeroDbs.Test
             };
             generator.Run();
 
-            Console.WriteLine("生成成功！");
+            Console.WriteLine("Generated successfully.");
         }
         static void InsertTest()
         {
@@ -116,9 +116,12 @@ namespace ZeroDbs.Test
             */
 
             DateTime myTime = DateTime.Now;
-            dbService.UpdateFromCustomEntity<MyDbs.SqlServer001.tUser>(new { ID = 1, Name = "abcdefgh", createTime = myTime });
-            dbService.UpdateFromCustomEntity<MyDbs.MySql001.tUser>(new { ID = 1, Name = "abcdefgh", createTime = myTime });
-            dbService.UpdateFromCustomEntity<MyDbs.Sqlite001.tUser>(new { ID = 1, Name = "abcdefgh", createTime = myTime });
+            int n = dbService.UpdateFromCustomEntity<MyDbs.SqlServer001.tUser>(new { ID = 1, Name = "abcdefgh2", createTime = myTime },"Email=@0", "user010@domain.com");
+            Console.WriteLine("{0} rows affected", n);
+            n = dbService.UpdateFromCustomEntity<MyDbs.MySql001.tUser>(new { ID = 1, Name = "abcdefgh2", createTime = myTime });
+            Console.WriteLine("{0} rows affected", n);
+            n = dbService.UpdateFromCustomEntity<MyDbs.Sqlite001.tUser>(new { ID = 1, Name = "abcdefgh2", createTime = myTime });
+            Console.WriteLine("{0} rows affected", n);
 
         }
         static void QueryTest()
