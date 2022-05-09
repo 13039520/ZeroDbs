@@ -23,5 +23,47 @@ namespace ZeroDbs.Common
         public string[] Fields { get { return _Fields; } set { _Fields = value; } }
         public string UniqueField { get { return _UniqueField; } set { _UniqueField = value; } }
         public object[] Paras { get { return _Paras; } set { _Paras = value; } }
+
+        public PageQuery UsePage(long page)
+        {
+            if (page > 0)
+            {
+                _Page = page;
+            }
+            return this;
+        }
+        public PageQuery UseSize(long size)
+        {
+            if (size > 0)
+            {
+                _Size = Size;
+            }
+            return this;
+        }
+        public PageQuery UseWhere(string where)
+        {
+            _Where = where;
+            return this;
+        }
+        public PageQuery UseOrderby(string orderby)
+        {
+            _Orderby = orderby;
+            return this;
+        }
+        public PageQuery UseFields(params string[] fields)
+        {
+            _Fields = fields;
+            return this;
+        }
+        public PageQuery UseUniqueField(string field)
+        {
+            _UniqueField = field;
+            return this;
+        }
+        public PageQuery UseParas(params object[] paras)
+        {
+            _Paras = paras;
+            return this;
+        }
     }
 }

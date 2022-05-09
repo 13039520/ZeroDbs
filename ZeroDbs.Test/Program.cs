@@ -127,8 +127,8 @@ namespace ZeroDbs.Test
         static void QueryTest()
         {
             #region -- page --
-            
-            var query = new ZeroDbs.Common.PageQuery
+
+            /*var query = new ZeroDbs.Common.PageQuery
             {
                 Page = 1,
                 Size = 5,
@@ -137,7 +137,8 @@ namespace ZeroDbs.Test
                 Paras = new object[] { 2 },//@0=2
                 Fields = new string[0],
                 UniqueField = ""
-            };
+            };*/
+            var query = new ZeroDbs.Common.PageQuery().UsePage(1).UseSize(5).UseWhere("ID>@0").UseParas(2).UseOrderby("ID DESC");
             var page1 = dbService.Page<MyDbs.SqlServer001.tUser,MyEntity>(query);
             Console.WriteLine("MyDbs.SqlServer001.tUser:");
             if (page1.Total > 0)
