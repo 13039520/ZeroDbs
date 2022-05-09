@@ -116,11 +116,12 @@ namespace ZeroDbs.Test
             */
 
             DateTime myTime = DateTime.Now;
-            int n = dbService.UpdateFromCustomEntity<MyDbs.SqlServer001.tUser>(new { ID = 1, Name = "abcdefgh2", createTime = myTime },"Email=@0", "user010@domain.com");
+            var obj = new { ID = 1, Name = "abcdefgh2", createTime = myTime };
+            int n = dbService.UpdateFromCustomEntity<MyDbs.SqlServer001.tUser>(obj, "Email=@0", "user010@domain.com");//WHERE ID=@ID AND Email=@0
             Console.WriteLine("{0} rows affected", n);
-            n = dbService.UpdateFromCustomEntity<MyDbs.MySql001.tUser>(new { ID = 1, Name = "abcdefgh2", createTime = myTime });
+            n = dbService.UpdateFromCustomEntity<MyDbs.MySql001.tUser>(obj);//WHERE ID=@ID
             Console.WriteLine("{0} rows affected", n);
-            n = dbService.UpdateFromCustomEntity<MyDbs.Sqlite001.tUser>(new { ID = 1, Name = "abcdefgh2", createTime = myTime });
+            n = dbService.UpdateFromCustomEntity<MyDbs.Sqlite001.tUser>(obj);//WHERE ID=@ID
             Console.WriteLine("{0} rows affected", n);
 
         }
