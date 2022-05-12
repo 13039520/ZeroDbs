@@ -1,141 +1,93 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 namespace ZeroDbs.Common
 {
-    internal static class DbDataReaderToEntity<T> where T :class,new()
+    public static class DbDataReaderToEntity<T> where T :class,new()
     {
-        public static T Entity(System.Data.IDataReader DataReader)
+        public static T Entity(System.Data.IDataReader reader)
         {
-            Dictionary<string, DataReaderInfo> FieldDic = new Dictionary<string, DataReaderInfo>();
+            T obj = default(T);
+            EntityList(reader, new DbExecuteReadOnebyOneAction<T>((r) => {
+                obj = r.RowData;
+                r.Next = false;
+            }));
+            return obj;
+        }
+        public static List<T> EntityList(System.Data.IDataReader reader)
+        {
+            var type = typeof(T);
+            var pis = type.GetProperties().ToList();
+            var dic = new Dictionary<int, System.Reflection.PropertyInfo>(reader.FieldCount);
             int i = 0;
-            while (i < DataReader.FieldCount)
+            while (i < reader.FieldCount)
             {
-                string Name = DataReader.GetName(i);
-                FieldDic.Add(Name.ToLower(), new DataReaderInfo { Index = i, Name = Name, FieldType = DataReader.GetFieldType(i) });
+                var index = pis.FindIndex(o => string.Equals(o.Name, reader.GetName(i), StringComparison.OrdinalIgnoreCase));
+                if (index > -1)
+                {
+                    dic.Add(index, pis[index]);
+                }
                 i++;
             }
-
-            List<T> Li = new List<T>();
-            while (Li.Count < 1 && DataReader.Read())
+            List<T> reval = new List<T>();
+            while (reader.Read())
             {
-                T obj = (T)Activator.CreateInstance(typeof(T));
-                System.Reflection.PropertyInfo[] pis = obj.GetType().GetProperties();
-                int j = 0;
-                while (j < pis.Length)
+                T obj = new T();
+                foreach (int index in dic.Keys)
                 {
-                    string fieldName = pis[j].Name;
-                    string name = fieldName.ToLower();
-                    if (FieldDic.ContainsKey(name))
+                    var val = reader.GetValue(index);
+                    if (TargetTypeIsBool(dic[index].PropertyType))
                     {
-                        DataReaderInfo info = FieldDic[name];
-                        string key = info.Name;
-                        object o = DataReader[key];
-                        if (TargetTypeIsBool(pis[j].PropertyType))
+                        dic[index].SetValue(obj, ConverToBool(val), null);
+                    }
+                    else
+                    {
+                        if (DBNull.Value != val)
                         {
-                            pis[j].SetValue(obj, ConverToBool(o), null);
-                        }
-                        else
-                        {
-                            if (DBNull.Value != o)
-                            {
-                                pis[j].SetValue(obj, o, null);
-                            }
+                            dic[index].SetValue(obj, val, null);
                         }
                     }
-                    j++;
                 }
-                Li.Add(obj);
+                reval.Add(obj);
             }
-            DataReader.Close();
-            return Li.Count > 0 ? Li[0] : default(T);
+            reader.Close();
+            return reval;
         }
-        public static List<T> EntityList(System.Data.IDataReader DataReader)
+        public static void EntityList(System.Data.IDataReader reader, DbExecuteReadOnebyOneAction<T> callback)
         {
-            Dictionary<string, DataReaderInfo> FieldDic = new Dictionary<string, DataReaderInfo>();
+            var type = typeof(T);
+            var pis = type.GetProperties().ToList();
+            var dic = new Dictionary<int, System.Reflection.PropertyInfo>(reader.FieldCount);
             int i = 0;
-            while (i < DataReader.FieldCount)
+            while (i < reader.FieldCount)
             {
-                string Name = DataReader.GetName(i);
-                FieldDic.Add(Name.ToLower(), new DataReaderInfo { Index=i, Name = Name, FieldType= DataReader.GetFieldType(i) });
-                i++;
-            }
-
-            List<T> Li = new List<T>();
-
-            while (DataReader.Read())
-            {
-                T obj = (T)Activator.CreateInstance(typeof(T));
-                System.Reflection.PropertyInfo[] pis = obj.GetType().GetProperties();
-                int j = 0;
-                while (j < pis.Length)
+                var index = pis.FindIndex(o => string.Equals(o.Name, reader.GetName(i), StringComparison.OrdinalIgnoreCase));
+                if (index > -1)
                 {
-                    string fieldName = pis[j].Name;
-                    string name = fieldName.ToLower();
-                    if (FieldDic.ContainsKey(name))
-                    {
-                        DataReaderInfo info = FieldDic[name];
-                        string key = info.Name;
-                        object o = DataReader[key];
-                        if (TargetTypeIsBool(pis[j].PropertyType))
-                        {
-                            pis[j].SetValue(obj, ConverToBool(o), null);
-                        }
-                        else
-                        {
-                            if (DBNull.Value != o)
-                            {
-                                pis[j].SetValue(obj, o, null);
-                            }
-                        }
-                    }
-                    j++;
+                    dic.Add(index, pis[index]);
                 }
-                Li.Add(obj);
-            }
-            DataReader.Close();
-            return Li;
-        }
-        public static void EntityList(System.Data.IDataReader DataReader, DbExecuteReadOnebyOneAction<T> callback)
-        {
-            Dictionary<string, DataReaderInfo> FieldDic = new Dictionary<string, DataReaderInfo>();
-            int i = 0;
-            while (i < DataReader.FieldCount)
-            {
-                string Name = DataReader.GetName(i);
-                FieldDic.Add(Name.ToLower(), new DataReaderInfo { Index = i, Name = Name, FieldType = DataReader.GetFieldType(i) });
                 i++;
             }
-
             long rowNum = 0;
-            while (DataReader.Read())
+            while (reader.Read())
             {
-                T obj = (T)Activator.CreateInstance(typeof(T));
-                System.Reflection.PropertyInfo[] pis = obj.GetType().GetProperties();
-                int j = 0;
-                while (j < pis.Length)
+                T obj = new T();
+                foreach(int index in dic.Keys)
                 {
-                    string fieldName = pis[j].Name;
-                    string name = fieldName.ToLower();
-                    if (FieldDic.ContainsKey(name))
+                    var val = reader.GetValue(index);
+                    if (TargetTypeIsBool(dic[index].PropertyType))
                     {
-                        DataReaderInfo info = FieldDic[name];
-                        string key = info.Name;
-                        object o = DataReader[key];
-                        if (TargetTypeIsBool(pis[j].PropertyType))
+                        dic[index].SetValue(obj, ConverToBool(val), null);
+                    }
+                    else
+                    {
+                        if (DBNull.Value != val)
                         {
-                            pis[j].SetValue(obj, ConverToBool(o), null);
-                        }
-                        else
-                        {
-                            if (DBNull.Value != o)
-                            {
-                                pis[j].SetValue(obj, o, null);
-                            }
+                            dic[index].SetValue(obj, val, null);
                         }
                     }
-                    j++;
                 }
                 rowNum++;
                 DbExecuteReadOnebyOneResult<T> result = new DbExecuteReadOnebyOneResult<T>(rowNum, obj);
@@ -152,120 +104,70 @@ namespace ZeroDbs.Common
                     break;
                 }
             }
-            DataReader.Close();
+            reader.Close();
         }
 
-        public static T EntityByEmit(System.Data.IDataReader DataReader)
+        public static T EntityByEmit(System.Data.IDataReader reader)
         {
-            Dictionary<string, string> FieldDic = new Dictionary<string, string>();
+            T obj = default(T);
+            EntityListByEmit(reader, new DbExecuteReadOnebyOneAction<T>((r) => {
+                obj = r.RowData;
+                r.Next = false;
+            }));
+            return obj;
+        }
+        public static List<T> EntityListByEmit(System.Data.IDataReader reader)
+        {
+            var type = typeof(T);
+            List<EntityPropertyEmitSetter> pis = EntityPropertyEmitSetter.GetProperties(typeof(T)).ToList();
+            var dic = new Dictionary<int, EntityPropertyEmitSetter>(reader.FieldCount);
             int i = 0;
-            while (i < DataReader.FieldCount)
+            while (i < reader.FieldCount)
             {
-                string Name = DataReader.GetName(i);
-                if (!FieldDic.ContainsKey(Name.ToLower()))
+                var index = pis.FindIndex(o => string.Equals(o.Info.Name, reader.GetName(i), StringComparison.OrdinalIgnoreCase));
+                if (index > -1)
                 {
-                    FieldDic.Add(Name.ToLower(), Name);
+                    dic.Add(index, pis[index]);
                 }
                 i++;
             }
-            List<T> Li = new List<T>();
-            while (Li.Count < 1 && DataReader.Read())
+            List<T> reval = new List<T>();
+            while (reader.Read())
             {
                 T obj = new T();
-                EntityPropertyEmitSetter[] ps = EntityPropertyEmitSetter.GetProperties(typeof(T));
-                int j = 0;
-                while (j < ps.Length)
+                foreach(var index in dic.Keys)
                 {
-                    string fieldName = ps[j].Info.Name;
-                    string name = fieldName.ToLower();
-                    if (FieldDic.ContainsKey(name))
-                    {
-                        object val = DataReader[FieldDic[name]];
-                        if (val != DBNull.Value)
-                        {
-                            ps[j].Setter(obj, val);
-                        }
-                    }
-                    j++;
+                    if (reader.IsDBNull(index)) { continue; }
+                    dic[index].Setter(obj, reader.GetValue(index));
                 }
-                Li.Add(obj);
+                reval.Add(obj);
             }
-            DataReader.Close();
-            return Li.Count > 0 ? Li[0] : default(T);
+            reader.Close();
+            return reval;
         }
-
-        public static List<T> EntityListByEmit(System.Data.IDataReader DataReader)
+        public static void EntityListByEmit(System.Data.IDataReader reader, DbExecuteReadOnebyOneAction<T> callback)
         {
-            Dictionary<string, string> FieldDic = new Dictionary<string, string>();
+            var type = typeof(T);
+            List<EntityPropertyEmitSetter> pis = EntityPropertyEmitSetter.GetProperties(typeof(T)).ToList();
+            var dic = new Dictionary<int, EntityPropertyEmitSetter>(reader.FieldCount);
             int i = 0;
-            while (i < DataReader.FieldCount)
+            while (i < reader.FieldCount)
             {
-                string Name = DataReader.GetName(i);
-                if (!FieldDic.ContainsKey(Name.ToLower()))
+                var index = pis.FindIndex(o => string.Equals(o.Info.Name, reader.GetName(i), StringComparison.OrdinalIgnoreCase));
+                if (index > -1)
                 {
-                    FieldDic.Add(Name.ToLower(), Name);
+                    dic.Add(index, pis[index]);
                 }
                 i++;
             }
-
-            List<T> Li = new List<T>();
-            EntityPropertyEmitSetter[] ps = EntityPropertyEmitSetter.GetProperties(typeof(T));
-            while (DataReader.Read())
-            {
-                T obj = new T();
-                int num = 0;
-                while (num < ps.Length)
-                {
-                    string fieldName = ps[num].Info.Name;
-                    string name = fieldName.ToLower();
-                    if (FieldDic.ContainsKey(name))
-                    {
-                        object val = DataReader[FieldDic[name]];
-                        if (val != DBNull.Value)
-                        {
-                            ps[num].Setter(obj, val);
-                        }
-                    }
-                    num++;
-                }
-                Li.Add(obj);
-            }
-            DataReader.Close();
-            return Li;
-        }
-        public static void EntityListByEmit(System.Data.IDataReader DataReader, DbExecuteReadOnebyOneAction<T> callback)
-        {
-            Dictionary<string, string> FieldDic = new Dictionary<string, string>();
-            int i = 0;
-            while (i < DataReader.FieldCount)
-            {
-                string Name = DataReader.GetName(i);
-                if (!FieldDic.ContainsKey(Name.ToLower()))
-                {
-                    FieldDic.Add(Name.ToLower(), Name);
-                }
-                i++;
-            }
-
-            EntityPropertyEmitSetter[] ps = EntityPropertyEmitSetter.GetProperties(typeof(T));
             long rowNum = 0;
-            while (DataReader.Read())
+            while (reader.Read())
             {
                 T obj = new T();
-                int num = 0;
-                while (num < ps.Length)
+                foreach (var index in dic.Keys)
                 {
-                    string fieldName = ps[num].Info.Name;
-                    string name = fieldName.ToLower();
-                    if (FieldDic.ContainsKey(name))
-                    {
-                        object val = DataReader[FieldDic[name]];
-                        if (val != DBNull.Value)
-                        {
-                            ps[num].Setter(obj, val);
-                        }
-                    }
-                    num++;
+                    if (reader.IsDBNull(index)) { continue; }
+                    dic[index].Setter(obj, reader.GetValue(index));
                 }
                 rowNum++;
                 DbExecuteReadOnebyOneResult<T> result = new DbExecuteReadOnebyOneResult<T>(rowNum, obj);
@@ -282,40 +184,44 @@ namespace ZeroDbs.Common
                     break;
                 }
             }
-            DataReader.Close();
+            reader.Close();
         }
 
-        public static bool TargetTypeIsBool(Type TargetType)
+        private static Type boolType = typeof(bool);
+        private static Type boolNullableType = typeof(Nullable<bool>);
+        public static bool TargetTypeIsBool(Type type)
         {
-            bool TargetTypeIsBool = false;
-            string s = TargetType.Name;
-            if (s == "Boolean")
-            {
-                TargetTypeIsBool = true;
-            }
-            else if (s == "Nullable`1")
-            {
-                s = TargetType.FullName;
-                if (s.IndexOf("System.Boolean") > 0)
-                {
-                    TargetTypeIsBool = true;
-                }
-            }
-            return TargetTypeIsBool;
+            return type == boolType || type == boolNullableType;
         }
-        public static bool ConverToBool(object TargetValue)
+        public static bool ConverToBool(object value)
         {
-            bool Val = false;
-            string s = s = TargetValue != null ? TargetValue.ToString().ToLower() : "";
-            if (s.Length < 1 || s == "false" || s == "0")
+            if(value == null) { return false; }
+            if(value is bool)
             {
-                Val = false;
+                return (bool)value;
             }
-            else
+            if(value is string)
             {
-                Val = true;
+                string s = value.ToString().ToLower();
+                return s == "true" || s == "1";
             }
-            return Val;
+            if (value is decimal)
+            {
+                return 0M != (decimal)value;
+            }
+            if (value is float || value is double)
+            {
+                return 0D != (double)value;
+            }
+            if (value is long || value is int || value is short || value is byte)
+            {
+                return 0L != (long)value;
+            }
+            if(value is Guid)
+            {
+                return Guid.Empty != (Guid)value;
+            }
+            return false;
         }
         /// <summary>
         /// 获取默认值
@@ -327,11 +233,5 @@ namespace ZeroDbs.Common
             return parameter.IsValueType ? Activator.CreateInstance(parameter) : null;
         }
 
-        class DataReaderInfo
-        {
-            public int Index { get; set; }
-            public string Name { get; set; }
-            public Type FieldType { get; set; }
-        }
     }
 }

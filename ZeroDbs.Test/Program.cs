@@ -246,6 +246,17 @@ namespace ZeroDbs.Test
             a = dbService.MaxIdentityPrimaryKeyValue<MyDbs.Sqlite001.tUser>("ID<@0", 5);
             Console.WriteLine("MyDbs.Sqlite001.tUser.MaxIdentityPrimaryKeyValue(ID<5)={0}", a);
 
+            MyDbs.SqlServer001.tUser user = null;
+            using (var cmd = dbService.GetDbCommand<MyDbs.SqlServer001.tUser>())
+            {
+                cmd.CommandText = cmd.SqlBuilder.Select<MyDbs.SqlServer001.tUser>(new Common.ListQuery { Where = "", Orderby="ID DESC"}).Sql;
+                var reader = cmd.ExecuteReader();
+                user = Common.DbDataReaderToEntity<MyDbs.SqlServer001.tUser>.EntityByEmit(reader);
+            }
+            if(user != null)
+            {
+                Console.WriteLine("MyDbs.SqlServer001.tUser=>{0}\t{1}\t{2}\t{3}", user.ID,user.Name,user.Email,user.CreateTime);
+            }
         }
         class MyEntity
         {
