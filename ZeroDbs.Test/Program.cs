@@ -110,18 +110,28 @@ namespace ZeroDbs.Test
             nvc.Add("ID", "1");
             nvc.Add("Password", "aaaaaa");
             nvc.Add("Email", "aaaaa@bbbb.es");
-            dbService.Update<MyDbs.SqlServer001.tUser>(nvc);
-            dbService.Update<MyDbs.MySql001.tUser>(nvc);
-            dbService.Update<MyDbs.Sqlite001.tUser>(nvc);
+            dbService.UpdateFromNameValueCollection<MyDbs.SqlServer001.tUser>(nvc);
+            dbService.UpdateFromNameValueCollection<MyDbs.MySql001.tUser>(nvc);
+            dbService.UpdateFromNameValueCollection<MyDbs.Sqlite001.tUser>(nvc);
+            */
+
+            /*
+            var dic = new System.Collections.Generic.Dictionary<string, object>();
+            dic.Add("ID", 1);
+            dic.Add("Password", "aaaaaa");
+            dic.Add("Email", "aaaaa@bbbb.es");
+            dbService.UpdateFromDictionary<MyDbs.SqlServer001.tUser>(dic);
+            dbService.UpdateFromDictionary<MyDbs.MySql001.tUser>(dic);
+            dbService.UpdateFromDictionary<MyDbs.Sqlite001.tUser>(dic);
             */
 
             DateTime myTime = DateTime.Now;
-            var obj = new { ID = 1, Name = "abcdefgh2", createTime = myTime };
-            int n = dbService.UpdateFromCustomEntity<MyDbs.SqlServer001.tUser>(obj, "Email=@0", "user010@domain.com");//WHERE ID=@ID AND Email=@0
+            var customEntity = new { ID = 1, Name = "abcdefgh2", createTime = myTime };
+            int n = dbService.UpdateFromCustomEntity<MyDbs.SqlServer001.tUser>(customEntity, "Email=@0", "user010@domain.com");//WHERE ID=@ID AND Email=@0
             Console.WriteLine("{0} rows affected", n);
-            n = dbService.UpdateFromCustomEntity<MyDbs.MySql001.tUser>(obj);//WHERE ID=@ID
+            n = dbService.UpdateFromCustomEntity<MyDbs.MySql001.tUser>(customEntity);//WHERE ID=@ID
             Console.WriteLine("{0} rows affected", n);
-            n = dbService.UpdateFromCustomEntity<MyDbs.Sqlite001.tUser>(obj);//WHERE ID=@ID
+            n = dbService.UpdateFromCustomEntity<MyDbs.Sqlite001.tUser>(customEntity);//WHERE ID=@ID
             Console.WriteLine("{0} rows affected", n);
 
         }
@@ -246,6 +256,7 @@ namespace ZeroDbs.Test
             /**/
             #endregion
 
+            #region -- MaxIdentityPrimaryKeyValue --
             var a = dbService.MaxIdentityPrimaryKeyValue<MyDbs.SqlServer001.tUser>();
             Console.WriteLine("MyDbs.SqlServer001.tUser.MaxIdentityPrimaryKeyValue={0}", a);
             a = dbService.MaxIdentityPrimaryKeyValue<MyDbs.SqlServer001.tUser>("ID<@0", 5);
@@ -258,6 +269,7 @@ namespace ZeroDbs.Test
             Console.WriteLine("MyDbs.Sqlite001.tUser.MaxIdentityPrimaryKeyValue={0}", a);
             a = dbService.MaxIdentityPrimaryKeyValue<MyDbs.Sqlite001.tUser>("ID<@0", 5);
             Console.WriteLine("MyDbs.Sqlite001.tUser.MaxIdentityPrimaryKeyValue(ID<5)={0}", a);
+            #endregion
 
             MyDbs.SqlServer001.tUser user = null;
             using (var cmd = dbService.GetDbCommand<MyDbs.SqlServer001.tUser>())
