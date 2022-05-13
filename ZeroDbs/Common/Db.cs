@@ -141,6 +141,22 @@ namespace ZeroDbs.Common
         {
             return Select<DbEntity>(query.Where, query.Orderby, query.Top, query.Fields, query.Paras);
         }
+        public List<OutType> Select<DbEntity, OutType>() where DbEntity : class, new() where OutType : class, new()
+        {
+            return Select<DbEntity, OutType>("");
+        }
+        public List<OutType> Select<DbEntity, OutType>(string where) where DbEntity : class, new() where OutType : class, new()
+        {
+            return Select<DbEntity, OutType>(where, "");
+        }
+        public List<OutType> Select<DbEntity, OutType>(string where, string orderby) where DbEntity : class, new() where OutType : class, new()
+        {
+            return Select<DbEntity, OutType>(where, orderby, 0);
+        }
+        public List<OutType> Select<DbEntity, OutType>(string where, string orderby, int top) where DbEntity : class, new() where OutType : class, new()
+        {
+            return Select<DbEntity, OutType>(where, orderby, top, new object[0]);
+        }
         public List<OutType> Select<DbEntity, OutType>(string where, string orderby, int top, params object[] paras) where DbEntity : class, new() where OutType : class, new()
         {
             string[] fields = typeof(OutType).GetProperties().Select(o => o.Name).ToArray();
@@ -157,6 +173,26 @@ namespace ZeroDbs.Common
                 cmd.Dispose();
                 throw ex;
             }
+        }
+        public List<DbEntity> Select<DbEntity>() where DbEntity : class, new()
+        {
+            return Select<DbEntity>("");
+        }
+        public List<DbEntity> Select<DbEntity>(string where) where DbEntity : class, new()
+        {
+            return Select<DbEntity>(where, "");
+        }
+        public List<DbEntity> Select<DbEntity>(string where, string orderby) where DbEntity : class, new()
+        {
+            return Select<DbEntity>(where, orderby, 0);
+        }
+        public List<DbEntity> Select<DbEntity>(string where, string orderby, int top) where DbEntity : class, new()
+        {
+            return Select<DbEntity>(where, orderby, top, new string[0]);
+        }
+        public List<DbEntity> Select<DbEntity>(string where, string orderby, int top, string[] fields) where DbEntity : class, new()
+        {
+            return Select<DbEntity>(where, orderby, top, fields, new object[0]);
         }
         public List<DbEntity> Select<DbEntity>(string where, string orderby, int top, string[] fields, params object[] paras) where DbEntity : class, new()
         {
@@ -182,6 +218,22 @@ namespace ZeroDbs.Common
         public Common.PageData<OutType> Page<DbEntity, OutType>(Common.PageQuery query) where DbEntity : class, new() where OutType : class, new()
         {
             return Page<DbEntity, OutType>(query.Page, query.Size, query.Where, query.Orderby, query.UniqueField, query.Paras);
+        }
+        public Common.PageData<OutType> Page<DbEntity, OutType>(long page, long size) where DbEntity : class, new() where OutType : class, new()
+        {
+            return Page<DbEntity, OutType>(page, size, "");
+        }
+        public Common.PageData<OutType> Page<DbEntity, OutType>(long page, long size, string where) where DbEntity : class, new() where OutType : class, new()
+        {
+            return Page<DbEntity, OutType>(page, size, where, "");
+        }
+        public Common.PageData<OutType> Page<DbEntity, OutType>(long page, long size, string where, string orderby) where DbEntity : class, new() where OutType : class, new()
+        {
+            return Page<DbEntity, OutType>(page, size, where, orderby, "");
+        }
+        public Common.PageData<OutType> Page<DbEntity, OutType>(long page, long size, string where, string orderby, string uniqueField) where DbEntity : class, new() where OutType : class, new()
+        {
+            return Page<DbEntity, OutType>(page, size, where, orderby, uniqueField, new object[0]);
         }
         public Common.PageData<OutType> Page<DbEntity, OutType>(long page, long size, string where, string orderby, string uniqueField, params object[] paras) where DbEntity : class, new() where OutType : class, new()
         {
@@ -217,6 +269,26 @@ namespace ZeroDbs.Common
 
                 throw ex;
             }
+        }
+        public PageData<DbEntity> Page<DbEntity>(long page, long size) where DbEntity : class, new()
+        {
+            return Page<DbEntity>(page, size, "");
+        }
+        public PageData<DbEntity> Page<DbEntity>(long page, long size, string where) where DbEntity : class, new()
+        {
+            return Page<DbEntity>(page, size, where, "");
+        }
+        public PageData<DbEntity> Page<DbEntity>(long page, long size, string where, string orderby) where DbEntity : class, new()
+        {
+            return Page<DbEntity>(page, size, where, orderby, new string[0]);
+        }
+        public PageData<DbEntity> Page<DbEntity>(long page, long size, string where, string orderby, string[] fields) where DbEntity : class, new()
+        {
+            return Page<DbEntity>(page, size, where, orderby, fields, "");
+        }
+        public PageData<DbEntity> Page<DbEntity>(long page, long size, string where, string orderby, string[] fields, string uniqueField) where DbEntity : class, new()
+        {
+            return Page<DbEntity>(page, size, where, orderby, fields, uniqueField, new object[0]);
         }
         public PageData<DbEntity> Page<DbEntity>(long page, long size, string where, string orderby, string[] fields, string uniqueField, params object[] paras) where DbEntity : class, new()
         {

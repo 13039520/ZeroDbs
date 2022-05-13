@@ -8,12 +8,30 @@ namespace ZeroDbs
     {
         List<OutType> Select<DbEntity, OutType>(Common.ListQuery query) where DbEntity : class, new() where OutType : class, new();
         List<DbEntity> Select<DbEntity>(Common.ListQuery query) where DbEntity : class, new();
+        List<OutType> Select<DbEntity, OutType>() where DbEntity : class, new() where OutType : class, new();
+        List<OutType> Select<DbEntity, OutType>(string where) where DbEntity : class, new() where OutType : class, new();
+        List<OutType> Select<DbEntity, OutType>(string where, string orderby) where DbEntity : class, new() where OutType : class, new();
+        List<OutType> Select<DbEntity, OutType>(string where, string orderby, int top) where DbEntity : class, new() where OutType : class, new();
         List<OutType> Select<DbEntity, OutType>(string where, string orderby, int top, params object[] paras) where DbEntity : class, new() where OutType : class, new();
+        List<DbEntity> Select<DbEntity>() where DbEntity : class, new();
+        List<DbEntity> Select<DbEntity>(string where) where DbEntity : class, new();
+        List<DbEntity> Select<DbEntity>(string where, string orderby) where DbEntity : class, new();
+        List<DbEntity> Select<DbEntity>(string where, string orderby, int top) where DbEntity : class, new();
+        List<DbEntity> Select<DbEntity>(string where, string orderby, int top, string[] fields) where DbEntity : class, new();
         List<DbEntity> Select<DbEntity>(string where, string orderby, int top, string[] fields, params object[] paras) where DbEntity : class, new();
 
         Common.PageData<DbEntity> Page<DbEntity>(Common.PageQuery query) where DbEntity : class, new();
         Common.PageData<OutType> Page<DbEntity, OutType>(Common.PageQuery query) where DbEntity : class, new() where OutType : class, new();
+        Common.PageData<DbEntity> Page<DbEntity>(long page, long size) where DbEntity : class, new();
+        Common.PageData<DbEntity> Page<DbEntity>(long page, long size, string where) where DbEntity : class, new();
+        Common.PageData<DbEntity> Page<DbEntity>(long page, long size, string where, string orderby) where DbEntity : class, new();
+        Common.PageData<DbEntity> Page<DbEntity>(long page, long size, string where, string orderby, string[] fields) where DbEntity : class, new();
+        Common.PageData<DbEntity> Page<DbEntity>(long page, long size, string where, string orderby, string[] fields, string uniqueField) where DbEntity : class, new();
         Common.PageData<DbEntity> Page<DbEntity>(long page, long size, string where, string orderby, string[] fields, string uniqueField, params object[] paras) where DbEntity : class, new();
+        Common.PageData<OutType> Page<DbEntity, OutType>(long page, long size) where DbEntity : class, new() where OutType : class, new();
+        Common.PageData<OutType> Page<DbEntity, OutType>(long page, long size, string where) where DbEntity : class, new() where OutType : class, new();
+        Common.PageData<OutType> Page<DbEntity, OutType>(long page, long size, string where, string orderby) where DbEntity : class, new() where OutType : class, new();
+        Common.PageData<OutType> Page<DbEntity, OutType>(long page, long size, string where, string orderby, string uniqueField) where DbEntity : class, new() where OutType : class, new();
         Common.PageData<OutType> Page<DbEntity, OutType>(long page, long size, string where, string orderby, string uniqueField, params object[] paras) where DbEntity : class, new() where OutType : class, new();
 
         long Count<DbEntity>(string where, params object[] paras) where DbEntity : class, new();

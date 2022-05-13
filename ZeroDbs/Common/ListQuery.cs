@@ -51,5 +51,34 @@ namespace ZeroDbs.Common
             return new ListQuery();
         }
 
+        public ListQuery() : this("")
+        {
+
+        }
+        public ListQuery(string where) : this(where, "")
+        {
+
+        }
+        public ListQuery(string where, string orderby) : this(where, orderby, 0)
+        {
+
+        }
+        public ListQuery(string where, string orderby, int top) : this(where, orderby, top, new string[0])
+        {
+
+        }
+        public ListQuery(string where, string orderby, int top, string[] fields) : this(where, orderby, top, fields, new object[0])
+        {
+
+        }
+        public ListQuery(string where, string orderby, int top, string[] fields, params object[] paras)
+        {
+            this._Where = where;
+            this._Orderby = orderby;
+            this._Top = top;
+            this._Fields = fields;
+            this.Paras = paras;
+        }
+
     }
 }

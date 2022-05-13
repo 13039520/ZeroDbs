@@ -179,6 +179,19 @@ namespace ZeroDbs.Test
             {
                 Console.WriteLine("no data");
             }
+            var page4 = dbService.Page<MyDbs.Sqlite001.tUser>(1,5);
+            Console.WriteLine("MyDbs.Sqlite001.tUser(page4):");
+            if (page4.Total > 0)
+            {
+                foreach (MyDbs.Sqlite001.tUser m in page4.Items)
+                {
+                    Console.WriteLine("{0}\t{1}\t{2}\t{3}", m.ID, m.Name, m.Email, m.CreateTime);
+                }
+            }
+            else
+            {
+                Console.WriteLine("no data");
+            }
             /**/
             #endregion
 

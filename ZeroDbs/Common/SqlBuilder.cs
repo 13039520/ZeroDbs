@@ -127,6 +127,26 @@ namespace ZeroDbs.Common
             return reval;
         }
 
+        public SqlInfo Page<DbEntity>(long page, long size) where DbEntity : class, new()
+        {
+            return Page<DbEntity>(page, size, "");
+        }
+        public SqlInfo Page<DbEntity>(long page, long size, string where) where DbEntity : class, new()
+        {
+            return Page<DbEntity>(page, size, where, "");
+        }
+        public SqlInfo Page<DbEntity>(long page, long size, string where, string orderby) where DbEntity : class, new()
+        {
+            return Page<DbEntity>(page, size, where, orderby, new string[0]);
+        }
+        public SqlInfo Page<DbEntity>(long page, long size, string where, string orderby, string[] fields) where DbEntity : class, new()
+        {
+            return Page<DbEntity>(page, size, where, orderby, fields, "");
+        }
+        public SqlInfo Page<DbEntity>(long page, long size, string where, string orderby, string[] fields, string uniqueField = "") where DbEntity : class, new()
+        {
+            return Page<DbEntity>(page, size, where, orderby, fields, uniqueField, new object[0]);
+        }
         public virtual SqlInfo Page<DbEntity>(long page, long size, string where, string orderby, string[] fields, string uniqueField = "", params object[] paras) where DbEntity : class, new()
         {
             var tableInfo = this.ZeroDb.GetTable<DbEntity>();
@@ -215,6 +235,22 @@ namespace ZeroDbs.Common
         public SqlInfo Select<DbEntity>(ListQuery query) where DbEntity : class, new()
         {
             return Select<DbEntity>(query.Where, query.Orderby, query.Top, query.Fields, query.Paras);
+        }
+        public SqlInfo Select<DbEntity>(string where) where DbEntity : class, new()
+        {
+            return Select<DbEntity>(where, "");
+        }
+        public SqlInfo Select<DbEntity>(string where, string orderby) where DbEntity : class, new()
+        {
+            return Select<DbEntity>(where, orderby, 0);
+        }
+        public SqlInfo Select<DbEntity>(string where, string orderby, int top) where DbEntity : class, new()
+        {
+            return Select<DbEntity>(where, orderby, top, new string[0]);
+        }
+        public SqlInfo Select<DbEntity>(string where, string orderby, int top, string[] fields) where DbEntity : class, new()
+        {
+            return Select<DbEntity>(where, orderby, top, fields, new object[0]);
         }
         public virtual SqlInfo Select<DbEntity>(string where, string orderby, int top, string[] fields, params object[] paras) where DbEntity : class, new()
         {

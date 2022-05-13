@@ -65,5 +65,43 @@ namespace ZeroDbs.Common
             _Paras = paras;
             return this;
         }
+
+        public PageQuery() : this(1, 1)
+        {
+
+        }
+        public PageQuery(long page, long size) : this(page, size, "")
+        {
+
+        }
+        public PageQuery(long page, long size, string where) : this(page, size, where, "")
+        {
+
+        }
+        public PageQuery(long page, long size, string where, string orderby) : this(page, size, where, orderby, new string[0])
+        {
+
+        }
+        public PageQuery(long page, long size, string where, string orderby, string[] fields) : this(page, size, where, orderby, fields, "")
+        {
+
+        }
+        public PageQuery(long page, long size, string where, string orderby, string[] fields, string uniqueField = "") : this(page, size, where, orderby, fields, uniqueField, new object[0])
+        {
+
+        }
+        public PageQuery(long page, long size, string where, string orderby, string[] fields, string uniqueField = "", params object[] paras)
+        {
+            this._Page = page;
+            this._Size = size;
+            this._Where = where;
+            this._Orderby = orderby;
+            this._Fields = fields;
+            this._UniqueField = uniqueField;
+            this._Paras = paras;
+        }
+
+
+
     }
 }
