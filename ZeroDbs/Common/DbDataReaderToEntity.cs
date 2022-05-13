@@ -27,7 +27,7 @@ namespace ZeroDbs.Common
                 var index = pis.FindIndex(o => string.Equals(o.Name, reader.GetName(i), StringComparison.OrdinalIgnoreCase));
                 if (index > -1)
                 {
-                    dic.Add(index, pis[index]);
+                    dic.Add(i, pis[index]);
                 }
                 i++;
             }
@@ -66,7 +66,7 @@ namespace ZeroDbs.Common
                 var index = pis.FindIndex(o => string.Equals(o.Name, reader.GetName(i), StringComparison.OrdinalIgnoreCase));
                 if (index > -1)
                 {
-                    dic.Add(index, pis[index]);
+                    dic.Add(i, pis[index]);
                 }
                 i++;
             }
@@ -127,7 +127,7 @@ namespace ZeroDbs.Common
                 var index = pis.FindIndex(o => string.Equals(o.Info.Name, reader.GetName(i), StringComparison.OrdinalIgnoreCase));
                 if (index > -1)
                 {
-                    dic.Add(index, pis[index]);
+                    dic.Add(i, pis[index]);
                 }
                 i++;
             }
@@ -156,7 +156,7 @@ namespace ZeroDbs.Common
                 var index = pis.FindIndex(o => string.Equals(o.Info.Name, reader.GetName(i), StringComparison.OrdinalIgnoreCase));
                 if (index > -1)
                 {
-                    dic.Add(index, pis[index]);
+                    dic.Add(i, pis[index]);
                 }
                 i++;
             }
