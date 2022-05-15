@@ -27,6 +27,16 @@ namespace ZeroDbs.Common
         {
             return PropertyInfoCache.GetPropertyInfoList(entityType);
         }
+        protected void SqlInfoUseParas(ref SqlInfo info, params object[] paras)
+        {
+            int n = 0;
+            int m = paras.Length;
+            while (n < m)
+            {
+                info.Paras.Add(n.ToString(), paras[n]);
+                n++;
+            }
+        }
 
         public ITableInfo GetTable<DbEntity>() where DbEntity : class, new()
         {
@@ -65,13 +75,7 @@ namespace ZeroDbs.Common
             var tableInfo = this.GetTable<DbEntity>();
             SqlInfo reval = new SqlInfo();
             reval.Sql = string.Format("SELECT COUNT(1) FROM {0} WHERE {1}", GetTableName(tableInfo), string.IsNullOrEmpty(where) ? "1>0" : where);
-            int n = 0;
-            int m = paras.Length;
-            while (n < m)
-            {
-                reval.Paras.Add(n.ToString(), paras[n]);
-                n++;
-            }
+            SqlInfoUseParas(ref reval, paras);
             return reval;
         }
 
@@ -91,14 +95,8 @@ namespace ZeroDbs.Common
             {
                 where = string.Format(" WHERE {0}",where);
             }
-            SqlInfo reval= new SqlInfo { Sql = string.Format("SELECT MAX({0}) FROM {1}{2}", GetColunmName(col.Name), GetTableName(tableInfo), where) };
-            int n = 0;
-            int m = paras.Length;
-            while (n < m)
-            {
-                reval.Paras.Add(n.ToString(), paras[n]);
-                n++;
-            }
+            SqlInfo reval= new SqlInfo(paras.Length) { Sql = string.Format("SELECT MAX({0}) FROM {1}{2}", GetColunmName(col.Name), GetTableName(tableInfo), where) };
+            SqlInfoUseParas(ref reval, paras);
             return reval;
         }
 
@@ -195,15 +193,9 @@ namespace ZeroDbs.Common
                 sql.Append(") TT");
                 sql.AppendFormat(" WHERE TT.Row BETWEEN {0} AND {1}", startIndex, endIndex);
             }
-            SqlInfo reval = new SqlInfo();
+            SqlInfo reval = new SqlInfo(paras.Length);
             reval.Sql = sql.ToString();
-            int n = 0;
-            int m = paras.Length;
-            while (n < m)
-            {
-                reval.Paras.Add(n.ToString(), paras[n]);
-                n++;
-            }
+            SqlInfoUseParas(ref reval, paras);
             return reval;
         }
 
@@ -288,13 +280,7 @@ namespace ZeroDbs.Common
                     reval.Sql = string.Format("SELECT TOP {0} {1} FROM {2} WHERE {3} ORDER BY {4}", top, field, tableName, where, orderby);
                 }
             }
-            int n = 0;
-            int m = paras.Length;
-            while (n < m)
-            {
-                reval.Paras.Add(n.ToString(),paras[n]);
-                n++;
-            }
+            SqlInfoUseParas(ref reval, paras);
             return reval;
         }
 
@@ -326,7 +312,7 @@ namespace ZeroDbs.Common
                 throw new Exception("Target does not support insert operation");
             }
             var ps = GetPropertyInfos<DbEntity>();
-            SqlInfo reval = new SqlInfo();
+            SqlInfo reval = new SqlInfo(tableInfo.Colunms.Count);
             StringBuilder field = new StringBuilder();
             StringBuilder value = new StringBuilder();
             foreach (var col in tableInfo.Colunms)
@@ -373,7 +359,7 @@ namespace ZeroDbs.Common
             {
                 throw new Exception("Input source is missing available insert field");
             }
-            SqlInfo reval = new SqlInfo();
+            SqlInfo reval = new SqlInfo(dic.Count);
             StringBuilder field = new StringBuilder();
             StringBuilder value = new StringBuilder();
             foreach (var key in dic.Keys)
@@ -420,7 +406,7 @@ namespace ZeroDbs.Common
             {
                 throw new Exception("Input source is missing available insert field");
             }
-            SqlInfo reval = new SqlInfo();
+            SqlInfo reval = new SqlInfo(values.Count);
             StringBuilder field = new StringBuilder();
             StringBuilder value = new StringBuilder();
             for (int i = 0; i < values.Count; i++)
@@ -470,7 +456,7 @@ namespace ZeroDbs.Common
             {
                 throw new Exception("Input source is missing available insert field");
             }
-            SqlInfo reval = new SqlInfo();
+            SqlInfo reval = new SqlInfo(values.Count);
             StringBuilder field = new StringBuilder();
             StringBuilder value = new StringBuilder();
             for (int i = 0; i < values.Count; i++)
@@ -569,7 +555,7 @@ namespace ZeroDbs.Common
                 }
             }
 
-            SqlInfo reval = new SqlInfo();
+            SqlInfo reval = new SqlInfo(dic.Count + paras.Length);
             StringBuilder set = new StringBuilder();
             StringBuilder where = new StringBuilder();
             foreach (var key in dic.Keys)
@@ -606,13 +592,7 @@ namespace ZeroDbs.Common
                 {
                     where.Append(appendWhere);
                 }
-                int n = 0;
-                int m = paras.Length;
-                while(n < m)
-                {
-                    reval.Paras.Add(n.ToString(), paras[n]);
-                    n++;
-                }
+                SqlInfoUseParas(ref reval, paras);
             }
             reval.Sql = String.Format("UPDATE {0} SET {1} WHERE {2}", GetTableName(tableInfo), set, where);
 
@@ -670,7 +650,7 @@ namespace ZeroDbs.Common
                 }
             }
 
-            SqlInfo reval = new SqlInfo();
+            SqlInfo reval = new SqlInfo(dic.Count + paras.Length);
             StringBuilder set = new StringBuilder();
             StringBuilder where = new StringBuilder();
             foreach (var key in dic.Keys)
@@ -707,13 +687,7 @@ namespace ZeroDbs.Common
                 {
                     where.Append(appendWhere);
                 }
-                int n = 0;
-                int m = paras.Length;
-                while (n < m)
-                {
-                    reval.Paras.Add(n.ToString(), paras[n]);
-                    n++;
-                }
+                SqlInfoUseParas(ref reval, paras);
             }
             reval.Sql = String.Format("UPDATE {0} SET {1} WHERE {2}", GetTableName(tableInfo), set, where);
 
@@ -772,7 +746,7 @@ namespace ZeroDbs.Common
                 }
             }
 
-            SqlInfo reval = new SqlInfo();
+            SqlInfo reval = new SqlInfo(values.Count + paras.Length);
             StringBuilder set = new StringBuilder();
             StringBuilder where = new StringBuilder();
             for (int i = 0; i < values.Count; i++)
@@ -809,13 +783,7 @@ namespace ZeroDbs.Common
                 {
                     where.Append(appendWhere);
                 }
-                int n = 0;
-                int m = paras.Length;
-                while (n < m)
-                {
-                    reval.Paras.Add(n.ToString(), paras[n]);
-                    n++;
-                }
+                SqlInfoUseParas(ref reval, paras);
             }
             reval.Sql = String.Format("UPDATE {0} SET {1} WHERE {2}", GetTableName(tableInfo), set, where);
 
@@ -868,7 +836,7 @@ namespace ZeroDbs.Common
                 throw new Exception("Missing field that needs to be updated");
             }
 
-            SqlInfo reval = new SqlInfo();
+            SqlInfo reval = new SqlInfo(values.Count);
             StringBuilder set = new StringBuilder();
             StringBuilder where = new StringBuilder();
             for (int i = 0; i < values.Count; i++)
@@ -945,7 +913,7 @@ namespace ZeroDbs.Common
                 }
             }
 
-            SqlInfo reval = new SqlInfo();
+            SqlInfo reval = new SqlInfo(values.Count + paras.Length);
             StringBuilder set = new StringBuilder();
             StringBuilder where = new StringBuilder();
             for (int i = 0; i < values.Count; i++)
@@ -982,13 +950,7 @@ namespace ZeroDbs.Common
                 {
                     where.Append(appendWhere);
                 }
-                int n = 0;
-                int m = paras.Length;
-                while (n < m)
-                {
-                    reval.Paras.Add(n.ToString(), paras[n]);
-                    n++;
-                }
+                SqlInfoUseParas(ref reval, paras);
             }
             reval.Sql = String.Format("UPDATE {0} SET {1} WHERE {2}", GetTableName(tableInfo), set, where);
 
@@ -1011,29 +973,17 @@ namespace ZeroDbs.Common
             {
                 throw new Exception("Does not support Delete operation on the view");
             }
-            SqlInfo reval = new SqlInfo();
+            SqlInfo reval = new SqlInfo(paras.Length);
             reval.Sql= string.Format("DELETE FROM {0} WHERE {1}", GetTableName(tableInfo), where);
-            int n = 0;
-            int m=paras.Length;
-            while (n < m)
-            {
-                reval.Paras.Add(n.ToString(), paras[n]);
-                n++;
-            }
+            SqlInfoUseParas(ref reval, paras);
             return reval;
         }
 
         public SqlInfo RawSql(string sql, params object[] paras)
         {
-            SqlInfo reval = new SqlInfo();
+            SqlInfo reval = new SqlInfo(paras.Length);
             reval.Sql = sql;
-            int n = 0;
-            int m = paras.Length;
-            while (n < m)
-            {
-                reval.Paras.Add(n.ToString(), paras[n]);
-                n++;
-            }
+            SqlInfoUseParas(ref reval, paras);
             return reval;
         }
 

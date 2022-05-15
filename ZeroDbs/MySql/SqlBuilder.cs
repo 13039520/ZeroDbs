@@ -100,20 +100,14 @@ namespace ZeroDbs.MySql
                 }
                 sql.AppendFormat(" LIMIT {0},{1}", startIndex, size);
             }
-            Common.SqlInfo reval = new Common.SqlInfo();
+            Common.SqlInfo reval = new Common.SqlInfo(paras.Length);
             reval.Sql = sql.ToString();
-            int n = 0;
-            int m = paras.Length;
-            while (n < m)
-            {
-                reval.Paras.Add(n.ToString(), paras[n]);
-                n++;
-            }
+            SqlInfoUseParas(ref reval, paras);
             return reval;
         }
         public override Common.SqlInfo Select<DbEntity>(string where, string orderby, int top, string[] fields, params object[] paras)
         {
-            Common.SqlInfo reval = new Common.SqlInfo();
+            Common.SqlInfo reval = new Common.SqlInfo(paras.Length);
             var tableInfo = this.GetTable<DbEntity>();
             StringBuilder field = new StringBuilder();
             bool needCheck = true;
@@ -172,13 +166,7 @@ namespace ZeroDbs.MySql
                     reval.Sql = string.Format("SELECT {0} FROM {1} WHERE {2} ORDER BY {3} LIMIT {4},{5}", field, tableName, where, orderby, 0, top);
                 }
             }
-            int n = 0;
-            int m = paras.Length;
-            while(n < m)
-            {
-                reval.Paras.Add(n.ToString(), paras[n]);
-                n++;
-            }
+            SqlInfoUseParas(ref reval, paras);
             return reval;
         }
 

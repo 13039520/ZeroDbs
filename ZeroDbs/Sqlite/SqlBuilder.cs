@@ -95,20 +95,14 @@ namespace ZeroDbs.Sqlite
                 sql.AppendFormat(" ORDER BY {0}", orderby);
                 sql.AppendFormat(" LIMIT {0} OFFSET {1}", size, startIndex);
             }
-            Common.SqlInfo reval = new Common.SqlInfo();
+            Common.SqlInfo reval = new Common.SqlInfo(paras.Length);
             reval.Sql = sql.ToString();
-            int n = 0;
-            int m = paras.Length;
-            while (n < m)
-            {
-                reval.Paras.Add(n.ToString(), paras[n]);
-                n++;
-            }
+            SqlInfoUseParas(ref reval, paras);
             return reval;
         }
         public override Common.SqlInfo Select<DbEntity>(string where, string orderby, int top, string[] fields, params object[] paras)
         {
-            Common.SqlInfo reval = new Common.SqlInfo();
+            Common.SqlInfo reval = new Common.SqlInfo(paras.Length);
             var tableInfo = this.GetTable<DbEntity>();
             StringBuilder field = new StringBuilder();
             bool needCheck = true;
@@ -167,13 +161,7 @@ namespace ZeroDbs.Sqlite
                     reval.Sql = string.Format("SELECT {1} FROM {2} WHERE {3} ORDER BY {4} LIMIT {0}", top, field, tableName, where, orderby);
                 }
             }
-            int n = 0;
-            int m = paras.Length;
-            while (n < m)
-            {
-                reval.Paras.Add(n.ToString(), paras[n]);
-                n++;
-            }
+            SqlInfoUseParas(ref reval, paras);
             return reval;
         }
 
