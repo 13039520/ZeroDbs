@@ -11,10 +11,6 @@ namespace ZeroDbs.Common
     /// </summary>
     public abstract class SqlBuilder
     {
-        private static Dictionary<Type,List<System.Reflection.PropertyInfo>> _properties = new Dictionary<Type,List<System.Reflection.PropertyInfo>>();
-        private static object _lock = new object();
-
-
         private IDb db = null;
         public IDb ZeroDb { get { return db; } }
 
@@ -23,34 +19,13 @@ namespace ZeroDbs.Common
             this.db = db;
         }
 
-        protected List<System.Reflection.PropertyInfo> GetPropertyInfos<DbEntity>()
+        protected List<System.Reflection.PropertyInfo> GetPropertyInfos<DbEntity>() where DbEntity : class, new()
         {
-            Type entityType = typeof(DbEntity);
-            if (_properties.ContainsKey(entityType)) { return _properties[entityType]; }
-            var ps = entityType.GetProperties().ToList();
-            lock (_lock)
-            {
-                if (_properties.ContainsKey(entityType))
-                {
-                    return _properties[entityType] = ps;
-                }
-                _properties.Add(entityType, ps);
-                return ps;
-            }
+            return EntityPropertyInfoCache.GetPropertyInfoList<DbEntity>();
         }
         protected List<System.Reflection.PropertyInfo> GetPropertyInfos(Type entityType)
         {
-            if (_properties.ContainsKey(entityType)) { return _properties[entityType]; }
-            var ps = entityType.GetProperties().ToList();
-            lock (_lock)
-            {
-                if (_properties.ContainsKey(entityType))
-                {
-                    return _properties[entityType] = ps;
-                }
-                _properties.Add(entityType, ps);
-                return ps;
-            }
+            return EntityPropertyInfoCache.GetPropertyInfoList(entityType);
         }
 
         public ITableInfo GetTable<DbEntity>() where DbEntity : class, new()

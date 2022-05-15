@@ -10,9 +10,8 @@ namespace ZeroDbs.Tools
         public static T Get<T>(System.Collections.Specialized.NameValueCollection source)
             where T : class, new()
         {
-            Type type = typeof(T);
             T reval = new T();
-            var ps = type.GetProperties().ToList();
+            var ps = Common.EntityPropertyInfoCache.GetPropertyInfoList<T>();
             for (var i = 0; i < source.Keys.Count; i++)
             {
                 var key = source.Keys[i];
@@ -29,7 +28,7 @@ namespace ZeroDbs.Tools
         {
             if (entity == null) { return; }
 
-            var ps = entity.GetType().GetProperties().ToList();
+            var ps = Common.EntityPropertyInfoCache.GetPropertyInfoList<T>();
             for (var i = 0; i < source.Keys.Count; i++)
             {
                 var key = source.Keys[i];

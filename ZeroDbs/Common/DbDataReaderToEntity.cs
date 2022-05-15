@@ -18,47 +18,15 @@ namespace ZeroDbs.Common
         }
         public static List<T> EntityList(System.Data.IDataReader reader)
         {
-            var type = typeof(T);
-            var pis = type.GetProperties().ToList();
-            var dic = new Dictionary<int, System.Reflection.PropertyInfo>(reader.FieldCount);
-            int i = 0;
-            while (i < reader.FieldCount)
-            {
-                var index = pis.FindIndex(o => string.Equals(o.Name, reader.GetName(i), StringComparison.OrdinalIgnoreCase));
-                if (index > -1)
-                {
-                    dic.Add(i, pis[index]);
-                }
-                i++;
-            }
             List<T> reval = new List<T>();
-            while (reader.Read())
-            {
-                T obj = new T();
-                foreach (int index in dic.Keys)
-                {
-                    var val = reader.GetValue(index);
-                    if (TargetTypeIsBool(dic[index].PropertyType))
-                    {
-                        dic[index].SetValue(obj, ConverToBool(val), null);
-                    }
-                    else
-                    {
-                        if (DBNull.Value != val)
-                        {
-                            dic[index].SetValue(obj, val, null);
-                        }
-                    }
-                }
-                reval.Add(obj);
-            }
-            reader.Close();
+            EntityList(reader, (e) => {
+                reval.Add(e.RowData);
+            });
             return reval;
         }
         public static void EntityList(System.Data.IDataReader reader, DbExecuteReadOnebyOneAction<T> callback)
         {
-            var type = typeof(T);
-            var pis = type.GetProperties().ToList();
+            var pis = EntityPropertyInfoCache.GetPropertyInfoList<T>();
             var dic = new Dictionary<int, System.Reflection.PropertyInfo>(reader.FieldCount);
             int i = 0;
             while (i < reader.FieldCount)
@@ -118,37 +86,16 @@ namespace ZeroDbs.Common
         }
         public static List<T> EntityListByEmit(System.Data.IDataReader reader)
         {
-            var type = typeof(T);
-            List<EntityPropertyEmitSetter> pis = EntityPropertyEmitSetter.GetProperties(typeof(T)).ToList();
-            var dic = new Dictionary<int, EntityPropertyEmitSetter>(reader.FieldCount);
-            int i = 0;
-            while (i < reader.FieldCount)
-            {
-                var index = pis.FindIndex(o => string.Equals(o.Info.Name, reader.GetName(i), StringComparison.OrdinalIgnoreCase));
-                if (index > -1)
-                {
-                    dic.Add(i, pis[index]);
-                }
-                i++;
-            }
             List<T> reval = new List<T>();
-            while (reader.Read())
-            {
-                T obj = new T();
-                foreach(var index in dic.Keys)
-                {
-                    if (reader.IsDBNull(index)) { continue; }
-                    dic[index].Setter(obj, reader.GetValue(index));
-                }
-                reval.Add(obj);
-            }
-            reader.Close();
+            EntityListByEmit(reader, (e) => {
+                reval.Add(e.RowData);
+            });
             return reval;
         }
         public static void EntityListByEmit(System.Data.IDataReader reader, DbExecuteReadOnebyOneAction<T> callback)
         {
             var type = typeof(T);
-            List<EntityPropertyEmitSetter> pis = EntityPropertyEmitSetter.GetProperties(typeof(T)).ToList();
+            List<EntityPropertyEmitSetter> pis = EntityPropertyEmitSetter.GetProperties(type).ToList();
             var dic = new Dictionary<int, EntityPropertyEmitSetter>(reader.FieldCount);
             int i = 0;
             while (i < reader.FieldCount)

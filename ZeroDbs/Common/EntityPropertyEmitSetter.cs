@@ -22,10 +22,10 @@ namespace ZeroDbs.Common
             {
                 return arr;
             }
-            PropertyInfo[] ps = type.GetProperties();
-            arr = new EntityPropertyEmitSetter[ps.Length];
+            var ps = EntityPropertyInfoCache.GetPropertyInfoList(type);
+            arr = new EntityPropertyEmitSetter[ps.Count];
             Type delegateType = typeof(ZeroEntityPropertyEmitSetter);
-            for (int i = 0; i < ps.Length; i++)
+            for (int i = 0; i < ps.Count; i++)
             {
                 EntityPropertyEmitSetter op = new EntityPropertyEmitSetter();
                 op.Info = ps[i];
