@@ -253,7 +253,7 @@ namespace ZeroDbs.Common
         {
             Parameters.Clear();
             if (entity == null) { return; }
-            var ps = EntityPropertyInfoCache.GetPropertyInfoList(entity.GetType());
+            var ps = PropertyInfoCache.GetPropertyInfoList(entity.GetType());
             foreach (System.Reflection.PropertyInfo p in ps)
             {
                 object value = p.GetValue(entity, null);

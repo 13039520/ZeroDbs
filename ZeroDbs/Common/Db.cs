@@ -159,7 +159,7 @@ namespace ZeroDbs.Common
         }
         public List<OutType> Select<DbEntity, OutType>(string where, string orderby, int top, params object[] paras) where DbEntity : class, new() where OutType : class, new()
         {
-            string[] fields = EntityPropertyInfoCache.GetPropertyInfoList<OutType>().Select(o => o.Name).ToArray();
+            string[] fields = PropertyInfoCache.GetPropertyInfoList<OutType>().Select(o => o.Name).ToArray();
             var info = SqlBuilder.Select<DbEntity>(where, orderby, top, fields, paras);
             var cmd = GetDbCommand();
             try
@@ -237,7 +237,7 @@ namespace ZeroDbs.Common
         }
         public Common.PageData<OutType> Page<DbEntity, OutType>(long page, long size, string where, string orderby, string uniqueField, params object[] paras) where DbEntity : class, new() where OutType : class, new()
         {
-            string[] fields = EntityPropertyInfoCache.GetPropertyInfoList<OutType>().Select(o => o.Name).ToArray();
+            string[] fields = PropertyInfoCache.GetPropertyInfoList<OutType>().Select(o => o.Name).ToArray();
             var countSql = SqlBuilder.Count<DbEntity>(where, paras);
             var info = SqlBuilder.Page<DbEntity>(page, size, where, orderby, fields, uniqueField, paras);
             var cmd = this.GetDbCommand();

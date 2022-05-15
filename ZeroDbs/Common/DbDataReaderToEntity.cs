@@ -26,7 +26,7 @@ namespace ZeroDbs.Common
         }
         public static void EntityList(System.Data.IDataReader reader, DbExecuteReadOnebyOneAction<T> callback)
         {
-            var pis = EntityPropertyInfoCache.GetPropertyInfoList<T>();
+            var pis = PropertyInfoCache.GetPropertyInfoList<T>();
             var dic = new Dictionary<int, System.Reflection.PropertyInfo>(reader.FieldCount);
             int i = 0;
             while (i < reader.FieldCount)
@@ -95,8 +95,8 @@ namespace ZeroDbs.Common
         public static void EntityListByEmit(System.Data.IDataReader reader, DbExecuteReadOnebyOneAction<T> callback)
         {
             var type = typeof(T);
-            List<EntityPropertyEmitSetter> pis = EntityPropertyEmitSetter.GetProperties(type).ToList();
-            var dic = new Dictionary<int, EntityPropertyEmitSetter>(reader.FieldCount);
+            List<PropertyEmitSetter> pis = PropertyEmitSetter.GetProperties(type).ToList();
+            var dic = new Dictionary<int, PropertyEmitSetter>(reader.FieldCount);
             int i = 0;
             while (i < reader.FieldCount)
             {

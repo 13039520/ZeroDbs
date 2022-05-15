@@ -8,26 +8,26 @@ using System.Linq;
 namespace ZeroDbs.Common
 {
     public delegate void ZeroEntityPropertyEmitSetter(object instance, object value);
-    public class EntityPropertyEmitSetter
+    public class PropertyEmitSetter
     {
         public PropertyInfo Info { get; set; }
         public ZeroEntityPropertyEmitSetter Setter { get; set; }
         static object _lock = new object();
-        static readonly Dictionary<Type, EntityPropertyEmitSetter[]> Cache = new Dictionary<Type, EntityPropertyEmitSetter[]>();
+        static readonly Dictionary<Type, PropertyEmitSetter[]> Cache = new Dictionary<Type, PropertyEmitSetter[]>();
 
-        public static EntityPropertyEmitSetter[] GetProperties(Type type)
+        public static PropertyEmitSetter[] GetProperties(Type type)
         {
-            EntityPropertyEmitSetter[] arr;
+            PropertyEmitSetter[] arr;
             if (Cache.TryGetValue(type, out arr))
             {
                 return arr;
             }
-            var ps = EntityPropertyInfoCache.GetPropertyInfoList(type);
-            arr = new EntityPropertyEmitSetter[ps.Count];
+            var ps = PropertyInfoCache.GetPropertyInfoList(type);
+            arr = new PropertyEmitSetter[ps.Count];
             Type delegateType = typeof(ZeroEntityPropertyEmitSetter);
             for (int i = 0; i < ps.Count; i++)
             {
-                EntityPropertyEmitSetter op = new EntityPropertyEmitSetter();
+                PropertyEmitSetter op = new PropertyEmitSetter();
                 op.Info = ps[i];
                 op.Setter = CreateSetter(op.Info, delegateType);
                 arr[i] = op;

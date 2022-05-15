@@ -21,11 +21,11 @@ namespace ZeroDbs.Common
 
         protected List<System.Reflection.PropertyInfo> GetPropertyInfos<DbEntity>() where DbEntity : class, new()
         {
-            return EntityPropertyInfoCache.GetPropertyInfoList<DbEntity>();
+            return PropertyInfoCache.GetPropertyInfoList<DbEntity>();
         }
         protected List<System.Reflection.PropertyInfo> GetPropertyInfos(Type entityType)
         {
-            return EntityPropertyInfoCache.GetPropertyInfoList(entityType);
+            return PropertyInfoCache.GetPropertyInfoList(entityType);
         }
 
         public ITableInfo GetTable<DbEntity>() where DbEntity : class, new()

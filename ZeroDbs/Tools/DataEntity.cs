@@ -11,7 +11,7 @@ namespace ZeroDbs.Tools
             where T : class, new()
         {
             T reval = new T();
-            var ps = Common.EntityPropertyInfoCache.GetPropertyInfoList<T>();
+            var ps = Common.PropertyInfoCache.GetPropertyInfoList<T>();
             for (var i = 0; i < source.Keys.Count; i++)
             {
                 var key = source.Keys[i];
@@ -28,7 +28,7 @@ namespace ZeroDbs.Tools
         {
             if (entity == null) { return; }
 
-            var ps = Common.EntityPropertyInfoCache.GetPropertyInfoList<T>();
+            var ps = Common.PropertyInfoCache.GetPropertyInfoList<T>();
             for (var i = 0; i < source.Keys.Count; i++)
             {
                 var key = source.Keys[i];

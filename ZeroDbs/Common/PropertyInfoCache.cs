@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ZeroDbs.Common
 {
-    internal static class EntityPropertyInfoCache
+    internal static class PropertyInfoCache
     {
         private static Dictionary<Type, List<System.Reflection.PropertyInfo>> _Properties = new Dictionary<Type, List<System.Reflection.PropertyInfo>>();
         private static object _lock = new object();
