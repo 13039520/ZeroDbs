@@ -14,6 +14,8 @@ namespace ZeroDbs
         System.Data.CommandType CommandType { get; set; }
         System.Data.Common.DbConnection DbConnection { get; }
         Common.SqlBuilder SqlBuilder { get; }
+        Common.ListQuery ListQuery();
+        Common.PageQuery PageQuery();
         System.Data.Common.DbParameter CreateParameter();
         System.Data.Common.DbParameter CreateParameter(string parameterName, object value);
         System.Data.Common.DbParameter CreateParameter(string parameterName, System.Data.DbType dbType, int size, object value);

@@ -19,12 +19,15 @@ namespace ZeroDbs.MySql
         }
         public override ITableInfo GetTable<DbEntity>()
         {
-            if (!IsMappingToDbKey<DbEntity>())
+            return GetTable(typeof(DbEntity).FullName);
+        }
+        public override ITableInfo GetTable(string entityFullName)
+        {
+            if (!IsMappingToDbKey(entityFullName))
             {
-                throw new Exception("类型" + typeof(DbEntity).FullName + "没有映射到" + Database.Key + "上");
+                throw new Exception("类型" + entityFullName + "没有映射到" + Database.Key + "上");
             }
-
-            var key = typeof(DbEntity).FullName;
+            string key = entityFullName;
             var value = Common.DbDataviewStructCache.Get(key);
             if (value != null)
             {
@@ -35,7 +38,7 @@ namespace ZeroDbs.MySql
             try
             {
                 var dbName = cmd.DbConnection.Database;
-                var dv = Common.DbMapping.GetDbConfigDataViewInfo<DbEntity>().Find(o => string.Equals(o.DbKey, Database.Key, StringComparison.OrdinalIgnoreCase));
+                var dv = Common.DbMapping.GetDbConfigDataViewInfoByEntityFullName(entityFullName).Find(o => string.Equals(o.DbKey, Database.Key, StringComparison.OrdinalIgnoreCase));
                 string getTableOrViewSql = "SELECT * FROM information_schema.TABLES WHERE TABLE_SCHEMA='" + dbName + "' AND TABLE_NAME='" + dv.TableName + "'";
 
                 Common.TableInfo dbDataTableInfo = null;

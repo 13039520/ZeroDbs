@@ -10,6 +10,7 @@ namespace ZeroDbs.Test
         static ZeroDbs.IDbService dbService = null;
         static void Main(string[] args)
         {
+            Console.WriteLine("Type.GetType(\"MyDbs.MySql001.tUser\")=" + Type.GetType("MyDbs.MySql001.tUser").Name);
             dbService = new ZeroDbs.Common.DbService(new Common.DbExecuteHandler((obj, e) => {
                 Console.ForegroundColor = ConsoleColor.Blue;
                 Console.WriteLine("DbKey={0}&Trans={1}&Sql=\r\n{2}\r\n&Message={3}", e.DbKey, e.TransactionInfo, e.ExecuteSql, e.Message);
@@ -274,7 +275,7 @@ namespace ZeroDbs.Test
             MyDbs.SqlServer001.tUser user = null;
             using (var cmd = dbService.GetDbCommand<MyDbs.SqlServer001.tUser>())
             {
-                cmd.CommandText = cmd.SqlBuilder.Select<MyDbs.SqlServer001.tUser>(new Common.ListQuery { Where = "", Orderby="ID DESC"}).Sql;
+                cmd.CommandText = cmd.SqlBuilder.Select<MyDbs.SqlServer001.tUser>(cmd.ListQuery().UseOrderby("ID DESC")).Sql;
                 var reader = cmd.ExecuteReader();
                 user = Common.DbDataReaderToEntity<MyDbs.SqlServer001.tUser>.EntityByEmit(reader);
             }
@@ -282,6 +283,19 @@ namespace ZeroDbs.Test
             {
                 Console.WriteLine("MyDbs.SqlServer001.tUser=>{0}\t{1}\t{2}\t{3}", user.ID,user.Name,user.Email,user.CreateTime);
             }
+            string entity = "MyDbs.SqlServer001.tUser";
+            System.Data.DataTable dt = new System.Data.DataTable();
+            using (var cmd = dbService.GetDbCommand(entity))
+            {
+                var sqlInfo = cmd.SqlBuilder.Select(entity, listQuery);
+                cmd.CommandText = sqlInfo.Sql;
+                cmd.ParametersFromDictionary(sqlInfo.Paras);
+                var reader = cmd.ExecuteReader();
+                dt.Load(reader);
+                reader.Close();
+            }
+            Console.WriteLine("dt.Rows.Count="+ dt.Rows.Count);
+
         }
         class MyEntity
         {

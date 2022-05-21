@@ -26,12 +26,16 @@ namespace ZeroDbs.SqlServer
         }
         public override ITableInfo GetTable<DbEntity>()
         {
-            if (!IsMappingToDbKey<DbEntity>())
+            return GetTable(typeof(DbEntity).FullName);
+        }
+        public override ITableInfo GetTable(string entityFullName)
+        {
+            if (!IsMappingToDbKey(entityFullName))
             {
-                throw new Exception("类型" + typeof(DbEntity).FullName + "没有映射到" + Database.Key + "上");
+                throw new Exception("类型" + entityFullName + "没有映射到" + Database.Key + "上");
             }
 
-            string key = typeof(DbEntity).FullName;
+            string key = entityFullName;
             var value = Common.DbDataviewStructCache.Get(key);
             if (value != null)
             {
@@ -41,7 +45,7 @@ namespace ZeroDbs.SqlServer
             var cmd = this.GetDbCommand();
             try
             {
-                var dv = Common.DbMapping.GetDbConfigDataViewInfo<DbEntity>().Find(o => string.Equals(o.DbKey, Database.Key, StringComparison.OrdinalIgnoreCase));
+                var dv = Common.DbMapping.GetDbConfigDataViewInfoByEntityFullName(entityFullName).Find(o => string.Equals(o.DbKey, Database.Key, StringComparison.OrdinalIgnoreCase));
                 string getTableOrViewSql = "SELECT A.[id],A.[type],A.[name],"
                     + "(SELECT TOP 1 ISNULL(value, '') FROM sys.extended_properties AS E LEFT JOIN (SELECT object_id,name AS name2 FROM sys.views UNION SELECT object_id,name AS name2 FROM sys.tables) AS T1 ON T1.object_id=major_id WHERE E.minor_id=0 AND E.name='MS_Description' AND name2=A.[name])"
                     + "AS [description]"

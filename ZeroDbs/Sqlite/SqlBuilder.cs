@@ -20,10 +20,8 @@ namespace ZeroDbs.Sqlite
         {
             return string.Format("[{0}]", colName);
         }
-        public override Common.SqlInfo Page<DbEntity>(long page, long size, string where, string orderby, string[] fields, string uniqueField = "", params object[] paras)
+        public override Common.SqlInfo Page(ITableInfo table, long page, long size, string where, string orderby, string[] fields, string uniqueField = "", params object[] paras)
         {
-            var tableInfo = this.GetTable<DbEntity>();
-
             page = page < 1 ? 1 : page;
             size = size < 1 ? 1 : size;
 
@@ -34,13 +32,13 @@ namespace ZeroDbs.Sqlite
             if (fields == null || fields.Length < 1)
             {
                 needCheck = false;
-                fields = tableInfo.Colunms.FindAll(o => o.MaxLength < 1000).Select(o => o.Name).ToArray();
+                fields = table.Colunms.FindAll(o => o.MaxLength < 1000).Select(o => o.Name).ToArray();
             }
             for (int i = 0; i < fields.Length; i++)
             {
                 if (needCheck)
                 {
-                    var col = tableInfo.Colunms.Find(o => string.Equals(o.Name, fields[i], StringComparison.OrdinalIgnoreCase));
+                    var col = table.Colunms.Find(o => string.Equals(o.Name, fields[i], StringComparison.OrdinalIgnoreCase));
                     if (col != null)
                     {
                         fieldStr.AppendFormat("{0},", GetColunmName(col.Name));
@@ -65,10 +63,10 @@ namespace ZeroDbs.Sqlite
             }
             if (string.IsNullOrEmpty(uniqueField))
             {
-                var ts = GetUniqueFieldName(tableInfo);
+                var ts = GetUniqueFieldName(table);
                 uniqueField = ts.Length == 1 ? ts[0] : string.Empty;
             }
-            string tableName = GetTableName(tableInfo);
+            string tableName = GetTableName(table);
             if (!string.IsNullOrEmpty(uniqueField))//具有唯一性字段
             {
                 string resultFieldName = uniqueField;
@@ -100,22 +98,21 @@ namespace ZeroDbs.Sqlite
             SqlInfoUseParas(ref reval, paras);
             return reval;
         }
-        public override Common.SqlInfo Select<DbEntity>(string where, string orderby, int top, string[] fields, params object[] paras)
+        public override Common.SqlInfo Select(ITableInfo table, string where, string orderby, int top, string[] fields, params object[] paras)
         {
             Common.SqlInfo reval = new Common.SqlInfo(paras.Length);
-            var tableInfo = this.GetTable<DbEntity>();
             StringBuilder field = new StringBuilder();
             bool needCheck = true;
             if (fields == null || fields.Length < 1)
             {
                 needCheck = false;
-                fields = tableInfo.Colunms.FindAll(o => o.MaxLength < 1000).Select(o => o.Name).ToArray();
+                fields = table.Colunms.FindAll(o => o.MaxLength < 1000).Select(o => o.Name).ToArray();
             }
             for (int i = 0; i < fields.Length; i++)
             {
                 if (needCheck)
                 {
-                    var col = tableInfo.Colunms.Find(o => string.Equals(o.Name, fields[i], StringComparison.OrdinalIgnoreCase));
+                    var col = table.Colunms.Find(o => string.Equals(o.Name, fields[i], StringComparison.OrdinalIgnoreCase));
                     if (col != null)
                     {
                         field.AppendFormat("{0},", GetColunmName(col.Name));
@@ -138,7 +135,7 @@ namespace ZeroDbs.Sqlite
             {
                 where = "1>0";
             }
-            var tableName = GetTableName(tableInfo);
+            var tableName = GetTableName(table);
             if (top < 1)
             {
                 if (string.IsNullOrEmpty(orderby))

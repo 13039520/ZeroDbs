@@ -56,6 +56,15 @@ namespace ZeroDbs.Common
             }
             return null;
         }
+        public static List<DbTableEntityMap> GetDbConfigDataViewInfoByEntityFullName(string entityFullName)
+        {
+            var zeroConfigInfo = DbConfigReader.GetDbConfigInfo();
+            if (zeroConfigInfo != null && zeroConfigInfo.Dbs != null && zeroConfigInfo.Dvs.Count > 0)
+            {
+                return zeroConfigInfo.Dvs.FindAll(o => string.Equals(o.EntityKey, entityFullName, StringComparison.OrdinalIgnoreCase));
+            }
+            return null;
+        }
         public static List<DbTableEntityMap> GetDbConfigDataViewInfo(string dbKey)
         {
             var zeroConfigInfo = DbConfigReader.GetDbConfigInfo();

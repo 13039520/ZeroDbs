@@ -17,14 +17,17 @@ namespace ZeroDbs.Sqlite
         {
             return new SQLiteConnection(Database.ConnectionString);
         }
-        public override ITableInfo GetTable<T>()
+        public override ITableInfo GetTable<DbEntity>()
         {
-            if (!IsMappingToDbKey<T>())
+            return GetTable(typeof(DbEntity).FullName);
+        }
+        public override ITableInfo GetTable(string entityFullName)
+        {
+            if (!IsMappingToDbKey(entityFullName))
             {
-                throw new Exception("类型" + typeof(T).FullName + "没有映射到" + Database.Key + "上");
+                throw new Exception("类型" + entityFullName + "没有映射到" + Database.Key + "上");
             }
-
-            var key = typeof(T).FullName;
+            string key = entityFullName;
             var value = Common.DbDataviewStructCache.Get(key);
             if (value != null)
             {
@@ -34,8 +37,8 @@ namespace ZeroDbs.Sqlite
             var cmd = this.GetDbCommand();
             try
             {
-                var dv = Common.DbMapping.GetDbConfigDataViewInfo<T>().Find(o => string.Equals(o.DbKey, Database.Key, StringComparison.OrdinalIgnoreCase));
-                string getTableOrViewSql = "select * from sqlite_master where name='"+dv.TableName + "' and type IN('table','view')";
+                var dv = Common.DbMapping.GetDbConfigDataViewInfoByEntityFullName(entityFullName).Find(o => string.Equals(o.DbKey, Database.Key, StringComparison.OrdinalIgnoreCase));
+                string getTableOrViewSql = "select * from sqlite_master where name='" + dv.TableName + "' and type IN('table','view')";
 
                 Common.TableInfo dbDataTableInfo = null;
                 List<string> IdentityNames = new List<string>();

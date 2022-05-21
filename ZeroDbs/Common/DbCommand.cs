@@ -43,6 +43,14 @@ namespace ZeroDbs.Common
             this.sqlBuilder = sqlBuilder;
             this.hasDbExecuteHandler = dbExecuteHandler != null;
         }
+        public Common.ListQuery ListQuery()
+        {
+            return this.sqlBuilder.ListQuery();
+        }
+        public Common.PageQuery PageQuery()
+        {
+            return this.sqlBuilder.PageQuery();
+        }
         public System.Data.Common.DbParameter CreateParameter()
         {
             return dbCommand.CreateParameter();

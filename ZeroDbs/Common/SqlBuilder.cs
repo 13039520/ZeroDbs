@@ -47,6 +47,15 @@ namespace ZeroDbs.Common
             }
             throw new Exception("类型" + typeof(DbEntity).FullName + "没有映射到" + ZeroDb.Database.Key + "上");
         }
+        public ITableInfo GetTable(string entityFullName)
+        {
+            var reval = this.db.GetTable(entityFullName);
+            if (reval != null)
+            {
+                return reval;
+            }
+            throw new Exception("类型" + entityFullName + "没有映射到" + ZeroDb.Database.Key + "上");
+        }
         public virtual string[] GetUniqueFieldName(ITableInfo tableInfo)
         {
             var keys = tableInfo.Colunms.FindAll(o => o.IsPrimaryKey);
@@ -70,11 +79,18 @@ namespace ZeroDbs.Common
             return colName;
         }
 
-        public virtual SqlInfo Count<DbEntity>(string where, params object[] paras) where DbEntity : class, new()
+        public SqlInfo Count<DbEntity>(string where, params object[] paras) where DbEntity : class, new()
         {
-            var tableInfo = this.GetTable<DbEntity>();
+            return Count(GetTable<DbEntity>(), where, paras);
+        }
+        public SqlInfo Count(string entityFullName, string where, params object[] paras)
+        {
+            return Count(GetTable(entityFullName), where, paras);
+        }
+        public virtual SqlInfo Count(ITableInfo table, string where, params object[] paras)
+        {
             SqlInfo reval = new SqlInfo();
-            reval.Sql = string.Format("SELECT COUNT(1) FROM {0} WHERE {1}", GetTableName(tableInfo), string.IsNullOrEmpty(where) ? "1>0" : where);
+            reval.Sql = string.Format("SELECT COUNT(1) FROM {0} WHERE {1}", GetTableName(table), string.IsNullOrEmpty(where) ? "1>0" : where);
             SqlInfoUseParas(ref reval, paras);
             return reval;
         }
@@ -83,19 +99,26 @@ namespace ZeroDbs.Common
         {
             return MaxIdentityPrimaryKeyValue<DbEntity>("");
         }
-        public virtual SqlInfo MaxIdentityPrimaryKeyValue<DbEntity>(string where, params object[] paras) where DbEntity : class, new()
+        public SqlInfo MaxIdentityPrimaryKeyValue<DbEntity>(string where, params object[] paras) where DbEntity : class, new()
         {
-            var tableInfo = this.GetTable<DbEntity>();
-            var col = tableInfo.Colunms.Find(o => o.IsPrimaryKey && o.IsIdentity);
+            return MaxIdentityPrimaryKeyValue(GetTable<DbEntity>(), where, paras);
+        }
+        public SqlInfo MaxIdentityPrimaryKeyValue(string entityFullName, string where, params object[] paras)
+        {
+            return MaxIdentityPrimaryKeyValue(GetTable(entityFullName), where, paras);
+        }
+        public virtual SqlInfo MaxIdentityPrimaryKeyValue(ITableInfo table, string where, params object[] paras)
+        {
+            var col = table.Colunms.Find(o => o.IsPrimaryKey && o.IsIdentity);
             if (col == null)
             {
                 throw new Exception("The target is missing an identity primary key field");
             }
             if (!string.IsNullOrEmpty(where))
             {
-                where = string.Format(" WHERE {0}",where);
+                where = string.Format(" WHERE {0}", where);
             }
-            SqlInfo reval= new SqlInfo(paras.Length) { Sql = string.Format("SELECT MAX({0}) FROM {1}{2}", GetColunmName(col.Name), GetTableName(tableInfo), where) };
+            SqlInfo reval = new SqlInfo(paras.Length) { Sql = string.Format("SELECT MAX({0}) FROM {1}{2}", GetColunmName(col.Name), GetTableName(table), where) };
             SqlInfoUseParas(ref reval, paras);
             return reval;
         }
@@ -120,10 +143,17 @@ namespace ZeroDbs.Common
         {
             return Page<DbEntity>(page, size, where, orderby, fields, uniqueField, new object[0]);
         }
-        public virtual SqlInfo Page<DbEntity>(long page, long size, string where, string orderby, string[] fields, string uniqueField = "", params object[] paras) where DbEntity : class, new()
+        public SqlInfo Page<DbEntity>(long page, long size, string where, string orderby, string[] fields, string uniqueField = "", params object[] paras) where DbEntity : class, new()
         {
             var tableInfo = this.ZeroDb.GetTable<DbEntity>();
-
+            return Page(tableInfo, page, size, where, orderby, fields, uniqueField, paras);
+        }
+        public SqlInfo Page(string entityFullName, PageQuery query)
+        {
+            return Page(GetTable(entityFullName), query.Page, query.Size, query.Where, query.Orderby, query.Fields, query.UniqueField,query.Paras);
+        }
+        public virtual SqlInfo Page(ITableInfo table, long page, long size, string where, string orderby, string[] fields, string uniqueField = "", params object[] paras)
+        {
             page = page < 1 ? 1 : page;
             size = size < 1 ? 1 : size;
 
@@ -135,13 +165,13 @@ namespace ZeroDbs.Common
             if (fields == null || fields.Length < 1)
             {
                 needCheck = false;
-                fields = tableInfo.Colunms.FindAll(o => o.MaxLength < 1000).Select(o => o.Name).ToArray();
+                fields = table.Colunms.FindAll(o => o.MaxLength < 1000).Select(o => o.Name).ToArray();
             }
             for (int i = 0; i < fields.Length; i++)
             {
                 if (needCheck)
                 {
-                    var col = tableInfo.Colunms.Find(o => string.Equals(o.Name, fields[i], StringComparison.OrdinalIgnoreCase));
+                    var col = table.Colunms.Find(o => string.Equals(o.Name, fields[i], StringComparison.OrdinalIgnoreCase));
                     if (col != null)
                     {
                         fieldStr.AppendFormat("{0},", GetColunmName(col.Name));
@@ -166,16 +196,16 @@ namespace ZeroDbs.Common
             }
             if (string.IsNullOrEmpty(uniqueField))
             {
-                var ts = GetUniqueFieldName(tableInfo);
+                var ts = GetUniqueFieldName(table);
                 uniqueField = ts.Length == 1 ? ts[0] : string.Empty;
             }
             if (!string.IsNullOrEmpty(uniqueField))//具有唯一性字段
             {
                 string resultFieldName = GetColunmName(uniqueField);
-                sql.AppendFormat("SELECT {0} FROM {1}", fieldStr, GetTableName(tableInfo));
+                sql.AppendFormat("SELECT {0} FROM {1}", fieldStr, GetTableName(table));
                 //获取唯一性字段集合
                 sql.AppendFormat(" WHERE {0} IN(SELECT {0} FROM(", resultFieldName);
-                sql.AppendFormat("SELECT ROW_NUMBER() OVER (ORDER BY {0})AS Row,{1} FROM {2}", orderby, resultFieldName, GetTableName(tableInfo));
+                sql.AppendFormat("SELECT ROW_NUMBER() OVER (ORDER BY {0})AS Row,{1} FROM {2}", orderby, resultFieldName, GetTableName(table));
                 if (!string.IsNullOrEmpty(where))
                 {
                     sql.AppendFormat(" WHERE {0}", where);
@@ -185,7 +215,7 @@ namespace ZeroDbs.Common
             else//没有唯一性字段
             {
                 sql.AppendFormat("SELECT {0} FROM (", fieldStr);
-                sql.AppendFormat("SELECT ROW_NUMBER() OVER (ORDER BY {0})AS Row,{1} FROM {2}", orderby, fieldStr, GetTableName(tableInfo));
+                sql.AppendFormat("SELECT ROW_NUMBER() OVER (ORDER BY {0})AS Row,{1} FROM {2}", orderby, fieldStr, GetTableName(table));
                 if (!string.IsNullOrEmpty(where))
                 {
                     sql.AppendFormat(" WHERE {0}", where);
@@ -219,22 +249,29 @@ namespace ZeroDbs.Common
         {
             return Select<DbEntity>(where, orderby, top, fields, new object[0]);
         }
-        public virtual SqlInfo Select<DbEntity>(string where, string orderby, int top, string[] fields, params object[] paras) where DbEntity : class, new()
+        public SqlInfo Select<DbEntity>(string where, string orderby, int top, string[] fields, params object[] paras) where DbEntity : class, new()
+        {
+            return Select(GetTable<DbEntity>(),where, orderby, top, fields, paras);
+        }
+        public SqlInfo Select(string entityFullName, ListQuery query)
+        {
+            return Select(GetTable(entityFullName), query.Where, query.Orderby, query.Top, query.Fields, query.Paras);
+        }
+        public virtual SqlInfo Select(ITableInfo table, string where, string orderby, int top, string[] fields, params object[] paras)
         {
             SqlInfo reval = new SqlInfo();
-            var tableInfo = this.GetTable<DbEntity>();
             StringBuilder field = new StringBuilder();
             bool needCheck = true;
             if (fields == null || fields.Length < 1)
             {
                 needCheck = false;
-                fields = tableInfo.Colunms.FindAll(o => o.MaxLength < 1000).Select(o => o.Name).ToArray();
+                fields = table.Colunms.FindAll(o => o.MaxLength < 1000).Select(o => o.Name).ToArray();
             }
             for (int i = 0; i < fields.Length; i++)
             {
                 if (needCheck)
                 {
-                    var col = tableInfo.Colunms.Find(o => string.Equals(o.Name, fields[i], StringComparison.OrdinalIgnoreCase));
+                    var col = table.Colunms.Find(o => string.Equals(o.Name, fields[i], StringComparison.OrdinalIgnoreCase));
                     if (col != null)
                     {
                         field.AppendFormat("{0},", GetColunmName(col.Name));
@@ -257,7 +294,7 @@ namespace ZeroDbs.Common
             {
                 where = "1>0";
             }
-            var tableName = GetTableName(tableInfo);
+            var tableName = GetTableName(table);
             if (top < 1)
             {
                 if (string.IsNullOrEmpty(orderby))
@@ -286,14 +323,17 @@ namespace ZeroDbs.Common
 
         public string Insert<DbEntity>() where DbEntity : class, new()
         {
-            var tableInfo = this.GetTable<DbEntity>();
-            if (tableInfo.IsView)
+            return Insert(GetTable<DbEntity>());
+        }
+        public string Insert(ITableInfo table)
+        {
+            if (table.IsView)
             {
                 throw new Exception("Target does not support update operation");
             }
             StringBuilder field = new StringBuilder();
             StringBuilder value = new StringBuilder();
-            foreach (var col in tableInfo.Colunms)
+            foreach (var col in table.Colunms)
             {
                 if (col.IsIdentity) { continue; }
                 field.AppendFormat("{0},", GetColunmName(col.Name));
@@ -302,7 +342,7 @@ namespace ZeroDbs.Common
             field.Remove(field.Length - 1, 1);
             value.Remove(value.Length - 1, 1);
 
-            return String.Format("INSERT INTO {0}({1}) VALUES({2})", GetTableName(tableInfo), field, value);
+            return String.Format("INSERT INTO {0}({1}) VALUES({2})", GetTableName(table), field, value);
         }
         public SqlInfo Insert<DbEntity>(DbEntity source) where DbEntity : class, new()
         {
@@ -331,20 +371,33 @@ namespace ZeroDbs.Common
         }
         public SqlInfo InsertFromCustomEntity<DbEntity>(object source) where DbEntity : class, new()
         {
+            Type type = typeof(DbEntity);
+            return InsertFromCustomEntity(GetTable(type.FullName), type, source);
+        }
+        public SqlInfo InsertFromCustomEntity(string entityFullName, object source)
+        {
+            Type type = Type.GetType(entityFullName);
+            if(type == null)
+            {
+                throw new ArgumentException("type dose not exists", "entityFullName");
+            }
+            return InsertFromCustomEntity(GetTable(entityFullName), type, source);
+        }
+        public SqlInfo InsertFromCustomEntity(ITableInfo table, Type entityType, object source)
+        {
             if (source == null)
             {
-                throw new ArgumentNullException("entity");
+                throw new ArgumentNullException("source");
             }
-            var tableInfo = this.GetTable<DbEntity>();
-            if (tableInfo.IsView)
+            if (table.IsView)
             {
                 throw new Exception("Target does not support insert operation");
             }
-            var ps = GetPropertyInfos<DbEntity>();
+            var ps = GetPropertyInfos(entityType);
             var dic = new Dictionary<System.Reflection.PropertyInfo, IColumnInfo>();
             for (int i = 0; i < ps.Count; i++)
             {
-                var col = tableInfo.Colunms.Find(o => string.Equals(o.Name, ps[i].Name, StringComparison.OrdinalIgnoreCase));
+                var col = table.Colunms.Find(o => string.Equals(o.Name, ps[i].Name, StringComparison.OrdinalIgnoreCase));
                 if (col == null)
                 {
                     throw new Exception("The " + ps[i].Name + " field does not exist in the target table");
@@ -371,18 +424,21 @@ namespace ZeroDbs.Common
             }
             field.Remove(field.Length - 1, 1);
             value.Remove(value.Length - 1, 1);
-            reval.Sql = String.Format("INSERT INTO {0}({1}) VALUES({2})", GetTableName(tableInfo), field, value);
+            reval.Sql = String.Format("INSERT INTO {0}({1}) VALUES({2})", GetTableName(table), field, value);
 
             return reval;
         }
         public SqlInfo InsertFromDictionary<DbEntity>(Dictionary<string, object> source) where DbEntity : class, new()
         {
+            return InsertFromDictionary(GetTable<DbEntity>(), source);
+        }
+        public SqlInfo InsertFromDictionary(ITableInfo table, Dictionary<string, object> source)
+        {
             if (source == null || source.Count < 1)
             {
                 throw new ArgumentNullException("source");
             }
-            var tableInfo = this.GetTable<DbEntity>();
-            if (tableInfo.IsView)
+            if (table.IsView)
             {
                 throw new Exception("Target does not support insert operation");
             }
@@ -390,7 +446,7 @@ namespace ZeroDbs.Common
             var values = new List<object>();
             foreach (var key in source.Keys)
             {
-                var col = tableInfo.Colunms.Find(o => string.Equals(o.Name, key));
+                var col = table.Colunms.Find(o => string.Equals(o.Name, key));
                 if (col == null)
                 {
                     throw new Exception("The " + key + " field does not exist in the target table");
@@ -418,24 +474,37 @@ namespace ZeroDbs.Common
             }
             field.Remove(field.Length - 1, 1);
             value.Remove(value.Length - 1, 1);
-            reval.Sql = String.Format("INSERT INTO {0}({1}) VALUES({2})", GetTableName(tableInfo), field, value);
+            reval.Sql = String.Format("INSERT INTO {0}({1}) VALUES({2})", GetTableName(table), field, value);
 
             return reval;
         }
         public SqlInfo InsertFromNameValueCollection<DbEntity>(System.Collections.Specialized.NameValueCollection source) where DbEntity : class, new()
         {
+            Type type = typeof(DbEntity);
+            return InsertFromNameValueCollection(GetTable(type.FullName), type, source);
+        }
+        public SqlInfo InsertFromNameValueCollection(string entityFullName, System.Collections.Specialized.NameValueCollection source)
+        {
+            Type type = Type.GetType(entityFullName);
+            if (type == null)
+            {
+                throw new ArgumentException("type dose not exists", "entityFullName");
+            }
+            return InsertFromNameValueCollection(GetTable(type.FullName), type, source);
+        }
+        public SqlInfo InsertFromNameValueCollection(ITableInfo table, Type entityType, System.Collections.Specialized.NameValueCollection source)
+        {
             if (source == null || source.Count < 1) { throw new ArgumentException("nvc"); }
-            var tableInfo = this.GetTable<DbEntity>();
-            if (tableInfo.IsView)
+            if (table.IsView)
             {
                 throw new Exception("Target does not support insert operation");
             }
-            var ps = GetPropertyInfos<DbEntity>();
+            var ps = GetPropertyInfos(entityType);
             var cols = new List<IColumnInfo>();
             var values = new List<object>();
             foreach (var key in source.AllKeys)
             {
-                var col = tableInfo.Colunms.Find(o => string.Equals(o.Name, key));
+                var col = table.Colunms.Find(o => string.Equals(o.Name, key));
                 if (col == null)
                 {
                     throw new Exception("The " + key + " field does not exist in the target table");
@@ -468,21 +537,28 @@ namespace ZeroDbs.Common
             }
             field.Remove(field.Length - 1, 1);
             value.Remove(value.Length - 1, 1);
-            reval.Sql = String.Format("INSERT INTO {0}({1}) VALUES({2})", GetTableName(tableInfo), field, value);
+            reval.Sql = String.Format("INSERT INTO {0}({1}) VALUES({2})", GetTableName(table), field, value);
 
             return reval;
         }
 
         public string Update<DbEntity>() where DbEntity : class, new()
         {
-            var tableInfo = this.GetTable<DbEntity>();
-            if (tableInfo.IsView)
+            return Update(GetTable<DbEntity>());
+        }
+        public string Update(string entityFullName)
+        {
+            return Update(GetTable(entityFullName));
+        }
+        public string Update(ITableInfo table)
+        {
+            if (table.IsView)
             {
                 throw new Exception("Target does not support update operation");
             }
             StringBuilder set = new StringBuilder();
             StringBuilder where = new StringBuilder();
-            foreach (var col in tableInfo.Colunms)
+            foreach (var col in table.Colunms)
             {
                 if (col.IsPrimaryKey)
                 {
@@ -501,7 +577,7 @@ namespace ZeroDbs.Common
             set.Remove(set.Length - 1, 1);
             where.Remove(where.Length - 5, 5);
 
-            return String.Format("UPDATE {0} SET {1} WHERE {2}", GetTableName(tableInfo), set, where);
+            return String.Format("UPDATE {0} SET {1} WHERE {2}", GetTableName(table), set, where);
         }
         public SqlInfo Update<DbEntity>(DbEntity entity) where DbEntity : class, new()
         {
@@ -604,16 +680,23 @@ namespace ZeroDbs.Common
         }
         public SqlInfo UpdateFromCustomEntity<DbEntity>(object source, string appendWhere, params object[] paras) where DbEntity : class, new()
         {
+            return UpdateFromCustomEntity(GetTable<DbEntity>(), source, appendWhere, paras);
+        }
+        public SqlInfo UpdateFromCustomEntity(string entityFullName, object source, string appendWhere, params object[] paras)
+        {
+            return UpdateFromCustomEntity(GetTable(entityFullName), source, appendWhere, paras);
+        }
+        public SqlInfo UpdateFromCustomEntity(ITableInfo table, object source, string appendWhere, params object[] paras)
+        {
             if (source == null)
             {
-                throw new ArgumentNullException("entity");
+                throw new ArgumentNullException("source");
             }
-            var tableInfo = this.GetTable<DbEntity>();
-            if (tableInfo.IsView)
+            if (table.IsView)
             {
                 throw new Exception("Target does not support update operation");
             }
-            var pKeys = tableInfo.Colunms.FindAll(o => o.IsPrimaryKey);
+            var pKeys = table.Colunms.FindAll(o => o.IsPrimaryKey);
             bool hasAppendWhere = !string.IsNullOrEmpty(appendWhere);
             if (pKeys.Count < 0)
             {
@@ -627,7 +710,7 @@ namespace ZeroDbs.Common
             int keyCount = 0;
             for (int i = 0; i < ps.Count; i++)
             {
-                var col = tableInfo.Colunms.Find(o => string.Equals(o.Name, ps[i].Name, StringComparison.OrdinalIgnoreCase));
+                var col = table.Colunms.Find(o => string.Equals(o.Name, ps[i].Name, StringComparison.OrdinalIgnoreCase));
                 if (col == null)
                 {
                     throw new Exception("The " + ps[i].Name + " field does not exist in the target table");
@@ -689,7 +772,7 @@ namespace ZeroDbs.Common
                 }
                 SqlInfoUseParas(ref reval, paras);
             }
-            reval.Sql = String.Format("UPDATE {0} SET {1} WHERE {2}", GetTableName(tableInfo), set, where);
+            reval.Sql = String.Format("UPDATE {0} SET {1} WHERE {2}", GetTableName(table), set, where);
 
             return reval;
         }
@@ -699,16 +782,23 @@ namespace ZeroDbs.Common
         }
         public SqlInfo UpdateFromDictionary<DbEntity>(Dictionary<string, object> source, string appendWhere, params object[] paras) where DbEntity : class, new()
         {
+            return UpdateFromDictionary(GetTable<DbEntity>(), source, appendWhere, paras);
+        }
+        public SqlInfo UpdateFromDictionary(string entityFullName, Dictionary<string, object> source, string appendWhere, params object[] paras)
+        {
+            return UpdateFromDictionary(GetTable(entityFullName), source, appendWhere, paras);
+        }
+        public SqlInfo UpdateFromDictionary(ITableInfo table, Dictionary<string, object> source, string appendWhere, params object[] paras)
+        {
             if (source == null || source.Count < 1)
             {
                 throw new ArgumentNullException("source");
             }
-            var tableInfo = this.GetTable<DbEntity>();
-            if (tableInfo.IsView)
+            if (table.IsView)
             {
                 throw new Exception("Target does not support update operation");
             }
-            var pKeys = tableInfo.Colunms.FindAll(o => o.IsPrimaryKey);
+            var pKeys = table.Colunms.FindAll(o => o.IsPrimaryKey);
             bool hasAppendWhere = !string.IsNullOrEmpty(appendWhere);
             if (pKeys.Count < 0)
             {
@@ -722,7 +812,7 @@ namespace ZeroDbs.Common
             int keyCount = 0;
             foreach (var key in source.Keys)
             {
-                var col = tableInfo.Colunms.Find(o => string.Equals(key, o.Name, StringComparison.OrdinalIgnoreCase));
+                var col = table.Colunms.Find(o => string.Equals(key, o.Name, StringComparison.OrdinalIgnoreCase));
                 if (col == null)
                 {
                     throw new Exception("The " + key + " field does not exist in the target table");
@@ -785,7 +875,7 @@ namespace ZeroDbs.Common
                 }
                 SqlInfoUseParas(ref reval, paras);
             }
-            reval.Sql = String.Format("UPDATE {0} SET {1} WHERE {2}", GetTableName(tableInfo), set, where);
+            reval.Sql = String.Format("UPDATE {0} SET {1} WHERE {2}", GetTableName(table), set, where);
 
             return reval;
         }
@@ -861,14 +951,27 @@ namespace ZeroDbs.Common
         }
         public SqlInfo UpdateFromNameValueCollection<DbEntity>(System.Collections.Specialized.NameValueCollection source, string appendWhere, params object[] paras) where DbEntity : class, new()
         {
+            Type type = typeof(DbEntity);
+            return UpdateFromNameValueCollection(GetTable(type.FullName), type, source, appendWhere, paras);
+        }
+        public SqlInfo UpdateFromNameValueCollection(string entityFullName, System.Collections.Specialized.NameValueCollection source, string appendWhere, params object[] paras)
+        {
+            Type type = Type.GetType(entityFullName);
+            if (type == null)
+            {
+                throw new ArgumentException("type dose not exists", "entityFullName");
+            }
+            return UpdateFromNameValueCollection(GetTable(type.FullName), type, source, appendWhere, paras);
+        }
+        public SqlInfo UpdateFromNameValueCollection(ITableInfo table, Type entityType, System.Collections.Specialized.NameValueCollection source, string appendWhere, params object[] paras)
+        {
             if (source == null || source.Count < 1) { throw new ArgumentException("source"); }
 
-            var tableInfo = this.GetTable<DbEntity>();
-            if (tableInfo.IsView)
+            if (table.IsView)
             {
                 throw new Exception("Target does not support update operation");
             }
-            var pKeys = tableInfo.Colunms.FindAll(o => o.IsPrimaryKey);
+            var pKeys = table.Colunms.FindAll(o => o.IsPrimaryKey);
             bool hasAppendWhere = !string.IsNullOrEmpty(appendWhere);
             if (pKeys.Count < 0)
             {
@@ -878,13 +981,13 @@ namespace ZeroDbs.Common
                 }
             }
 
-            var ps = GetPropertyInfos<DbEntity>();
+            var ps = GetPropertyInfos(entityType);
             var cols = new List<IColumnInfo>();
             var values = new List<object>();
             int keyCount = 0;
             foreach (var key in source.AllKeys)
             {
-                var col = tableInfo.Colunms.Find(o => string.Equals(o.Name, key));
+                var col = table.Colunms.Find(o => string.Equals(o.Name, key));
                 if (col == null)
                 {
                     throw new Exception("The " + key + " field does not exist in the target table");
@@ -952,12 +1055,20 @@ namespace ZeroDbs.Common
                 }
                 SqlInfoUseParas(ref reval, paras);
             }
-            reval.Sql = String.Format("UPDATE {0} SET {1} WHERE {2}", GetTableName(tableInfo), set, where);
+            reval.Sql = String.Format("UPDATE {0} SET {1} WHERE {2}", GetTableName(table), set, where);
 
             return reval;
         }
 
         public SqlInfo Delete<DbEntity>(string where, params object[] paras) where DbEntity : class, new()
+        {
+            return Delete(GetTable<DbEntity>(), where, paras);
+        }
+        public SqlInfo Delete(string entityFullName, string where, params object[] paras)
+        {
+            return Delete(GetTable(entityFullName), where, paras);
+        }
+        public SqlInfo Delete(ITableInfo table, string where, params object[] paras)
         {
             if (string.IsNullOrEmpty(where))
             {
@@ -968,13 +1079,12 @@ namespace ZeroDbs.Common
             {
                 where = where.Remove(0, 5);
             }
-            var tableInfo = this.GetTable<DbEntity>();
-            if (tableInfo.IsView)
+            if (table.IsView)
             {
                 throw new Exception("Does not support Delete operation on the view");
             }
             SqlInfo reval = new SqlInfo(paras.Length);
-            reval.Sql= string.Format("DELETE FROM {0} WHERE {1}", GetTableName(tableInfo), where);
+            reval.Sql = string.Format("DELETE FROM {0} WHERE {1}", GetTableName(table), where);
             SqlInfoUseParas(ref reval, paras);
             return reval;
         }
@@ -985,6 +1095,15 @@ namespace ZeroDbs.Common
             reval.Sql = sql;
             SqlInfoUseParas(ref reval, paras);
             return reval;
+        }
+
+        public PageQuery PageQuery()
+        {
+            return new PageQuery();
+        }
+        public ListQuery ListQuery()
+        {
+            return new ListQuery();
         }
 
     }

@@ -56,12 +56,25 @@ namespace ZeroDbs.Common
             }
             return null != temp.Find(o => string.Equals(o.Key, Database.Key, StringComparison.OrdinalIgnoreCase));
         }
+        protected bool IsMappingToDbKey(string entityFullName)
+        {
+            var temp = Common.DbMapping.GetDbInfoByEntityFullName(entityFullName);
+            if (temp == null || temp.Count < 1)
+            {
+                return false;
+            }
+            return null != temp.Find(o => string.Equals(o.Key, Database.Key, StringComparison.OrdinalIgnoreCase));
+        }
 
         public virtual System.Data.Common.DbConnection GetDbConnection()
         {
             throw new NotImplementedException();
         }
         public virtual ITableInfo GetTable<DbEntity>() where DbEntity : class, new()
+        {
+            throw new NotImplementedException();
+        }
+        public virtual ITableInfo GetTable(string entityFullName)
         {
             throw new NotImplementedException();
         }
