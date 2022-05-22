@@ -31,7 +31,7 @@ namespace ZeroDbs
         /// <typeparam name="T"></typeparam>
         /// <param name="action"></param>
         /// <param name="useEmit"></param>
-        void ExecuteReader<T>(Common.DbExecuteReadOnebyOneAction<T> action, bool useEmit = true) where T : class, new();
+        void ExecuteReader<T>(Common.DataReadHandler<T> action, bool useEmit = true) where T : class, new();
         System.Data.IDataReader ExecuteReader();
         object ExecuteScalar();
         

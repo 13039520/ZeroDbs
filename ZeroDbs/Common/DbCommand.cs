@@ -146,7 +146,7 @@ namespace ZeroDbs.Common
                 {
                     FireExecuteSql(DbExecuteSqlType.QUERY);
                 }
-                return useEmit ? DbDataReaderToEntity<T>.EntityListByEmit(dr) : DbDataReaderToEntity<T>.EntityList(dr);
+                return useEmit ? DataReaderToEntity.ListByEmit<T>(dr) : DataReaderToEntity.List<T>(dr);
             }
             catch (Exception ex)
             {
@@ -157,7 +157,7 @@ namespace ZeroDbs.Common
                 throw ex;
             }
         }
-        public void ExecuteReader<T>(Common.DbExecuteReadOnebyOneAction<T> action, bool useEmit = true) where T : class, new()
+        public void ExecuteReader<T>(Common.DataReadHandler<T> action, bool useEmit = true) where T : class, new()
         {
             try
             {
@@ -179,11 +179,11 @@ namespace ZeroDbs.Common
                 }
                 if (useEmit)
                 {
-                    DbDataReaderToEntity<T>.EntityListByEmit(dr, action);
+                    DataReaderToEntity.ListByEmit<T>(dr, action);
                 }
                 else
                 {
-                    DbDataReaderToEntity<T>.EntityList(dr, action);
+                    DataReaderToEntity.List<T>(dr, action);
                 }
             }
             catch (Exception ex)

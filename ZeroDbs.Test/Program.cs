@@ -277,7 +277,7 @@ namespace ZeroDbs.Test
             {
                 cmd.CommandText = cmd.SqlBuilder.Select<MyDbs.SqlServer001.tUser>(cmd.ListQuery().UseOrderby("ID DESC")).Sql;
                 var reader = cmd.ExecuteReader();
-                user = Common.DbDataReaderToEntity<MyDbs.SqlServer001.tUser>.EntityByEmit(reader);
+                user = Common.DataReaderToEntity.TakeOneByEmit<MyDbs.SqlServer001.tUser>(reader);
             }
             if(user != null)
             {

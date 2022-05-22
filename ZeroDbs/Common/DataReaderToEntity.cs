@@ -5,26 +5,26 @@ using System.Linq;
 
 namespace ZeroDbs.Common
 {
-    public static class DbDataReaderToEntity<T> where T :class,new()
+    public static class DataReaderToEntity
     {
-        public static T Entity(System.Data.IDataReader reader)
+        public static T TakeOne<T>(System.Data.IDataReader reader) where T :class,new ()
         {
             T obj = default(T);
-            EntityList(reader, new DbExecuteReadOnebyOneAction<T>((r) => {
+            List<T>(reader, new DataReadHandler<T>((r) => {
                 obj = r.RowData;
                 r.Next = false;
             }));
             return obj;
         }
-        public static List<T> EntityList(System.Data.IDataReader reader)
+        public static List<T> List<T>(System.Data.IDataReader reader) where T : class, new()
         {
             List<T> reval = new List<T>();
-            EntityList(reader, (e) => {
+            List<T>(reader, (e) => {
                 reval.Add(e.RowData);
             });
             return reval;
         }
-        public static void EntityList(System.Data.IDataReader reader, DbExecuteReadOnebyOneAction<T> callback)
+        public static void List<T>(System.Data.IDataReader reader, DataReadHandler<T> callback) where T : class, new()
         {
             var pis = PropertyInfoCache.GetPropertyInfoList<T>();
             var dic = new Dictionary<int, System.Reflection.PropertyInfo>(reader.FieldCount);
@@ -58,7 +58,7 @@ namespace ZeroDbs.Common
                     }
                 }
                 rowNum++;
-                DbExecuteReadOnebyOneResult<T> result = new DbExecuteReadOnebyOneResult<T>(rowNum, obj);
+                DataReadArgs<T> result = new DataReadArgs<T>(rowNum, obj);
                 try
                 {
                     callback(result);
@@ -75,24 +75,24 @@ namespace ZeroDbs.Common
             reader.Close();
         }
 
-        public static T EntityByEmit(System.Data.IDataReader reader)
+        public static T TakeOneByEmit<T>(System.Data.IDataReader reader) where T : class, new()
         {
             T obj = default(T);
-            EntityListByEmit(reader, new DbExecuteReadOnebyOneAction<T>((r) => {
+            ListByEmit<T>(reader, new DataReadHandler<T>((r) => {
                 obj = r.RowData;
                 r.Next = false;
             }));
             return obj;
         }
-        public static List<T> EntityListByEmit(System.Data.IDataReader reader)
+        public static List<T> ListByEmit<T>(System.Data.IDataReader reader) where T : class, new()
         {
             List<T> reval = new List<T>();
-            EntityListByEmit(reader, (e) => {
+            ListByEmit<T>(reader, (e) => {
                 reval.Add(e.RowData);
             });
             return reval;
         }
-        public static void EntityListByEmit(System.Data.IDataReader reader, DbExecuteReadOnebyOneAction<T> callback)
+        public static void ListByEmit<T>(System.Data.IDataReader reader, DataReadHandler<T> callback) where T : class, new()
         {
             var type = typeof(T);
             List<PropertyEmitSetter> pis = PropertyEmitSetter.GetProperties(type).ToList();
@@ -117,7 +117,7 @@ namespace ZeroDbs.Common
                     dic[index].Setter(obj, reader.GetValue(index));
                 }
                 rowNum++;
-                DbExecuteReadOnebyOneResult<T> result = new DbExecuteReadOnebyOneResult<T>(rowNum, obj);
+                DataReadArgs<T> result = new DataReadArgs<T>(rowNum, obj);
                 try
                 {
                     callback(result);
@@ -133,6 +133,7 @@ namespace ZeroDbs.Common
             }
             reader.Close();
         }
+
 
         private static Type boolType = typeof(bool);
         private static Type boolNullableType = typeof(Nullable<bool>);
