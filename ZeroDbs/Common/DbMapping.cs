@@ -7,72 +7,56 @@ namespace ZeroDbs.Common
 {
     static class DbMapping
     {
+        private static DbConfigInfo GetDbConfigInfo()
+        {
+            var config = DbConfigReader.GetDbConfigInfo();
+            if (config == null || config.Dbs == null || config.Dbs.Count < 1)
+            {
+                throw new Exception("DbConfigInfo error");
+            }
+            return config;
+        }
         public static DbInfo GetDbInfo(string dbKey)
         {
-            var zeroConfigInfo = DbConfigReader.GetDbConfigInfo();
-            if (zeroConfigInfo != null && zeroConfigInfo.Dbs != null && zeroConfigInfo.Dbs.Count > 0)
-            {
-                return zeroConfigInfo.Dbs.Find(o => string.Equals(o.Key, dbKey, StringComparison.OrdinalIgnoreCase));
-            }
-            return null;
+            var db = GetDbConfigInfo().Dbs.Find(o => string.Equals(o.Key, dbKey, StringComparison.OrdinalIgnoreCase));
+            if (db != null) { return db; }
+            throw new Exception("the \"" + dbKey + "\" does not exists");
         }
-        public static List<DbInfo> GetDbInfo<T>()
+        public static List<IDbInfo> GetDbInfo<T>()
         {
             return GetDbInfoByEntityFullName(typeof(T).FullName);
         }
-        public static List<DbInfo> GetDbInfoByEntityFullName(string entityFullName)
+        public static List<IDbInfo> GetDbInfoByEntityFullName(string entityFullName)
         {
-            if (string.IsNullOrEmpty(entityFullName)) { return null; }
-            var zeroConfigInfo = DbConfigReader.GetDbConfigInfo();
-            if (zeroConfigInfo != null && zeroConfigInfo.Dbs != null && zeroConfigInfo.Dvs.Count > 0)
-            {
-                var entityKey = entityFullName;
-                var info1 = zeroConfigInfo.Dvs.FindAll(o => string.Equals(o.EntityKey, entityKey, StringComparison.OrdinalIgnoreCase));
-                if (info1 == null || info1.Count < 1)
-                {
-                    return null;
-                }
-                var dbKeys = info1.Select(o => o.DbKey).Distinct().ToArray();
-                var reval = new List<DbInfo>();
-                foreach (var dbKey in dbKeys)
-                {
-                    var db = zeroConfigInfo.Dbs.Find(o => string.Equals(o.Key, dbKey, StringComparison.OrdinalIgnoreCase));
-                    if (db != null)
-                    {
-                        reval.Add(db);
-                    }
-                }
-                return reval;
+            if (string.IsNullOrEmpty(entityFullName)) {
+                throw new Exception("The entityFullName is noll or empty ");
             }
-            return null;
+            var config = GetDbConfigInfo();
+            var info1 = config.Dvs.Find(o => string.Equals(o.EntityKey, entityFullName, StringComparison.OrdinalIgnoreCase));
+            if (info1 == null)
+            {
+                throw new Exception("\"" + entityFullName + "\" does not exists");
+            }
+            var reval = new List<IDbInfo>();
+            var db = config.Dbs.Find(o => string.Equals(o.Key, info1.DbKey, StringComparison.OrdinalIgnoreCase));
+            if (db != null)
+            {
+                reval.Add(db);
+            }
+            return reval;
         }
-        public static List<DbTableEntityMap> GetDbConfigDataViewInfo<T>()
+        public static List<DbTableEntityMap> DbTableEntityMap<T>()
         {
-            var zeroConfigInfo = DbConfigReader.GetDbConfigInfo();
-            if (zeroConfigInfo != null && zeroConfigInfo.Dbs != null && zeroConfigInfo.Dvs.Count > 0)
-            {
-                var entityKey = typeof(T).FullName;
-                return zeroConfigInfo.Dvs.FindAll(o => string.Equals(o.EntityKey, entityKey, StringComparison.OrdinalIgnoreCase));
-            }
-            return null;
+            string entityKey = typeof(T).FullName;
+            return GetDbConfigInfo().Dvs.FindAll(o => string.Equals(o.EntityKey, entityKey, StringComparison.OrdinalIgnoreCase));
         }
-        public static List<DbTableEntityMap> GetDbConfigDataViewInfoByEntityFullName(string entityFullName)
+        public static List<DbTableEntityMap> GetDbTableEntityMapByEntityFullName(string entityFullName)
         {
-            var zeroConfigInfo = DbConfigReader.GetDbConfigInfo();
-            if (zeroConfigInfo != null && zeroConfigInfo.Dbs != null && zeroConfigInfo.Dvs.Count > 0)
-            {
-                return zeroConfigInfo.Dvs.FindAll(o => string.Equals(o.EntityKey, entityFullName, StringComparison.OrdinalIgnoreCase));
-            }
-            return null;
+            return GetDbConfigInfo().Dvs.FindAll(o => string.Equals(o.EntityKey, entityFullName, StringComparison.OrdinalIgnoreCase));
         }
-        public static List<DbTableEntityMap> GetDbConfigDataViewInfo(string dbKey)
+        public static List<DbTableEntityMap> GetDbTableEntityMap(string dbKey)
         {
-            var zeroConfigInfo = DbConfigReader.GetDbConfigInfo();
-            if (zeroConfigInfo != null && zeroConfigInfo.Dbs != null && zeroConfigInfo.Dvs.Count > 0)
-            {
-                return zeroConfigInfo.Dvs.FindAll(o => string.Equals(o.DbKey, dbKey, StringComparison.OrdinalIgnoreCase));
-            }
-            return null;
+            return GetDbConfigInfo().Dvs.FindAll(o => string.Equals(o.DbKey, dbKey, StringComparison.OrdinalIgnoreCase));
         }
         public static bool IsStandardMapping<T>()
         {

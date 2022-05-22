@@ -37,7 +37,7 @@ namespace ZeroDbs.Sqlite
             var cmd = this.GetDbCommand();
             try
             {
-                var dv = Common.DbMapping.GetDbConfigDataViewInfoByEntityFullName(entityFullName).Find(o => string.Equals(o.DbKey, Database.Key, StringComparison.OrdinalIgnoreCase));
+                var dv = Common.DbMapping.GetDbTableEntityMapByEntityFullName(entityFullName).Find(o => string.Equals(o.DbKey, Database.Key, StringComparison.OrdinalIgnoreCase));
                 string getTableOrViewSql = "select * from sqlite_master where name='" + dv.TableName + "' and type IN('table','view')";
 
                 Common.TableInfo dbDataTableInfo = null;

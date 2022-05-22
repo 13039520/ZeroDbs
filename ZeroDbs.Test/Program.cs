@@ -283,7 +283,7 @@ namespace ZeroDbs.Test
             {
                 Console.WriteLine("MyDbs.SqlServer001.tUser=>{0}\t{1}\t{2}\t{3}", user.ID,user.Name,user.Email,user.CreateTime);
             }
-            string entity = "MyDbs.SqlServer001.tUser";
+            string entity = "MyDbs.SqlServer001.tUser001";
             System.Data.DataTable dt = new System.Data.DataTable();
             using (var cmd = dbService.GetDbCommand(entity))
             {

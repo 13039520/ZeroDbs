@@ -38,7 +38,7 @@ namespace ZeroDbs.MySql
             try
             {
                 var dbName = cmd.DbConnection.Database;
-                var dv = Common.DbMapping.GetDbConfigDataViewInfoByEntityFullName(entityFullName).Find(o => string.Equals(o.DbKey, Database.Key, StringComparison.OrdinalIgnoreCase));
+                var dv = Common.DbMapping.GetDbTableEntityMapByEntityFullName(entityFullName).Find(o => string.Equals(o.DbKey, Database.Key, StringComparison.OrdinalIgnoreCase));
                 string getTableOrViewSql = "SELECT * FROM information_schema.TABLES WHERE TABLE_SCHEMA='" + dbName + "' AND TABLE_NAME='" + dv.TableName + "'";
 
                 Common.TableInfo dbDataTableInfo = null;

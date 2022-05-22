@@ -45,7 +45,7 @@ namespace ZeroDbs.SqlServer
             var cmd = this.GetDbCommand();
             try
             {
-                var dv = Common.DbMapping.GetDbConfigDataViewInfoByEntityFullName(entityFullName).Find(o => string.Equals(o.DbKey, Database.Key, StringComparison.OrdinalIgnoreCase));
+                var dv = Common.DbMapping.GetDbTableEntityMapByEntityFullName(entityFullName).Find(o => string.Equals(o.DbKey, Database.Key, StringComparison.OrdinalIgnoreCase));
                 string getTableOrViewSql = "SELECT A.[id],A.[type],A.[name],"
                     + "(SELECT TOP 1 ISNULL(value, '') FROM sys.extended_properties AS E LEFT JOIN (SELECT object_id,name AS name2 FROM sys.views UNION SELECT object_id,name AS name2 FROM sys.tables) AS T1 ON T1.object_id=major_id WHERE E.minor_id=0 AND E.name='MS_Description' AND name2=A.[name])"
                     + "AS [description]"
