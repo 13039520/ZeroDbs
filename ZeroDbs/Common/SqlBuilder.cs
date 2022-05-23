@@ -717,9 +717,9 @@ namespace ZeroDbs.Common
             }
             if (!hasAppendWhere)
             {
-                if (keyCount < pKeys.Count)
+                if (keyCount < 1)
                 {
-                    throw new Exception("Input source is missing fields other than primary key fields");
+                    throw new Exception("No primary key field provided");
                 }
                 if (keyCount == ps.Count)
                 {
@@ -821,9 +821,9 @@ namespace ZeroDbs.Common
             }
             if (!hasAppendWhere)
             {
-                if (keyCount < pKeys.Count)
+                if (keyCount < 1)
                 {
-                    throw new Exception("Input source is missing fields other than primary key fields");
+                    throw new Exception("No primary key field provided");
                 }
                 if (keyCount == source.Count)
                 {
@@ -997,9 +997,9 @@ namespace ZeroDbs.Common
             }
             if (!hasAppendWhere)
             {
-                if (keyCount < pKeys.Count)
+                if (keyCount < 1)
                 {
-                    throw new Exception("Input source is missing fields other than primary key fields");
+                    throw new Exception("No primary key field provided");
                 }
                 if (keyCount == source.Count)
                 {
