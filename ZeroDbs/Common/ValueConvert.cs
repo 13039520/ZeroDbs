@@ -120,276 +120,167 @@ namespace ZeroDbs.Common
             }
             return s;
         }
-        public static object StrToTargetType(string OriginalStr, Type TargetType)
+        public static object StrToTargetType(string str, Type type)
         {
-            object obj = GetTypeDefaultValue(TargetType);
-            switch (TargetType.Name)
+            string typeName = type.Name;
+            object val;
+            if(StrToTargetType(str, typeName, out val))
             {
-                case "Boolean":
-                    OriginalStr = OriginalStr.ToLower().Trim();
-                    if (OriginalStr.Length < 1 || OriginalStr == "0" || OriginalStr == "false")
-                    {
-                        obj = false;
-                    }
-                    else
-                    {
-                        obj = true;
-                    }
-                    break;
-                case "Char":
-                    char MyChar;
-                    if (Char.TryParse(OriginalStr, out MyChar))
-                    {
-                        obj = MyChar;
-                    }
-                    break;
-                case "Decimal":
-                    Decimal MyDecimal;
-                    if (Decimal.TryParse(OriginalStr, out MyDecimal))
-                    {
-                        obj = MyDecimal;
-                    }
-                    break;
-                case "Double":
-                    Double MyDouble;
-                    if (Double.TryParse(OriginalStr, out MyDouble))
-                    {
-                        obj = MyDouble;
-                    }
-                    break;
-                case "Single":
-                    Single MySingle;
-                    if (Single.TryParse(OriginalStr, out MySingle))
-                    {
-                        obj = MySingle;
-                    }
-                    break;
-                case "Int32":
-                    Int32 MyInt32;
-                    if (Int32.TryParse(OriginalStr, out MyInt32))
-                    {
-                        obj = MyInt32;
-                    }
-                    break;
-                case "Int64":
-                    Int64 MyInt64;
-                    if (Int64.TryParse(OriginalStr, out MyInt64))
-                    {
-                        obj = MyInt64;
-                    }
-                    break;
-                case "Int16":
-                    Int16 MyInt16;
-                    if (Int16.TryParse(OriginalStr, out MyInt16))
-                    {
-                        obj = MyInt16;
-                    }
-                    break;
-                case "UInt32":
-                    UInt32 MyUInt32;
-                    if (UInt32.TryParse(OriginalStr, out MyUInt32))
-                    {
-                        obj = MyUInt32;
-                    }
-                    break;
-                case "UInt64":
-                    UInt64 MyUInt64;
-                    if (UInt64.TryParse(OriginalStr, out MyUInt64))
-                    {
-                        obj = MyUInt64;
-                    }
-                    break;
-                case "UInt16":
-                    UInt16 MyUInt16;
-                    if (UInt16.TryParse(OriginalStr, out MyUInt16))
-                    {
-                        obj = MyUInt16;
-                    }
-                    break;
-                case "Byte":
-                    Byte MyByte;
-                    if (Byte.TryParse(OriginalStr, out MyByte))
-                    {
-                        obj = MyByte;
-                    }
-                    break;
-                case "SByte":
-                    SByte MySByte;
-                    if (SByte.TryParse(OriginalStr, out MySByte))
-                    {
-                        obj = MySByte;
-                    }
-                    break;
-                case "DateTime":
-                    DateTime MyDateTime;
-                    if (DateTime.TryParse(OriginalStr, out MyDateTime))
-                    {
-                        obj = MyDateTime;
-                    }
-                    break;
-                case "TimeSpan":
-                    TimeSpan MyTimeSpan;
-                    if (TimeSpan.TryParse(OriginalStr, out MyTimeSpan))
-                    {
-                        obj = MyTimeSpan;
-                    }
-                    break;
-                case "String":
-                    obj = "" + OriginalStr.ToString().Replace("''", "'").Replace("'", "''");
-                    break;
-                case "Guid":
-                    Guid t = Guid.Empty;
-                    Guid.TryParse(OriginalStr, out t);
-                    obj = t;
-                    break;
-                case "Nullable`1":
-                    obj = StrToTargetNullableType(OriginalStr, TargetType);
-                    break;
+                return val;
             }
-            return obj;
+            return GetTypeDefaultValue(type);
         }
-        private static object StrToTargetNullableType(string OriginalStr, Type TargetType)
+        public static bool StrToTargetType(string OriginalStr, string typeName, out object result)
         {
-            object obj = GetTypeDefaultValue(TargetType);
-            string s = TargetType.FullName;
-
-            if (s.IndexOf("System.Boolean") > 0)
+            result = null;
+            string s1 = typeName.ToLower();
+            string s2 = OriginalStr;
+            if (s1 == "string")
             {
-                OriginalStr = OriginalStr.ToLower().Trim();
-                if (OriginalStr.Length < 1 || OriginalStr == "0" || OriginalStr == "false")
-                {
-                    obj = false;
-                }
-                else
-                {
-                    obj = true;
-                }
+                result = s2;
+                return true;
             }
-            else if (s.IndexOf("System.DateTime") > 0)
+            if (s1 == "int16" || s1 == "short")
             {
-                DateTime MyDateTime;
-                if (DateTime.TryParse(OriginalStr, out MyDateTime))
+                short v1;
+                if (short.TryParse(s2, out v1))
                 {
-                    obj = MyDateTime;
+                    result = v1;
+                    return true;
                 }
             }
-            else if (s.IndexOf("System.TimeSpan") > 0)
+            if (s1 == "uint16" || s1 == "ushort")
             {
-                TimeSpan MyTimeSpan;
-                if (TimeSpan.TryParse(OriginalStr, out MyTimeSpan))
+                ushort v1;
+                if (ushort.TryParse(s2, out v1))
                 {
-                    obj = MyTimeSpan;
+                    result = v1;
+                    return true;
                 }
             }
-            else if (s.IndexOf("System.String") > 0)
+            if (s1 == "int" || s1 == "int32")
             {
-                obj = "" + OriginalStr.ToString();
-            }
-            else if (s.IndexOf("System.Guid") > 0)
-            {
-                Guid t = Guid.Empty;
-                if (Guid.TryParse(OriginalStr, out t))
+                int v1;
+                if (int.TryParse(s2, out v1))
                 {
-                    obj = t;
+                    result = v1;
+                    return true;
                 }
             }
-            else if (s.IndexOf("System.Decimal") > 0)
+            if (s1 == "u" || s1 == "uint" || s1 == "uint32")
             {
-                Decimal MyDecimal;
-                if (Decimal.TryParse(OriginalStr, out MyDecimal))
+                uint v1;
+                if (uint.TryParse(s2, out v1))
                 {
-                    obj = MyDecimal;
+                    result = v1;
+                    return true;
                 }
             }
-            else if (s.IndexOf("System.Double") > 0)
+            if (s1 == "l" || s1 == "long" || s1 == "int64")
             {
-                Double MyDouble;
-                if (Double.TryParse(OriginalStr, out MyDouble))
+                long v1;
+                if (long.TryParse(s2, out v1))
                 {
-                    obj = MyDouble;
+                    result = v1;
+                    return true;
                 }
             }
-            else if (s.IndexOf("System.Single") > 0)
+            if (s1 == "ul" || s1 == "ulong" || s1 == "uint64")
             {
-                Single MySingle;
-                if (Single.TryParse(OriginalStr, out MySingle))
+                ulong v1;
+                if (ulong.TryParse(s2, out v1))
                 {
-                    obj = MySingle;
+                    result = v1;
+                    return true;
                 }
             }
-            else if (s.IndexOf("System.Int32") > 0)
+            if (s1 == "f" || s1 == "single" || s1 == "float")
             {
-                Int32 MyInt32;
-                if (Int32.TryParse(OriginalStr, out MyInt32))
+                float v1;
+                if (float.TryParse(s2, out v1))
                 {
-                    obj = MyInt32;
+                    result = v1;
+                    return true;
                 }
             }
-            else if (s.IndexOf("System.Int64") > 0)
+            if (s1 == "d" || s1 == "double")
             {
-                Int64 MyInt64;
-                if (Int64.TryParse(OriginalStr, out MyInt64))
+                double v1;
+                if (double.TryParse(s2, out v1))
                 {
-                    obj = MyInt64;
+                    result = v1;
+                    return true;
                 }
             }
-            else if (s.IndexOf("System.Int16") > 0)
+            if (s1 == "m" || s1 == "decimal")
             {
-                Int16 MyInt16;
-                if (Int16.TryParse(OriginalStr, out MyInt16))
+                decimal v1;
+                if (decimal.TryParse(s2, out v1))
                 {
-                    obj = MyInt16;
+                    result = v1;
+                    return true;
                 }
             }
-            else if (s.IndexOf("System.UInt32") > 0)
+            if (s1 == "dt" || s1 == "datetime")
             {
-                UInt32 MyUInt32;
-                if (UInt32.TryParse(OriginalStr, out MyUInt32))
+                DateTime v1;
+                if (DateTime.TryParse(s2, out v1))
                 {
-                    obj = MyUInt32;
+                    result = v1;
+                    return true;
                 }
             }
-            else if (s.IndexOf("System.UInt64") > 0)
+            if (s1 == "timespan")
             {
-                UInt64 MyUInt64;
-                if (UInt64.TryParse(OriginalStr, out MyUInt64))
+                TimeSpan v1;
+                if (TimeSpan.TryParse(s2, out v1))
                 {
-                    obj = MyUInt64;
+                    result = v1;
+                    return true;
                 }
             }
-            else if (s.IndexOf("System.UInt16") > 0)
+            if (s1 == "guid")
             {
-                UInt16 MyUInt16;
-                if (UInt16.TryParse(OriginalStr, out MyUInt16))
+                Guid v1;
+                if (Guid.TryParse(s2, out v1))
                 {
-                    obj = MyUInt16;
+                    result = v1;
+                    return true;
                 }
             }
-            else if (s.IndexOf("System.Byte") > 0)
+            if (s1 == "bool" || s1 == "boolean")
             {
-                Byte MyByte;
-                if (Byte.TryParse(OriginalStr, out MyByte))
+                s2 = s2.ToLower();
+                return s2 == "1" || s2 == "true";
+            }
+            if (s1 == "byte")
+            {
+                byte v1;
+                if (byte.TryParse(s2, out v1))
                 {
-                    obj = MyByte;
+                    result = v1;
+                    return true;
                 }
             }
-            else if (s.IndexOf("System.SByte") > 0)
+            if (s1 == "sbyte")
             {
-                SByte MySByte;
-                if (SByte.TryParse(OriginalStr, out MySByte))
+                sbyte v1;
+                if (sbyte.TryParse(s2, out v1))
                 {
-                    obj = MySByte;
+                    result = v1;
+                    return true;
                 }
             }
-            else if (s.IndexOf("System.Char") > 0)
+            if (s1 == "char")
             {
-                char MyChar;
-                if (Char.TryParse(OriginalStr, out MyChar))
+                char v1;
+                if (char.TryParse(s2, out v1))
                 {
-                    obj = MyChar;
+                    result = v1;
+                    return true;
                 }
             }
-            return obj;
+            return false;
         }
         private static object GetTypeDefaultValue(Type parameter)
         {

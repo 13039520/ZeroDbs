@@ -478,20 +478,19 @@ namespace ZeroDbs.Common
         public SqlInfo InsertFromNameValueCollection<DbEntity>(System.Collections.Specialized.NameValueCollection source) where DbEntity : class, new()
         {
             Type type = typeof(DbEntity);
-            return InsertFromNameValueCollection(GetTable(type.FullName), type, source);
+            return InsertFromNameValueCollection(GetTable(type.FullName), source);
         }
         public SqlInfo InsertFromNameValueCollection(Type entityType, System.Collections.Specialized.NameValueCollection source)
         {
-            return InsertFromNameValueCollection(GetTable(entityType.FullName), entityType, source);
+            return InsertFromNameValueCollection(GetTable(entityType.FullName), source);
         }
-        public SqlInfo InsertFromNameValueCollection(ITableInfo table, Type entityType, System.Collections.Specialized.NameValueCollection source)
+        public SqlInfo InsertFromNameValueCollection(ITableInfo table, System.Collections.Specialized.NameValueCollection source)
         {
             if (source == null || source.Count < 1) { throw new ArgumentException("nvc"); }
             if (table.IsView)
             {
                 throw new Exception("Target does not support insert operation");
             }
-            var ps = GetPropertyInfos(entityType);
             var cols = new List<IColumnInfo>();
             var values = new List<object>();
             foreach (var key in source.AllKeys)
@@ -506,12 +505,12 @@ namespace ZeroDbs.Common
                 {
                     continue;
                 }
-                var p = ps.Find(o => string.Equals(o.Name, key));
-                if (p == null)
+                object val;
+                if(!ValueConvert.StrToTargetType(source[key], col.Type, out val))
                 {
-                    throw new Exception("Don't know the data type of field " + key);
+                    val = null;
                 }
-                values.Add(ValueConvert.StrToTargetType(source[key], p.PropertyType));
+                values.Add(val);
                 cols.Add(col);
             }
             if (cols.Count < 0)
@@ -947,13 +946,13 @@ namespace ZeroDbs.Common
         public SqlInfo UpdateFromNameValueCollection<DbEntity>(System.Collections.Specialized.NameValueCollection source, string appendWhere, params object[] paras) where DbEntity : class, new()
         {
             Type type = typeof(DbEntity);
-            return UpdateFromNameValueCollection(GetTable(type.FullName), type, source, appendWhere, paras);
+            return UpdateFromNameValueCollection(GetTable(type.FullName), source, appendWhere, paras);
         }
         public SqlInfo UpdateFromNameValueCollection(Type entityType, System.Collections.Specialized.NameValueCollection source, string appendWhere, params object[] paras)
         {
-            return UpdateFromNameValueCollection(GetTable(entityType.FullName), entityType, source, appendWhere, paras);
+            return UpdateFromNameValueCollection(GetTable(entityType.FullName), source, appendWhere, paras);
         }
-        public SqlInfo UpdateFromNameValueCollection(ITableInfo table, Type entityType, System.Collections.Specialized.NameValueCollection source, string appendWhere, params object[] paras)
+        public SqlInfo UpdateFromNameValueCollection(ITableInfo table, System.Collections.Specialized.NameValueCollection source, string appendWhere, params object[] paras)
         {
             if (source == null || source.Count < 1) { throw new ArgumentException("source"); }
 
@@ -971,7 +970,6 @@ namespace ZeroDbs.Common
                 }
             }
 
-            var ps = GetPropertyInfos(entityType);
             var cols = new List<IColumnInfo>();
             var values = new List<object>();
             int keyCount = 0;
@@ -983,16 +981,16 @@ namespace ZeroDbs.Common
                     //throw new Exception("The " + key + " field does not exist in the target table");
                     continue;
                 }
-                var p = ps.Find(o => string.Equals(o.Name, key));
-                if (p == null)
-                {
-                    throw new Exception("Don't know the data type of field " + key);
-                }
                 if (col.IsPrimaryKey)
                 {
                     keyCount++;
                 }
-                values.Add(ValueConvert.StrToTargetType(source[key], p.PropertyType));
+                object val;
+                if(!ValueConvert.StrToTargetType(source[key], col.Type, out val))
+                {
+                    val = null;
+                }
+                values.Add(val);
                 cols.Add(col);
             }
             if (!hasAppendWhere)
@@ -1198,135 +1196,12 @@ namespace ZeroDbs.Common
             if (index < 1 || index == value.Length - 1) { return value; }
             string s1 = value.Substring(0 + 1, index - 1).ToLower();
             string s2 = value.Substring(index + 1);
-            string error = "TryParse error of \"" + value.Replace("\"", "\\\"") + "\"";
-            if (s1 == "int16" || s1 == "short")
+            object obj;
+            if (ValueConvert.StrToTargetType(s2, s1, out obj))
             {
-                short v1;
-                if (!short.TryParse(s2, out v1))
-                {
-                    throw new Exception(error);
-                }
-                return v1;
+                return obj;
             }
-            if (s1 == "uint16" || s1 == "ushort")
-            {
-                ushort v1;
-                if (!ushort.TryParse(s2, out v1))
-                {
-                    throw new Exception(error);
-                }
-                return v1;
-            }
-            if (s1 == "int" || s1 == "int32")
-            {
-                int v1;
-                if (!int.TryParse(s2, out v1))
-                {
-                    throw new Exception(error);
-                }
-                return v1;
-            }
-            if (s1 == "u" || s1 == "uint" || s1 == "uint32")
-            {
-                uint v1;
-                if (!uint.TryParse(s2, out v1))
-                {
-                    throw new Exception(error);
-                }
-                return v1;
-            }
-            if (s1 == "l" || s1 == "long" || s1 == "int64")
-            {
-                long v1;
-                if (!long.TryParse(s2, out v1))
-                {
-                    throw new Exception(error);
-                }
-                return v1;
-            }
-            if (s1 == "ul" || s1 == "ulong" || s1 == "uint64")
-            {
-                ulong v1;
-                if (!ulong.TryParse(s2, out v1))
-                {
-                    throw new Exception(error);
-                }
-                return v1;
-            }
-            if (s1 == "f" || s1 == "single" || s1 == "float")
-            {
-                float v1;
-                if (!float.TryParse(s2, out v1))
-                {
-                    throw new Exception(error);
-                }
-                return v1;
-            }
-            if (s1 == "d" || s1 == "double")
-            {
-                double v1;
-                if (!double.TryParse(s2, out v1))
-                {
-                    throw new Exception(error);
-                }
-                return v1;
-            }
-            if (s1 == "m" || s1 == "decimal")
-            {
-                decimal v1;
-                if (!decimal.TryParse(s2, out v1))
-                {
-                    throw new Exception(error);
-                }
-                return v1;
-            }
-            if (s1 == "dt" || s1 == "datetime")
-            {
-                DateTime v1;
-                if (!DateTime.TryParse(s2, out v1))
-                {
-                    throw new Exception(error);
-                }
-                return v1;
-            }
-            if (s1 == "guid")
-            {
-                Guid v1;
-                if (!Guid.TryParse(s2, out v1))
-                {
-                    throw new Exception(error);
-                }
-                return v1;
-            }
-            if (s1 == "bool")
-            {
-                bool v1;
-                if (!bool.TryParse(s2, out v1))
-                {
-                    throw new Exception(error);
-                }
-                return v1;
-            }
-            if (s1 == "byte")
-            {
-                byte v;
-                if (!byte.TryParse(s2, out v))
-                {
-                    throw new Exception(error);
-                }
-                return v;
-            }
-            if (s1 == "sbyte")
-            {
-                sbyte v1;
-                if (!sbyte.TryParse(s2, out v1))
-                {
-                    throw new Exception(error);
-                }
-                return v1;
-            }
-
-            throw new Exception("Unrecognized prefix \"" + s1 + "\"");
+            throw new Exception("failed to parsing \"" + value+ "\"");
         }
         public object[] SqlParaParse(string[] values)
         {
