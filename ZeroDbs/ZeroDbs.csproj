@@ -10,7 +10,7 @@
     <Version>3.9.0.0</Version>
     <Description>Database access library of .net40/.netcoreapp3.1/.net5/.net6, Support SqlServer/MySql/Sqlite.</Description>
     <PackageProjectUrl>https://github.com/13039520/ZeroDbs</PackageProjectUrl>
-    <PackageReleaseNotes>Fix emit cache operation</PackageReleaseNotes>
+    <PackageReleaseNotes>Extend SqlBuiler</PackageReleaseNotes>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
   <ItemGroup>

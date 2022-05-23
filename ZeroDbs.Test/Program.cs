@@ -275,7 +275,7 @@ namespace ZeroDbs.Test
             MyDbs.SqlServer001.tUser user = null;
             using (var cmd = dbService.GetDbCommand<MyDbs.SqlServer001.tUser>())
             {
-                cmd.CommandText = cmd.SqlBuilder.Select<MyDbs.SqlServer001.tUser>(cmd.ListQuery().UseOrderby("ID DESC")).Sql;
+                cmd.CommandText = cmd.SqlBuilder.Select<MyDbs.SqlServer001.tUser>(cmd.SqlBuilder.ListQuery().UseOrderby("ID DESC")).Sql;
                 var reader = cmd.ExecuteReader();
                 user = Common.DataReaderToEntity.TakeOneByEmit<MyDbs.SqlServer001.tUser>(reader);
             }
@@ -283,11 +283,20 @@ namespace ZeroDbs.Test
             {
                 Console.WriteLine("MyDbs.SqlServer001.tUser=>{0}\t{1}\t{2}\t{3}", user.ID,user.Name,user.Email,user.CreateTime);
             }
-            string entity = "MyDbs.SqlServer001.tUser001";
+            string entity = "MyDbs.SqlServer001.tUser";
+            Type entityType = Type.GetType(entity);
+            Console.WriteLine("获取到类型了：{0}",entityType.FullName);
             System.Data.DataTable dt = new System.Data.DataTable();
             using (var cmd = dbService.GetDbCommand(entity))
             {
-                var sqlInfo = cmd.SqlBuilder.Select(entity, listQuery);
+                var nvc = new System.Collections.Specialized.NameValueCollection();
+                nvc.Add("ID", "9");
+                nvc.Add("Email", "abcdef@ghi.jkl");
+                var sqlInfo1 = cmd.SqlBuilder.UpdateFromNameValueCollection(entityType, nvc, "");
+                var rows = cmd.ExecuteNonQuery(sqlInfo1);
+                Console.WriteLine("受影响 {0} 行", rows);
+
+                var sqlInfo = cmd.SqlBuilder.Select(entityType, listQuery);
                 cmd.CommandText = sqlInfo.Sql;
                 cmd.ParametersFromDictionary(sqlInfo.Paras);
                 var reader = cmd.ExecuteReader();

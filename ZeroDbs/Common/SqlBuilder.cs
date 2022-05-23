@@ -83,9 +83,9 @@ namespace ZeroDbs.Common
         {
             return Count(GetTable<DbEntity>(), where, paras);
         }
-        public SqlInfo Count(string entityFullName, string where, params object[] paras)
+        public SqlInfo Count(Type entityType, string where, params object[] paras)
         {
-            return Count(GetTable(entityFullName), where, paras);
+            return Count(GetTable(entityType.FullName), where, paras);
         }
         public virtual SqlInfo Count(ITableInfo table, string where, params object[] paras)
         {
@@ -103,9 +103,9 @@ namespace ZeroDbs.Common
         {
             return MaxIdentityPrimaryKeyValue(GetTable<DbEntity>(), where, paras);
         }
-        public SqlInfo MaxIdentityPrimaryKeyValue(string entityFullName, string where, params object[] paras)
+        public SqlInfo MaxIdentityPrimaryKeyValue(Type entityType, string where, params object[] paras)
         {
-            return MaxIdentityPrimaryKeyValue(GetTable(entityFullName), where, paras);
+            return MaxIdentityPrimaryKeyValue(GetTable(entityType.FullName), where, paras);
         }
         public virtual SqlInfo MaxIdentityPrimaryKeyValue(ITableInfo table, string where, params object[] paras)
         {
@@ -148,9 +148,9 @@ namespace ZeroDbs.Common
             var tableInfo = this.ZeroDb.GetTable<DbEntity>();
             return Page(tableInfo, page, size, where, orderby, fields, uniqueField, paras);
         }
-        public SqlInfo Page(string entityFullName, PageQuery query)
+        public SqlInfo Page(Type entityType, PageQuery query)
         {
-            return Page(GetTable(entityFullName), query.Page, query.Size, query.Where, query.Orderby, query.Fields, query.Unique,query.Paras);
+            return Page(GetTable(entityType.FullName), query.Page, query.Size, query.Where, query.Orderby, query.Fields, query.Unique,query.Paras);
         }
         public virtual SqlInfo Page(ITableInfo table, long page, long size, string where, string orderby, string[] fields, string uniqueField = "", params object[] paras)
         {
@@ -253,9 +253,9 @@ namespace ZeroDbs.Common
         {
             return Select(GetTable<DbEntity>(),where, orderby, top, fields, paras);
         }
-        public SqlInfo Select(string entityFullName, ListQuery query)
+        public SqlInfo Select(Type entityType, ListQuery query)
         {
-            return Select(GetTable(entityFullName), query.Where, query.Orderby, query.Top, query.Fields, query.Paras);
+            return Select(GetTable(entityType.FullName), query.Where, query.Orderby, query.Top, query.Fields, query.Paras);
         }
         public virtual SqlInfo Select(ITableInfo table, string where, string orderby, int top, string[] fields, params object[] paras)
         {
@@ -374,14 +374,9 @@ namespace ZeroDbs.Common
             Type type = typeof(DbEntity);
             return InsertFromCustomEntity(GetTable(type.FullName), type, source);
         }
-        public SqlInfo InsertFromCustomEntity(string entityFullName, object source)
+        public SqlInfo InsertFromCustomEntity(Type entityType, object source)
         {
-            Type type = Type.GetType(entityFullName);
-            if(type == null)
-            {
-                throw new ArgumentException("type dose not exists", "entityFullName");
-            }
-            return InsertFromCustomEntity(GetTable(entityFullName), type, source);
+            return InsertFromCustomEntity(GetTable(entityType.FullName), entityType, source);
         }
         public SqlInfo InsertFromCustomEntity(ITableInfo table, Type entityType, object source)
         {
@@ -400,7 +395,8 @@ namespace ZeroDbs.Common
                 var col = table.Colunms.Find(o => string.Equals(o.Name, ps[i].Name, StringComparison.OrdinalIgnoreCase));
                 if (col == null)
                 {
-                    throw new Exception("The " + ps[i].Name + " field does not exist in the target table");
+                    //throw new Exception("The " + ps[i].Name + " field does not exist in the target table");
+                    continue;
                 }
                 if (col.IsIdentity)
                 {
@@ -449,7 +445,8 @@ namespace ZeroDbs.Common
                 var col = table.Colunms.Find(o => string.Equals(o.Name, key));
                 if (col == null)
                 {
-                    throw new Exception("The " + key + " field does not exist in the target table");
+                    //throw new Exception("The " + key + " field does not exist in the target table");
+                    continue;
                 }
                 if (col.IsIdentity)
                 {
@@ -483,14 +480,9 @@ namespace ZeroDbs.Common
             Type type = typeof(DbEntity);
             return InsertFromNameValueCollection(GetTable(type.FullName), type, source);
         }
-        public SqlInfo InsertFromNameValueCollection(string entityFullName, System.Collections.Specialized.NameValueCollection source)
+        public SqlInfo InsertFromNameValueCollection(Type entityType, System.Collections.Specialized.NameValueCollection source)
         {
-            Type type = Type.GetType(entityFullName);
-            if (type == null)
-            {
-                throw new ArgumentException("type dose not exists", "entityFullName");
-            }
-            return InsertFromNameValueCollection(GetTable(type.FullName), type, source);
+            return InsertFromNameValueCollection(GetTable(entityType.FullName), entityType, source);
         }
         public SqlInfo InsertFromNameValueCollection(ITableInfo table, Type entityType, System.Collections.Specialized.NameValueCollection source)
         {
@@ -507,7 +499,8 @@ namespace ZeroDbs.Common
                 var col = table.Colunms.Find(o => string.Equals(o.Name, key));
                 if (col == null)
                 {
-                    throw new Exception("The " + key + " field does not exist in the target table");
+                    //throw new Exception("The " + key + " field does not exist in the target table");
+                    continue;
                 }
                 if (col.IsIdentity)
                 {
@@ -546,9 +539,9 @@ namespace ZeroDbs.Common
         {
             return Update(GetTable<DbEntity>());
         }
-        public string Update(string entityFullName)
+        public string Update(Type entityType)
         {
-            return Update(GetTable(entityFullName));
+            return Update(GetTable(entityType.FullName));
         }
         public string Update(ITableInfo table)
         {
@@ -682,9 +675,9 @@ namespace ZeroDbs.Common
         {
             return UpdateFromCustomEntity(GetTable<DbEntity>(), source, appendWhere, paras);
         }
-        public SqlInfo UpdateFromCustomEntity(string entityFullName, object source, string appendWhere, params object[] paras)
+        public SqlInfo UpdateFromCustomEntity(Type entityType, object source, string appendWhere, params object[] paras)
         {
-            return UpdateFromCustomEntity(GetTable(entityFullName), source, appendWhere, paras);
+            return UpdateFromCustomEntity(GetTable(entityType.FullName), source, appendWhere, paras);
         }
         public SqlInfo UpdateFromCustomEntity(ITableInfo table, object source, string appendWhere, params object[] paras)
         {
@@ -713,7 +706,8 @@ namespace ZeroDbs.Common
                 var col = table.Colunms.Find(o => string.Equals(o.Name, ps[i].Name, StringComparison.OrdinalIgnoreCase));
                 if (col == null)
                 {
-                    throw new Exception("The " + ps[i].Name + " field does not exist in the target table");
+                    //throw new Exception("The " + ps[i].Name + " field does not exist in the target table");
+                    continue;
                 }
                 if (pKeys.Contains(col))
                 {
@@ -784,9 +778,9 @@ namespace ZeroDbs.Common
         {
             return UpdateFromDictionary(GetTable<DbEntity>(), source, appendWhere, paras);
         }
-        public SqlInfo UpdateFromDictionary(string entityFullName, Dictionary<string, object> source, string appendWhere, params object[] paras)
+        public SqlInfo UpdateFromDictionary(Type entityType, Dictionary<string, object> source, string appendWhere, params object[] paras)
         {
-            return UpdateFromDictionary(GetTable(entityFullName), source, appendWhere, paras);
+            return UpdateFromDictionary(GetTable(entityType.FullName), source, appendWhere, paras);
         }
         public SqlInfo UpdateFromDictionary(ITableInfo table, Dictionary<string, object> source, string appendWhere, params object[] paras)
         {
@@ -815,7 +809,8 @@ namespace ZeroDbs.Common
                 var col = table.Colunms.Find(o => string.Equals(key, o.Name, StringComparison.OrdinalIgnoreCase));
                 if (col == null)
                 {
-                    throw new Exception("The " + key + " field does not exist in the target table");
+                    //throw new Exception("The " + key + " field does not exist in the target table");
+                    continue;
                 }
                 if (col.IsPrimaryKey)
                 {
@@ -954,14 +949,9 @@ namespace ZeroDbs.Common
             Type type = typeof(DbEntity);
             return UpdateFromNameValueCollection(GetTable(type.FullName), type, source, appendWhere, paras);
         }
-        public SqlInfo UpdateFromNameValueCollection(string entityFullName, System.Collections.Specialized.NameValueCollection source, string appendWhere, params object[] paras)
+        public SqlInfo UpdateFromNameValueCollection(Type entityType, System.Collections.Specialized.NameValueCollection source, string appendWhere, params object[] paras)
         {
-            Type type = Type.GetType(entityFullName);
-            if (type == null)
-            {
-                throw new ArgumentException("type dose not exists", "entityFullName");
-            }
-            return UpdateFromNameValueCollection(GetTable(type.FullName), type, source, appendWhere, paras);
+            return UpdateFromNameValueCollection(GetTable(entityType.FullName), entityType, source, appendWhere, paras);
         }
         public SqlInfo UpdateFromNameValueCollection(ITableInfo table, Type entityType, System.Collections.Specialized.NameValueCollection source, string appendWhere, params object[] paras)
         {
@@ -990,7 +980,8 @@ namespace ZeroDbs.Common
                 var col = table.Colunms.Find(o => string.Equals(o.Name, key));
                 if (col == null)
                 {
-                    throw new Exception("The " + key + " field does not exist in the target table");
+                    //throw new Exception("The " + key + " field does not exist in the target table");
+                    continue;
                 }
                 var p = ps.Find(o => string.Equals(o.Name, key));
                 if (p == null)
@@ -1064,9 +1055,9 @@ namespace ZeroDbs.Common
         {
             return Delete(GetTable<DbEntity>(), where, paras);
         }
-        public SqlInfo Delete(string entityFullName, string where, params object[] paras)
+        public SqlInfo Delete(Type entityType, string where, params object[] paras)
         {
-            return Delete(GetTable(entityFullName), where, paras);
+            return Delete(GetTable(entityType.FullName), where, paras);
         }
         public SqlInfo Delete(ITableInfo table, string where, params object[] paras)
         {
@@ -1127,19 +1118,18 @@ namespace ZeroDbs.Common
                 }
             }
             string where = queryNVC["where"];
-            if (string.IsNullOrEmpty(where))
+            if (!string.IsNullOrEmpty(where))
             {
-                query.Where = SecondUrlDecoding(where);
+                query.Where = where;
             }
             string orderby = queryNVC["orderby"];
             if (!string.IsNullOrEmpty(orderby))
             {
-                query.Orderby = SecondUrlDecoding(orderby);
+                query.Orderby = orderby;
             }
             string unique = queryNVC["unique"];
             if (!string.IsNullOrEmpty(unique))
             {
-                unique = SecondUrlDecoding(unique);
                 if (!System.Text.RegularExpressions.Regex.IsMatch(unique, @"^[_a-zA-Z]{1,64}$"))
                 {
                     throw new Exception("unique parameter error");
@@ -1166,14 +1156,14 @@ namespace ZeroDbs.Common
         {
             ListQuery query = new ListQuery();
             string where = queryNVC["where"];
-            if (string.IsNullOrEmpty(where))
+            if (!string.IsNullOrEmpty(where))
             {
-                query.Where = SecondUrlDecoding(where);
+                query.Where = where;
             }
             string orderby = queryNVC["orderby"];
             if (!string.IsNullOrEmpty(orderby))
             {
-                query.Orderby = SecondUrlDecoding(orderby);
+                query.Orderby = orderby;
             }
             string top = queryNVC["top"];
             if (!string.IsNullOrEmpty(top))
@@ -1200,49 +1190,15 @@ namespace ZeroDbs.Common
             }
             return query;
         }
-        private string SecondUrlDecoding(string text)
+        public object SqlParaParse(string value)
         {
-            if (text.IndexOf('%') > -1)
-            {
-                text = System.Text.RegularExpressions.Regex.Replace(text, @"(?<p>%)(?<code>[0-9A-Fa-f]{2})", (m) => {
-                    return Convert.ToString(Convert.ToChar(Convert.ToByte(m.Groups["code"].Value, 16)));
-                });
-            }
-            return text;
-        }
-        private string[] GetFields(System.Collections.Specialized.NameValueCollection nvc)
-        {
-            string fields = nvc["fields"];
-            if (string.IsNullOrEmpty(fields))
-            {
-                return new string[0];
-            }
-            return SecondUrlDecoding(fields).Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Distinct().ToArray();
-        }
-        private object[] GetParas(System.Collections.Specialized.NameValueCollection nvc)
-        {
-            string paras = nvc["paras"];
-            if (string.IsNullOrEmpty(paras))
-            {
-                return new object[0];
-            }
-            string[] arr = SecondUrlDecoding(paras).Split(',');
-            object[] obj = new object[arr.Length];
-            for (int i = 0; i < arr.Length; i++)
-            {
-                obj[i] = SqlParaParse(arr[i]);
-            }
-            return obj;
-        }
-        private object SqlParaParse(string val)
-        {
-            if (val.Length < 1) { return val; }
-            if (val[0] != '(') { return val; }
-            int index = val.IndexOf(')');
-            if (index < 1 || index == val.Length - 1) { return val; }
-            string s1 = val.Substring(0 + 1, index - 1).ToLower();
-            string s2 = val.Substring(index + 1);
-            string error = "TryParse error of \"" + val.Replace("\"", "\\\"") + "\"";
+            if (value.Length < 1) { return value; }
+            if (value[0] != '(') { return value; }
+            int index = value.IndexOf(')');
+            if (index < 1 || index == value.Length - 1) { return value; }
+            string s1 = value.Substring(0 + 1, index - 1).ToLower();
+            string s2 = value.Substring(index + 1);
+            string error = "TryParse error of \"" + value.Replace("\"", "\\\"") + "\"";
             if (s1 == "int16" || s1 == "short")
             {
                 short v1;
@@ -1372,7 +1328,37 @@ namespace ZeroDbs.Common
 
             throw new Exception("Unrecognized prefix \"" + s1 + "\"");
         }
-
+        public object[] SqlParaParse(string[] values)
+        {
+            if(values == null || values.Length < 1)
+            {
+                return new object[0];
+            }
+            List<object> reval = new List<object>();
+            foreach(string s in values)
+            {
+                reval.Add(SqlParaParse(s));
+            }
+            return reval.ToArray();
+        }
+        private string[] GetFields(System.Collections.Specialized.NameValueCollection nvc)
+        {
+            string fields = nvc["fields"];
+            if (string.IsNullOrEmpty(fields))
+            {
+                return new string[0];
+            }
+            return fields.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Distinct().ToArray();
+        }
+        private object[] GetParas(System.Collections.Specialized.NameValueCollection nvc)
+        {
+            string paras = nvc["paras"];
+            if (string.IsNullOrEmpty(paras))
+            {
+                return new object[0];
+            }
+            return SqlParaParse(paras.Split(','));
+        }
 
     }
 }
