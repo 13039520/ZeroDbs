@@ -13,7 +13,7 @@ namespace ZeroDbs.Common
         private string _Where = "";
         private string _Orderby = "";
         private string[] _Fields = new string[0];
-        private string _UniqueField = "";
+        private string _Unique = "";
         private object[] _Paras = new object[0];
 
         public long Page { get { return _Page; } set { _Page = value; } } 
@@ -21,7 +21,7 @@ namespace ZeroDbs.Common
         public string Where { get { return _Where; } set { _Where = value; } }
         public string Orderby { get { return _Orderby; } set { _Orderby = value; } }
         public string[] Fields { get { return _Fields; } set { _Fields = value; } }
-        public string UniqueField { get { return _UniqueField; } set { _UniqueField = value; } }
+        public string Unique { get { return _Unique; } set { _Unique = value; } }
         public object[] Paras { get { return _Paras; } set { _Paras = value; } }
 
         public PageQuery UsePage(long page)
@@ -55,9 +55,9 @@ namespace ZeroDbs.Common
             _Fields = fields;
             return this;
         }
-        public PageQuery UseUniqueField(string field)
+        public PageQuery UseUnique(string field)
         {
-            _UniqueField = field;
+            _Unique = field;
             return this;
         }
         public PageQuery UseParas(params object[] paras)
@@ -86,18 +86,18 @@ namespace ZeroDbs.Common
         {
 
         }
-        public PageQuery(long page, long size, string where, string orderby, string[] fields, string uniqueField = "") : this(page, size, where, orderby, fields, uniqueField, new object[0])
+        public PageQuery(long page, long size, string where, string orderby, string[] fields, string unique = "") : this(page, size, where, orderby, fields, unique, new object[0])
         {
 
         }
-        public PageQuery(long page, long size, string where, string orderby, string[] fields, string uniqueField = "", params object[] paras)
+        public PageQuery(long page, long size, string where, string orderby, string[] fields, string unique = "", params object[] paras)
         {
             this._Page = page;
             this._Size = size;
             this._Where = where;
             this._Orderby = orderby;
             this._Fields = fields;
-            this._UniqueField = uniqueField;
+            this._Unique = unique;
             this._Paras = paras;
         }
 

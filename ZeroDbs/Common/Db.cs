@@ -226,11 +226,11 @@ namespace ZeroDbs.Common
 
         public Common.PageData<DbEntity> Page<DbEntity>(Common.PageQuery query) where DbEntity : class, new()
         {
-            return Page<DbEntity>(query.Page, query.Size, query.Where, query.Orderby, query.Fields, query.UniqueField, query.Paras);
+            return Page<DbEntity>(query.Page, query.Size, query.Where, query.Orderby, query.Fields, query.Unique, query.Paras);
         }
         public Common.PageData<OutType> Page<DbEntity, OutType>(Common.PageQuery query) where DbEntity : class, new() where OutType : class, new()
         {
-            return Page<DbEntity, OutType>(query.Page, query.Size, query.Where, query.Orderby, query.UniqueField, query.Paras);
+            return Page<DbEntity, OutType>(query.Page, query.Size, query.Where, query.Orderby, query.Unique, query.Paras);
         }
         public Common.PageData<OutType> Page<DbEntity, OutType>(long page, long size) where DbEntity : class, new() where OutType : class, new()
         {

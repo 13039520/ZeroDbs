@@ -43,13 +43,21 @@ namespace ZeroDbs.Common
             this.sqlBuilder = sqlBuilder;
             this.hasDbExecuteHandler = dbExecuteHandler != null;
         }
-        public Common.ListQuery ListQuery()
+        public ListQuery ListQuery()
         {
             return this.sqlBuilder.ListQuery();
         }
-        public Common.PageQuery PageQuery()
+        public ListQuery ListQuery(System.Collections.Specialized.NameValueCollection queryNVC)
+        {
+            return this.sqlBuilder.ListQuery(queryNVC);
+        }
+        public PageQuery PageQuery()
         {
             return this.sqlBuilder.PageQuery();
+        }
+        public PageQuery PageQuery(System.Collections.Specialized.NameValueCollection queryNVC)
+        {
+            return this.sqlBuilder.PageQuery(queryNVC);
         }
         public System.Data.Common.DbParameter CreateParameter()
         {

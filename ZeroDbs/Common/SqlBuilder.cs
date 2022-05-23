@@ -150,7 +150,7 @@ namespace ZeroDbs.Common
         }
         public SqlInfo Page(string entityFullName, PageQuery query)
         {
-            return Page(GetTable(entityFullName), query.Page, query.Size, query.Where, query.Orderby, query.Fields, query.UniqueField,query.Paras);
+            return Page(GetTable(entityFullName), query.Page, query.Size, query.Where, query.Orderby, query.Fields, query.Unique,query.Paras);
         }
         public virtual SqlInfo Page(ITableInfo table, long page, long size, string where, string orderby, string[] fields, string uniqueField = "", params object[] paras)
         {
@@ -1105,6 +1105,274 @@ namespace ZeroDbs.Common
         {
             return new ListQuery();
         }
+        public PageQuery PageQuery(System.Collections.Specialized.NameValueCollection queryNVC)
+        {
+            PageQuery query = new PageQuery();
+            string page = queryNVC["page"];
+            if (!string.IsNullOrEmpty(page))
+            {
+                int _page;
+                if (int.TryParse(page, out _page) && _page > 0)
+                {
+                    query.Page = _page;
+                }
+            }
+            string size = queryNVC["size"];
+            if (!string.IsNullOrEmpty(page))
+            {
+                int _size;
+                if (int.TryParse(size, out _size) && _size > 0)
+                {
+                    query.Size = _size;
+                }
+            }
+            string where = queryNVC["where"];
+            if (string.IsNullOrEmpty(where))
+            {
+                query.Where = SecondUrlDecoding(where);
+            }
+            string orderby = queryNVC["orderby"];
+            if (!string.IsNullOrEmpty(orderby))
+            {
+                query.Orderby = SecondUrlDecoding(orderby);
+            }
+            string unique = queryNVC["unique"];
+            if (!string.IsNullOrEmpty(unique))
+            {
+                unique = SecondUrlDecoding(unique);
+                if (!System.Text.RegularExpressions.Regex.IsMatch(unique, @"^[_a-zA-Z]{1,64}$"))
+                {
+                    throw new Exception("unique parameter error");
+                }
+                query.Unique = unique;
+            }
+            if (query.Size < 1)
+            {
+                query.Size = 10;
+            }
+            if (query.Size > 1000)
+            {
+                query.Size = 1000;
+            }
+            query.UseFields(GetFields(queryNVC));
+            if (!string.IsNullOrEmpty(query.Where))
+            {
+                object[] paras = GetParas(queryNVC);
+                query.UseParas(paras);
+            }
+            return query;
+        }
+        public ListQuery ListQuery(System.Collections.Specialized.NameValueCollection queryNVC)
+        {
+            ListQuery query = new ListQuery();
+            string where = queryNVC["where"];
+            if (string.IsNullOrEmpty(where))
+            {
+                query.Where = SecondUrlDecoding(where);
+            }
+            string orderby = queryNVC["orderby"];
+            if (!string.IsNullOrEmpty(orderby))
+            {
+                query.Orderby = SecondUrlDecoding(orderby);
+            }
+            string top = queryNVC["top"];
+            if (!string.IsNullOrEmpty(top))
+            {
+                int _top;
+                if (int.TryParse(top, out _top) && _top > 0)
+                {
+                    query.Top = _top;
+                }
+            }
+            if (query.Top < 1)
+            {
+                query.Top = 10;
+            }
+            if (query.Top > 1000)
+            {
+                query.Top = 1000;
+            }
+            query.UseFields(GetFields(queryNVC));
+            if (!string.IsNullOrEmpty(query.Where))
+            {
+                object[] paras = GetParas(queryNVC);
+                query.UseParas(paras);
+            }
+            return query;
+        }
+        private string SecondUrlDecoding(string text)
+        {
+            if (text.IndexOf('%') > -1)
+            {
+                text = System.Text.RegularExpressions.Regex.Replace(text, @"(?<p>%)(?<code>[0-9A-Fa-f]{2})", (m) => {
+                    return Convert.ToString(Convert.ToChar(Convert.ToByte(m.Groups["code"].Value, 16)));
+                });
+            }
+            return text;
+        }
+        private string[] GetFields(System.Collections.Specialized.NameValueCollection nvc)
+        {
+            string fields = nvc["fields"];
+            if (string.IsNullOrEmpty(fields))
+            {
+                return new string[0];
+            }
+            return SecondUrlDecoding(fields).Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Distinct().ToArray();
+        }
+        private object[] GetParas(System.Collections.Specialized.NameValueCollection nvc)
+        {
+            string paras = nvc["paras"];
+            if (string.IsNullOrEmpty(paras))
+            {
+                return new object[0];
+            }
+            string[] arr = SecondUrlDecoding(paras).Split(',');
+            object[] obj = new object[arr.Length];
+            for (int i = 0; i < arr.Length; i++)
+            {
+                obj[i] = SqlParaParse(arr[i]);
+            }
+            return obj;
+        }
+        private object SqlParaParse(string val)
+        {
+            if (val.Length < 1) { return val; }
+            if (val[0] != '(') { return val; }
+            int index = val.IndexOf(')');
+            if (index < 1 || index == val.Length - 1) { return val; }
+            string s1 = val.Substring(0 + 1, index - 1).ToLower();
+            string s2 = val.Substring(index + 1);
+            string error = "TryParse error of \"" + val.Replace("\"", "\\\"") + "\"";
+            if (s1 == "int16" || s1 == "short")
+            {
+                short v1;
+                if (!short.TryParse(s2, out v1))
+                {
+                    throw new Exception(error);
+                }
+                return v1;
+            }
+            if (s1 == "uint16" || s1 == "ushort")
+            {
+                ushort v1;
+                if (!ushort.TryParse(s2, out v1))
+                {
+                    throw new Exception(error);
+                }
+                return v1;
+            }
+            if (s1 == "int" || s1 == "int32")
+            {
+                int v1;
+                if (!int.TryParse(s2, out v1))
+                {
+                    throw new Exception(error);
+                }
+                return v1;
+            }
+            if (s1 == "u" || s1 == "uint" || s1 == "uint32")
+            {
+                uint v1;
+                if (!uint.TryParse(s2, out v1))
+                {
+                    throw new Exception(error);
+                }
+                return v1;
+            }
+            if (s1 == "l" || s1 == "long" || s1 == "int64")
+            {
+                long v1;
+                if (!long.TryParse(s2, out v1))
+                {
+                    throw new Exception(error);
+                }
+                return v1;
+            }
+            if (s1 == "ul" || s1 == "ulong" || s1 == "uint64")
+            {
+                ulong v1;
+                if (!ulong.TryParse(s2, out v1))
+                {
+                    throw new Exception(error);
+                }
+                return v1;
+            }
+            if (s1 == "f" || s1 == "single" || s1 == "float")
+            {
+                float v1;
+                if (!float.TryParse(s2, out v1))
+                {
+                    throw new Exception(error);
+                }
+                return v1;
+            }
+            if (s1 == "d" || s1 == "double")
+            {
+                double v1;
+                if (!double.TryParse(s2, out v1))
+                {
+                    throw new Exception(error);
+                }
+                return v1;
+            }
+            if (s1 == "m" || s1 == "decimal")
+            {
+                decimal v1;
+                if (!decimal.TryParse(s2, out v1))
+                {
+                    throw new Exception(error);
+                }
+                return v1;
+            }
+            if (s1 == "dt" || s1 == "datetime")
+            {
+                DateTime v1;
+                if (!DateTime.TryParse(s2, out v1))
+                {
+                    throw new Exception(error);
+                }
+                return v1;
+            }
+            if (s1 == "guid")
+            {
+                Guid v1;
+                if (!Guid.TryParse(s2, out v1))
+                {
+                    throw new Exception(error);
+                }
+                return v1;
+            }
+            if (s1 == "bool")
+            {
+                bool v1;
+                if (!bool.TryParse(s2, out v1))
+                {
+                    throw new Exception(error);
+                }
+                return v1;
+            }
+            if (s1 == "byte")
+            {
+                byte v;
+                if (!byte.TryParse(s2, out v))
+                {
+                    throw new Exception(error);
+                }
+                return v;
+            }
+            if (s1 == "sbyte")
+            {
+                sbyte v1;
+                if (!sbyte.TryParse(s2, out v1))
+                {
+                    throw new Exception(error);
+                }
+                return v1;
+            }
+
+            throw new Exception("Unrecognized prefix \"" + s1 + "\"");
+        }
+
 
     }
 }
