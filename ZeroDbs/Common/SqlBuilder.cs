@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Collections.Specialized;
 
 namespace ZeroDbs.Common
 {
@@ -320,6 +320,67 @@ namespace ZeroDbs.Common
             SqlInfoUseParas(ref reval, paras);
             return reval;
         }
+        public SqlInfo SelectByPrimaryKey<DbEntity>(object key) where DbEntity : class, new()
+        {
+            return SelectByPrimaryKey(GetTable<DbEntity>(), key);
+        }
+        public SqlInfo SelectByPrimaryKey(Type entityType, object key)
+        {
+            return SelectByPrimaryKey(GetTable(entityType.FullName), key);
+        }
+        public SqlInfo SelectByPrimaryKey(ITableInfo table, object key)
+        {
+            if (key == null) { throw new ArgumentNullException("key"); }
+
+            var pKeys = table.Colunms.FindAll(o => o.IsPrimaryKey);
+            if (pKeys.Count < 1)
+            {
+                throw new ArgumentNullException("The target table is missing a primary key");
+            }
+            var dic = new Dictionary<IColumnInfo, object>(pKeys.Count);
+            var type = key.GetType();
+            if (pKeys.Count > 1)
+            {
+                var ps = GetPropertyInfos(type);
+                foreach(var k in pKeys)
+                {
+                    var p = ps.Find(o => string.Equals(o.Name, k.Name, StringComparison.OrdinalIgnoreCase));
+                    if(p == null)
+                    {
+                        throw new ArgumentNullException("Parameter '" + key + "' must have property '" + k.Name + "'");
+                    }
+                    if (!string.Equals(p.PropertyType.Name, k.Type))
+                    {
+                        throw new ArgumentException("Property '" + p.Name + "' type error");
+                    }
+                    var val = p.GetValue(key, null);
+                    dic.Add(k, val);
+                }
+            }
+            else
+            {
+                if (!string.Equals(type.Name, pKeys[0].Type, StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new ArgumentNullException("Wrong data type for parameter");
+                }
+                dic.Add(pKeys[0], key);
+            }
+            SqlInfo reval = new SqlInfo(dic.Count);
+            StringBuilder where = new StringBuilder();
+            foreach(var item in dic.Keys)
+            {
+                where.AppendFormat("{0}=@{1} AND ", GetColunmName(item.Name), item.Name);
+                reval.Paras.Add(item.Name, dic[item]);
+            }
+            where.Remove(where.Length - 5, 5);
+            string[] fields = table.Colunms.Select(o => o.Name).ToArray();
+            for(int i = 0; i < fields.Length; i++)
+            {
+                fields[i] = GetColunmName(fields[i]);
+            }
+            reval.Sql = string.Format("SELECT {0} FROM {1} WHERE {2}", string.Join(",", fields), GetTableName(table), where);
+            return reval;
+        }
 
         public string Insert<DbEntity>() where DbEntity : class, new()
         {
@@ -369,16 +430,16 @@ namespace ZeroDbs.Common
             reval.Sql = String.Format("INSERT INTO {0}({1}) VALUES({2})", GetTableName(tableInfo), field, value);
             return reval;
         }
-        public SqlInfo InsertFromCustomEntity<DbEntity>(object source) where DbEntity : class, new()
+        public SqlInfo InsertByCustomEntity<DbEntity>(object source) where DbEntity : class, new()
         {
             Type type = typeof(DbEntity);
-            return InsertFromCustomEntity(GetTable(type.FullName), type, source);
+            return InsertByCustomEntity(GetTable(type.FullName), type, source);
         }
-        public SqlInfo InsertFromCustomEntity(Type entityType, object source)
+        public SqlInfo InsertByCustomEntity(Type entityType, object source)
         {
-            return InsertFromCustomEntity(GetTable(entityType.FullName), entityType, source);
+            return InsertByCustomEntity(GetTable(entityType.FullName), entityType, source);
         }
-        public SqlInfo InsertFromCustomEntity(ITableInfo table, Type entityType, object source)
+        public SqlInfo InsertByCustomEntity(ITableInfo table, Type entityType, object source)
         {
             if (source == null)
             {
@@ -424,11 +485,15 @@ namespace ZeroDbs.Common
 
             return reval;
         }
-        public SqlInfo InsertFromDictionary<DbEntity>(Dictionary<string, object> source) where DbEntity : class, new()
+        public SqlInfo InsertByDictionary<DbEntity>(Dictionary<string, object> source) where DbEntity : class, new()
         {
-            return InsertFromDictionary(GetTable<DbEntity>(), source);
+            return InsertByDictionary(typeof(DbEntity), source);
         }
-        public SqlInfo InsertFromDictionary(ITableInfo table, Dictionary<string, object> source)
+        public SqlInfo InsertByDictionary(Type entityType, Dictionary<string, object> source)
+        {
+            return InsertByDictionary(GetTable(entityType.FullName), source);
+        }
+        public SqlInfo InsertByDictionary(ITableInfo table, Dictionary<string, object> source)
         {
             if (source == null || source.Count < 1)
             {
@@ -475,16 +540,16 @@ namespace ZeroDbs.Common
 
             return reval;
         }
-        public SqlInfo InsertFromNameValueCollection<DbEntity>(System.Collections.Specialized.NameValueCollection source) where DbEntity : class, new()
+        public SqlInfo InsertByNameValueCollection<DbEntity>(NameValueCollection source) where DbEntity : class, new()
         {
             Type type = typeof(DbEntity);
-            return InsertFromNameValueCollection(GetTable(type.FullName), source);
+            return InsertByNameValueCollection(GetTable(type.FullName), source);
         }
-        public SqlInfo InsertFromNameValueCollection(Type entityType, System.Collections.Specialized.NameValueCollection source)
+        public SqlInfo InsertByNameValueCollection(Type entityType, NameValueCollection source)
         {
-            return InsertFromNameValueCollection(GetTable(entityType.FullName), source);
+            return InsertByNameValueCollection(GetTable(entityType.FullName), source);
         }
-        public SqlInfo InsertFromNameValueCollection(ITableInfo table, System.Collections.Specialized.NameValueCollection source)
+        public SqlInfo InsertByNameValueCollection(ITableInfo table, NameValueCollection source)
         {
             if (source == null || source.Count < 1) { throw new ArgumentException("nvc"); }
             if (table.IsView)
@@ -666,19 +731,19 @@ namespace ZeroDbs.Common
 
             return reval;
         }
-        public SqlInfo UpdateFromCustomEntity<DbEntity>(object source) where DbEntity : class, new()
+        public SqlInfo UpdateByCustomEntity<DbEntity>(object source) where DbEntity : class, new()
         {
-            return UpdateFromCustomEntity<DbEntity>(source, "");
+            return UpdateByCustomEntity<DbEntity>(source, "");
         }
-        public SqlInfo UpdateFromCustomEntity<DbEntity>(object source, string appendWhere, params object[] paras) where DbEntity : class, new()
+        public SqlInfo UpdateByCustomEntity<DbEntity>(object source, string appendWhere, params object[] paras) where DbEntity : class, new()
         {
-            return UpdateFromCustomEntity(GetTable<DbEntity>(), source, appendWhere, paras);
+            return UpdateByCustomEntity(GetTable<DbEntity>(), source, appendWhere, paras);
         }
-        public SqlInfo UpdateFromCustomEntity(Type entityType, object source, string appendWhere, params object[] paras)
+        public SqlInfo UpdateByCustomEntity(Type entityType, object source, string appendWhere, params object[] paras)
         {
-            return UpdateFromCustomEntity(GetTable(entityType.FullName), source, appendWhere, paras);
+            return UpdateByCustomEntity(GetTable(entityType.FullName), source, appendWhere, paras);
         }
-        public SqlInfo UpdateFromCustomEntity(ITableInfo table, object source, string appendWhere, params object[] paras)
+        public SqlInfo UpdateByCustomEntity(ITableInfo table, object source, string appendWhere, params object[] paras)
         {
             if (source == null)
             {
@@ -698,7 +763,7 @@ namespace ZeroDbs.Common
                 }
             }
             var ps = GetPropertyInfos(source.GetType());
-            var dic = new Dictionary<System.Reflection.PropertyInfo, IColumnInfo>();
+            var dic = new Dictionary<System.Reflection.PropertyInfo, IColumnInfo>(ps.Count);
             int keyCount = 0;
             for (int i = 0; i < ps.Count; i++)
             {
@@ -769,19 +834,19 @@ namespace ZeroDbs.Common
 
             return reval;
         }
-        public SqlInfo UpdateFromDictionary<DbEntity>(Dictionary<string,object> source) where DbEntity : class, new()
+        public SqlInfo UpdateByDictionary<DbEntity>(Dictionary<string,object> source) where DbEntity : class, new()
         {
-            return UpdateFromDictionary<DbEntity>(source, "");
+            return UpdateByDictionary<DbEntity>(source, "");
         }
-        public SqlInfo UpdateFromDictionary<DbEntity>(Dictionary<string, object> source, string appendWhere, params object[] paras) where DbEntity : class, new()
+        public SqlInfo UpdateByDictionary<DbEntity>(Dictionary<string, object> source, string appendWhere, params object[] paras) where DbEntity : class, new()
         {
-            return UpdateFromDictionary(GetTable<DbEntity>(), source, appendWhere, paras);
+            return UpdateByDictionary(GetTable<DbEntity>(), source, appendWhere, paras);
         }
-        public SqlInfo UpdateFromDictionary(Type entityType, Dictionary<string, object> source, string appendWhere, params object[] paras)
+        public SqlInfo UpdateByDictionary(Type entityType, Dictionary<string, object> source, string appendWhere, params object[] paras)
         {
-            return UpdateFromDictionary(GetTable(entityType.FullName), source, appendWhere, paras);
+            return UpdateByDictionary(GetTable(entityType.FullName), source, appendWhere, paras);
         }
-        public SqlInfo UpdateFromDictionary(ITableInfo table, Dictionary<string, object> source, string appendWhere, params object[] paras)
+        public SqlInfo UpdateByDictionary(ITableInfo table, Dictionary<string, object> source, string appendWhere, params object[] paras)
         {
             if (source == null || source.Count < 1)
             {
@@ -873,7 +938,7 @@ namespace ZeroDbs.Common
 
             return reval;
         }
-        public SqlInfo UpdateFromNameValueCollection<DbEntity>(System.Collections.Specialized.NameValueCollection source) where DbEntity : class, new()
+        public SqlInfo UpdateByNameValueCollection<DbEntity>(NameValueCollection source) where DbEntity : class, new()
         {
             if (source == null || source.Count < 1) { throw new ArgumentException("source"); }
 
@@ -948,16 +1013,16 @@ namespace ZeroDbs.Common
 
             return reval;
         }
-        public SqlInfo UpdateFromNameValueCollection<DbEntity>(System.Collections.Specialized.NameValueCollection source, string appendWhere, params object[] paras) where DbEntity : class, new()
+        public SqlInfo UpdateByNameValueCollection<DbEntity>(NameValueCollection source, string appendWhere, params object[] paras) where DbEntity : class, new()
         {
             Type type = typeof(DbEntity);
-            return UpdateFromNameValueCollection(GetTable(type.FullName), source, appendWhere, paras);
+            return UpdateByNameValueCollection(GetTable(type.FullName), source, appendWhere, paras);
         }
-        public SqlInfo UpdateFromNameValueCollection(Type entityType, System.Collections.Specialized.NameValueCollection source, string appendWhere, params object[] paras)
+        public SqlInfo UpdateByNameValueCollection(Type entityType, NameValueCollection source, string appendWhere, params object[] paras)
         {
-            return UpdateFromNameValueCollection(GetTable(entityType.FullName), source, appendWhere, paras);
+            return UpdateByNameValueCollection(GetTable(entityType.FullName), source, appendWhere, paras);
         }
-        public SqlInfo UpdateFromNameValueCollection(ITableInfo table, System.Collections.Specialized.NameValueCollection source, string appendWhere, params object[] paras)
+        public SqlInfo UpdateByNameValueCollection(ITableInfo table, NameValueCollection source, string appendWhere, params object[] paras)
         {
             if (source == null || source.Count < 1) { throw new ArgumentException("source"); }
 
@@ -980,7 +1045,7 @@ namespace ZeroDbs.Common
             int keyCount = 0;
             foreach (var key in source.AllKeys)
             {
-                var col = table.Colunms.Find(o => string.Equals(o.Name, key));
+                var col = table.Colunms.Find(o => string.Equals(o.Name, key, StringComparison.OrdinalIgnoreCase));
                 if (col == null)
                 {
                     //throw new Exception("The " + key + " field does not exist in the target table");
@@ -1054,9 +1119,48 @@ namespace ZeroDbs.Common
             return reval;
         }
 
+        public SqlInfo Delete<DbEntity>(DbEntity source) where DbEntity : class, new()
+        {
+            if (source == null) { throw new ArgumentException("source"); }
+
+            var type = typeof(DbEntity);
+            var table = GetTable(type.FullName);
+            if (table.IsView)
+            {
+                throw new Exception("Target does not support update operation");
+            }
+            var pKeys = table.Colunms.FindAll(o => o.IsPrimaryKey);
+            if (pKeys.Count < 1)
+            {
+                throw new ArgumentNullException("The target table is missing a primary key");
+            }
+            var ps = GetPropertyInfos(type);
+            var dic = new Dictionary<System.Reflection.PropertyInfo, IColumnInfo>(pKeys.Count);
+            foreach(var p in pKeys)
+            {
+                var t = ps.Find(o => string.Equals(o.Name, p.Name, StringComparison.OrdinalIgnoreCase));
+                if (t == null)
+                {
+                    throw new Exception("No primary key field entered");
+                }
+                dic.Add(t, p);
+            }
+            SqlInfo reval = new SqlInfo(dic.Count);
+            StringBuilder where = new StringBuilder();
+            foreach (var p in dic.Keys)
+            {
+                var col = dic[p];
+                where.AppendFormat("{0}=@{1} AND ", GetColunmName(col.Name), col.Name);
+                reval.Paras.Add(col.Name, p.GetValue(source, null));
+            }
+            where.Remove(where.Length - 5, 5);
+            reval.Sql = string.Format("DELETE FROM {0} WHERE {1}", GetTableName(table), where);
+
+            return reval;
+        }
         public SqlInfo Delete<DbEntity>(string where, params object[] paras) where DbEntity : class, new()
         {
-            return Delete(GetTable<DbEntity>(), where, paras);
+            return Delete(typeof(DbEntity), where, paras);
         }
         public SqlInfo Delete(Type entityType, string where, params object[] paras)
         {
@@ -1082,6 +1186,204 @@ namespace ZeroDbs.Common
             SqlInfoUseParas(ref reval, paras);
             return reval;
         }
+        public SqlInfo DeleteByPrimaryKey<DbEntity>(object key) where DbEntity : class, new()
+        {
+            return DeleteByPrimaryKey(typeof(DbEntity), key);
+        }
+        public SqlInfo DeleteByPrimaryKey(Type entityType, object key)
+        {
+            return DeleteByPrimaryKey(GetTable(entityType.FullName), key);
+        }
+        public SqlInfo DeleteByPrimaryKey(ITableInfo table, object key)
+        {
+            if (key == null) { throw new ArgumentNullException("key"); }
+
+            var pKeys = table.Colunms.FindAll(o => o.IsPrimaryKey);
+            if (pKeys.Count < 1)
+            {
+                throw new ArgumentNullException("The target table is missing a primary key");
+            }
+            var dic = new Dictionary<IColumnInfo, object>(pKeys.Count);
+            var type = key.GetType();
+            if (pKeys.Count > 1)
+            {
+                var ps = GetPropertyInfos(type);
+                foreach (var k in pKeys)
+                {
+                    var p = ps.Find(o => string.Equals(o.Name, k.Name, StringComparison.OrdinalIgnoreCase));
+                    if (p == null)
+                    {
+                        throw new ArgumentNullException("Parameter '" + key + "' must have property '" + k.Name + "'");
+                    }
+                    if (!string.Equals(p.PropertyType.Name, k.Type))
+                    {
+                        throw new ArgumentException("Property '" + p.Name + "' type error");
+                    }
+                    var val = p.GetValue(key, null);
+                    dic.Add(k, val);
+                }
+            }
+            else
+            {
+                if (!string.Equals(type.Name, pKeys[0].Type, StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new ArgumentNullException("Wrong data type for parameter");
+                }
+                dic.Add(pKeys[0], key);
+            }
+            SqlInfo reval = new SqlInfo(dic.Count);
+            StringBuilder where = new StringBuilder();
+            foreach (var item in dic.Keys)
+            {
+                where.AppendFormat("{0}=@{1} AND ", GetColunmName(item.Name), item.Name);
+                reval.Paras.Add(item.Name, dic[item]);
+            }
+            where.Remove(where.Length - 5, 5);
+            reval.Sql = string.Format("DELETE FROM {0} WHERE {1}", GetTableName(table), where);
+            return reval;
+        }
+        public SqlInfo DeleteByCustomEntity<DbEntity>(object source) where DbEntity : class, new()
+        {
+            return DeleteByCustomEntity(typeof(DbEntity), source);
+        }
+        public SqlInfo DeleteByCustomEntity(Type entityType, object source)
+        {
+            return DeleteByCustomEntity(GetTable(entityType.FullName), source);
+        }
+        public SqlInfo DeleteByCustomEntity(ITableInfo table, object source)
+        {
+            if (source == null) { throw new ArgumentException("source"); }
+
+            if (table.IsView)
+            {
+                throw new Exception("Target does not support update operation");
+            }
+            var ps = GetPropertyInfos(source.GetType());
+            var dic = new Dictionary<System.Reflection.PropertyInfo, IColumnInfo>(ps.Count);
+            for (int i = 0; i < ps.Count; i++)
+            {
+                var col = table.Colunms.Find(o => string.Equals(o.Name, ps[i].Name, StringComparison.OrdinalIgnoreCase));
+                if (col == null)
+                {
+                    //throw new Exception("The " + ps[i].Name + " field does not exist in the target table");
+                    continue;
+                }
+                dic.Add(ps[i], col);
+            }
+            if (dic.Count < 1)
+            {
+                throw new Exception("Missing condition field");
+            }
+            SqlInfo reval = new SqlInfo(dic.Count);
+            StringBuilder where = new StringBuilder();
+            foreach (var p in dic.Keys)
+            {
+                var col = dic[p];
+                where.AppendFormat("{0}=@{1} AND ", GetColunmName(col.Name), col.Name);
+                reval.Paras.Add(col.Name, p.GetValue(source,null));
+            }
+            where.Remove(where.Length - 5, 5);
+            reval.Sql = string.Format("DELETE FROM {0} WHERE {1}", GetTableName(table), where);
+
+            return reval;
+        }
+        public SqlInfo DeleteByDictionary<DbEntity>(Dictionary<string, object> source) where DbEntity : class, new()
+        {
+            return DeleteByDictionary(typeof(DbEntity), source);
+        }
+        public SqlInfo DeleteByDictionary(Type entityType, Dictionary<string, object> source)
+        {
+            return DeleteByDictionary(GetTable(entityType.FullName), source);
+        }
+        public SqlInfo DeleteByDictionary(ITableInfo table, Dictionary<string, object> source)
+        {
+            if (source == null || source.Count < 1) { throw new ArgumentException("source"); }
+
+            if (table.IsView)
+            {
+                throw new Exception("Target does not support update operation");
+            }
+
+            var cols = new List<IColumnInfo>();
+            var values = new List<object>();
+            foreach (var key in source.Keys)
+            {
+                var col = table.Colunms.Find(o => string.Equals(o.Name, key, StringComparison.OrdinalIgnoreCase));
+                if (col == null)
+                {
+                    //throw new Exception("The " + key + " field does not exist in the target table");
+                    continue;
+                }
+                values.Add(source[key]);
+                cols.Add(col);
+            }
+            if (cols.Count < 0)
+            {
+                throw new Exception("Missing condition field");
+            }
+            SqlInfo reval = new SqlInfo(values.Count);
+            StringBuilder where = new StringBuilder();
+            for (int i = 0; i < cols.Count; i++)
+            {
+                where.AppendFormat("{0}=@{1} AND ", GetColunmName(cols[i].Name), cols[i].Name);
+                reval.Paras.Add(cols[i].Name, values[i]);
+            }
+            where.Remove(where.Length - 5, 5);
+            reval.Sql = string.Format("DELETE FROM {0} WHERE {1}", GetTableName(table), where);
+
+            return reval;
+        }
+        public SqlInfo DeleteByNameValueCollection<DbEntity>(NameValueCollection source) where DbEntity : class, new()
+        {
+            return DeleteByNameValueCollection(typeof(DbEntity), source);
+        }
+        public SqlInfo DeleteByNameValueCollection(Type entityType, NameValueCollection source)
+        {
+            return DeleteByNameValueCollection(GetTable(entityType.FullName), source);
+        }
+        public SqlInfo DeleteByNameValueCollection(ITableInfo table, NameValueCollection source)
+        {
+            if (source == null || source.Count < 1) { throw new ArgumentException("source"); }
+
+            if (table.IsView)
+            {
+                throw new Exception("Target does not support update operation");
+            }
+
+            var cols = new List<IColumnInfo>();
+            var values = new List<object>();
+            foreach (var key in source.AllKeys)
+            {
+                var col = table.Colunms.Find(o => string.Equals(o.Name, key, StringComparison.OrdinalIgnoreCase));
+                if(col== null)
+                {
+                    //throw new Exception("The " + key + " field does not exist in the target table");
+                    continue;
+                }
+                object val;
+                if (!ValueConvert.StrToTargetType(source[key], col.Type, out val))
+                {
+                    throw new Exception("Cannot convert to target type");
+                }
+                values.Add(val);
+                cols.Add(col);
+            }
+            if(cols.Count < 0)
+            {
+                throw new Exception("Missing condition field");
+            }
+            SqlInfo reval = new SqlInfo(values.Count);
+            StringBuilder where = new StringBuilder();
+            for (int i = 0; i < cols.Count; i++)
+            {
+                where.AppendFormat("{0}=@{1} AND ", GetColunmName(cols[i].Name), cols[i].Name);
+                reval.Paras.Add(cols[i].Name, values[i]);
+            }
+            where.Remove(where.Length - 5, 5);
+            reval.Sql = string.Format("DELETE FROM {0} WHERE {1}", GetTableName(table), where);
+
+            return reval;
+        }
 
         public SqlInfo RawSql(string sql, params object[] paras)
         {
@@ -1099,7 +1401,7 @@ namespace ZeroDbs.Common
         {
             return new ListQuery();
         }
-        public PageQuery PageQuery(System.Collections.Specialized.NameValueCollection queryNVC)
+        public PageQuery PageQuery(NameValueCollection queryNVC)
         {
             PageQuery query = new PageQuery();
             string page = queryNVC["page"];
@@ -1155,7 +1457,7 @@ namespace ZeroDbs.Common
             }
             return query;
         }
-        public ListQuery ListQuery(System.Collections.Specialized.NameValueCollection queryNVC)
+        public ListQuery ListQuery(NameValueCollection queryNVC)
         {
             ListQuery query = new ListQuery();
             string where = queryNVC["where"];
@@ -1221,7 +1523,7 @@ namespace ZeroDbs.Common
             }
             return reval.ToArray();
         }
-        private string[] GetFields(System.Collections.Specialized.NameValueCollection nvc)
+        private string[] GetFields(NameValueCollection nvc)
         {
             string fields = nvc["fields"];
             if (string.IsNullOrEmpty(fields))
@@ -1230,7 +1532,7 @@ namespace ZeroDbs.Common
             }
             return fields.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Distinct().ToArray();
         }
-        private object[] GetParas(System.Collections.Specialized.NameValueCollection nvc)
+        private object[] GetParas(NameValueCollection nvc)
         {
             string paras = nvc["paras"];
             if (string.IsNullOrEmpty(paras))

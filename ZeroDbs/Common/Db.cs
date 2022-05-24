@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Collections.Specialized;
 
 namespace ZeroDbs.Common
 {
@@ -13,9 +13,9 @@ namespace ZeroDbs.Common
     {
         private IDataTypeMaping dataTypeMaping = null;
         private IDbInfo database = null;
-        private Common.SqlBuilder sqlBuilder = null;
+        private SqlBuilder sqlBuilder = null;
         public IDbInfo Database { get { return database; } }
-        public Common.SqlBuilder SqlBuilder { get { return sqlBuilder; } }
+        public SqlBuilder SqlBuilder { get { return sqlBuilder; } }
         public IDataTypeMaping DataTypeMaping { get { return dataTypeMaping; } }
 
         public event DbExecuteHandler OnDbExecuteSqlEvent = null;
@@ -24,15 +24,15 @@ namespace ZeroDbs.Common
             this.database = database;
             switch (this.database.Type)
             {
-                case Common.DbType.SqlServer:
+                case DbType.SqlServer:
                     this.sqlBuilder = new SqlServer.SqlBuilder(this);
                     this.dataTypeMaping = new SqlServer.DbDataTypeMaping();
                     break;
-                case Common.DbType.MySql:
+                case DbType.MySql:
                     this.sqlBuilder = new MySql.SqlBuilder(this);
                     this.dataTypeMaping = new MySql.DbDataTypeMaping();
                     break;
-                case Common.DbType.Sqlite:
+                case DbType.Sqlite:
                     this.sqlBuilder = new Sqlite.SqlBuilder(this);
                     this.dataTypeMaping = new Sqlite.DbDataTypeMaping();
                     break;
@@ -49,7 +49,7 @@ namespace ZeroDbs.Common
         }
         protected bool IsMappingToDbKey<DbEntity>()
         {
-            var temp = Common.DbMapping.GetDbInfo<DbEntity>();
+            var temp = DbMapping.GetDbInfo<DbEntity>();
             if (temp == null || temp.Count < 1)
             {
                 return false;
@@ -58,7 +58,7 @@ namespace ZeroDbs.Common
         }
         protected bool IsMappingToDbKey(string entityFullName)
         {
-            var temp = Common.DbMapping.GetDbInfoByEntityFullName(entityFullName);
+            var temp = DbMapping.GetDbInfoByEntityFullName(entityFullName);
             if (temp == null || temp.Count < 1)
             {
                 return false;
@@ -146,11 +146,11 @@ namespace ZeroDbs.Common
             return GetDbTransactionScope(level, identification, groupId);
         }
 
-        public List<Target> Select<DbEntity, Target>(Common.ListQuery query) where DbEntity : class, new() where Target : class, new()
+        public List<Target> Select<DbEntity, Target>(ListQuery query) where DbEntity : class, new() where Target : class, new()
         {
             return Select<DbEntity, Target>(query.Where, query.Orderby, query.Top, query.Paras);
         }
-        public List<DbEntity> Select<DbEntity>(Common.ListQuery query) where DbEntity : class, new()
+        public List<DbEntity> Select<DbEntity>(ListQuery query) where DbEntity : class, new()
         {
             return Select<DbEntity>(query.Where, query.Orderby, query.Top, query.Fields, query.Paras);
         }
@@ -223,32 +223,54 @@ namespace ZeroDbs.Common
                 throw ex;
             }
         }
+        public DbEntity SelectByPrimaryKey<DbEntity>(object key) where DbEntity : class, new()
+        {
+            var info = SqlBuilder.SelectByPrimaryKey<DbEntity>(key);
+            var cmd = GetDbCommand();
+            try
+            {
+                DbEntity reval = null;
+                cmd.CommandText = info.Sql;
+                cmd.ParametersFromDictionary(info.Paras);
+                cmd.ExecuteReader<DbEntity>((e) => {
+                    reval = e.RowData;
+                    e.Next = false;
+                }, true);
+                cmd.Dispose();
+                return reval;
+            }
+            catch (Exception ex)
+            {
+                cmd.Dispose();
+                throw ex;
+            }
+        }
 
-        public Common.PageData<DbEntity> Page<DbEntity>(Common.PageQuery query) where DbEntity : class, new()
+        public PageData<DbEntity> Page<DbEntity>(PageQuery query) where DbEntity : class, new()
         {
             return Page<DbEntity>(query.Page, query.Size, query.Where, query.Orderby, query.Fields, query.Unique, query.Paras);
         }
-        public Common.PageData<OutType> Page<DbEntity, OutType>(Common.PageQuery query) where DbEntity : class, new() where OutType : class, new()
+        public PageData<OutType> Page<DbEntity, OutType>(PageQuery query) where DbEntity : class, new() where OutType : class, new()
         {
             return Page<DbEntity, OutType>(query.Page, query.Size, query.Where, query.Orderby, query.Unique, query.Paras);
         }
-        public Common.PageData<OutType> Page<DbEntity, OutType>(long page, long size) where DbEntity : class, new() where OutType : class, new()
+        public PageData<OutType> Page<DbEntity, OutType>(long page, long size) where DbEntity : class, new() where OutType : class, new()
         {
             return Page<DbEntity, OutType>(page, size, "");
         }
-        public Common.PageData<OutType> Page<DbEntity, OutType>(long page, long size, string where) where DbEntity : class, new() where OutType : class, new()
+        public PageData<OutType> Page<DbEntity, OutType>(long page, long size, string where) where DbEntity : class, new() where OutType : class, new()
         {
             return Page<DbEntity, OutType>(page, size, where, "");
         }
-        public Common.PageData<OutType> Page<DbEntity, OutType>(long page, long size, string where, string orderby) where DbEntity : class, new() where OutType : class, new()
+        public PageData<OutType> Page<DbEntity, OutType>(long page, long size, string where, string orderby) where DbEntity : class, new() where OutType : class, new()
         {
             return Page<DbEntity, OutType>(page, size, where, orderby, "");
         }
-        public Common.PageData<OutType> Page<DbEntity, OutType>(long page, long size, string where, string orderby, string uniqueField) where DbEntity : class, new() where OutType : class, new()
+        public PageData<OutType> Page<DbEntity, OutType>(long page, long size, string where, string orderby, string uniqueField) where DbEntity : class, new() where OutType : class, new()
         {
             return Page<DbEntity, OutType>(page, size, where, orderby, uniqueField, new object[0]);
         }
-        public Common.PageData<OutType> Page<DbEntity, OutType>(long page, long size, string where, string orderby, string uniqueField, params object[] paras) where DbEntity : class, new() where OutType : class, new()
+        public PageData<OutType> Page<DbEntity, OutType>(long page, long size, string where, string orderby, string uniqueField, params object[] paras) where DbEntity : class, new() where OutType : class, new()
         {
             string[] fields = PropertyInfoCache.GetPropertyInfoList<OutType>().Select(o => o.Name).ToArray();
             var countSql = SqlBuilder.Count<DbEntity>(where, paras);
@@ -263,18 +285,18 @@ namespace ZeroDbs.Common
                 if (total < 1)
                 {
                     cmd.Dispose();
-                    return new Common.PageData<OutType> { Total = total, Items = new List<OutType>() };
+                    return new PageData<OutType> { Total = total, Items = new List<OutType>() };
                 }
                 long pages = total % size == 0 ? total / size : (total / size + 1);
                 if (page > pages)
                 {
                     cmd.Dispose();
-                    return new Common.PageData<OutType> { Total = total, Items = new List<OutType>() };
+                    return new PageData<OutType> { Total = total, Items = new List<OutType>() };
                 }
                 var reval = cmd.ExecuteQuery<OutType>(info);
                 cmd.Dispose();
 
-                return new Common.PageData<OutType> { Total = total, Items = reval };
+                return new PageData<OutType> { Total = total, Items = reval };
             }
             catch (Exception ex)
             {
@@ -317,18 +339,18 @@ namespace ZeroDbs.Common
                 if (total < 1)
                 {
                     cmd.Dispose();
-                    return new Common.PageData<DbEntity> { Total = total, Items = new List<DbEntity>() };
+                    return new PageData<DbEntity> { Total = total, Items = new List<DbEntity>() };
                 }
                 long pages = total % size == 0 ? total / size : (total / size + 1);
                 if (page > pages)
                 {
                     cmd.Dispose();
-                    return new Common.PageData<DbEntity> { Total = total, Items = new List<DbEntity>() };
+                    return new PageData<DbEntity> { Total = total, Items = new List<DbEntity>() };
                 }
                 var reval = cmd.ExecuteQuery<DbEntity>(info);
                 cmd.Dispose();
 
-                return new Common.PageData<DbEntity> { Total = total, Items = reval };
+                return new PageData<DbEntity> { Total = total, Items = reval };
             }
             catch (Exception ex)
             {
@@ -337,9 +359,14 @@ namespace ZeroDbs.Common
             }
         }
 
+
         public long Count<DbEntity>(string where, params object[] paras) where DbEntity : class, new()
         {
-            var info = SqlBuilder.Count<DbEntity>(where);
+            return Count(typeof(DbEntity), where, paras);
+        }
+        public long Count(Type entityType, string where, params object[] paras)
+        {
+            var info = SqlBuilder.Count(entityType, where, paras);
             var cmd = this.GetDbCommand();
             try
             {
@@ -358,11 +385,19 @@ namespace ZeroDbs.Common
         }
         public long MaxIdentityPrimaryKeyValue<DbEntity>() where DbEntity : class, new()
         {
-            return MaxIdentityPrimaryKeyValue<DbEntity>("");
+            return MaxIdentityPrimaryKeyValue(typeof(DbEntity));
+        }
+        public long MaxIdentityPrimaryKeyValue(Type entityType)
+        {
+            return MaxIdentityPrimaryKeyValue(entityType,"");
         }
         public long MaxIdentityPrimaryKeyValue<DbEntity>(string where, params object[] paras) where DbEntity : class, new()
         {
-            var info = this.SqlBuilder.MaxIdentityPrimaryKeyValue<DbEntity>(where,paras);
+            return MaxIdentityPrimaryKeyValue(typeof(DbEntity), where, paras);
+        }
+        public long MaxIdentityPrimaryKeyValue(Type entityType, string where, params object[] paras)
+        {
+            var info = this.SqlBuilder.MaxIdentityPrimaryKeyValue(entityType, where, paras);
             var cmd = this.GetDbCommand();
             try
             {
@@ -383,9 +418,9 @@ namespace ZeroDbs.Common
             }
         }
 
-        public int Insert<DbEntity>(DbEntity entity) where DbEntity : class, new()
+
+        protected int _NonQuery(SqlInfo info)
         {
-            var info = this.SqlBuilder.Insert<DbEntity>(entity);
             var cmd = this.GetDbCommand();
             try
             {
@@ -398,6 +433,11 @@ namespace ZeroDbs.Common
                 cmd.Dispose();
                 throw ex;
             }
+        }
+
+        public int Insert<DbEntity>(DbEntity entity) where DbEntity : class, new()
+        {
+            return _NonQuery(this.SqlBuilder.Insert<DbEntity>(entity));
         }
         public int Insert<DbEntity>(List<DbEntity> entities) where DbEntity : class, new()
         {
@@ -424,53 +464,29 @@ namespace ZeroDbs.Common
                 throw ex;
             }
         }
-        public int InsertFromNameValueCollection<DbEntity>(System.Collections.Specialized.NameValueCollection source) where DbEntity : class, new()
+        public int InsertByNameValueCollection<DbEntity>(NameValueCollection source) where DbEntity : class, new()
         {
-            var info = this.SqlBuilder.InsertFromNameValueCollection<DbEntity>(source);
-            var cmd = this.GetDbCommand();
-            try
-            {
-                var reval = cmd.ExecuteNonQuery(info);
-                cmd.Dispose();
-                return reval;
-            }
-            catch (Exception ex)
-            {
-                cmd.Dispose();
-                throw ex;
-            }
+            return InsertByNameValueCollection(typeof(DbEntity), source);
         }
-        public int InsertFromCustomEntity<DbEntity>(object source) where DbEntity : class, new()
+        public int InsertByNameValueCollection(Type entityType, NameValueCollection source)
         {
-            var info = this.SqlBuilder.InsertFromCustomEntity<DbEntity>(source);
-            var cmd = this.GetDbCommand();
-            try
-            {
-                var reval = cmd.ExecuteNonQuery(info);
-                cmd.Dispose();
-                return reval;
-            }
-            catch (Exception ex)
-            {
-                cmd.Dispose();
-                throw ex;
-            }
+            return _NonQuery(this.SqlBuilder.InsertByNameValueCollection(entityType, source));
         }
-        public int InsertFromDictionary<DbEntity>(Dictionary<string, object> source) where DbEntity : class, new()
+        public int InsertByCustomEntity<DbEntity>(object source) where DbEntity : class, new()
         {
-            var info = this.SqlBuilder.InsertFromDictionary<DbEntity>(source);
-            var cmd = this.GetDbCommand();
-            try
-            {
-                var reval = cmd.ExecuteNonQuery(info);
-                cmd.Dispose();
-                return reval;
-            }
-            catch (Exception ex)
-            {
-                cmd.Dispose();
-                throw ex;
-            }
+            return InsertByCustomEntity(typeof(DbEntity), source);
+        }
+        public int InsertByCustomEntity(Type entityType, object source)
+        {
+            return _NonQuery(this.SqlBuilder.InsertByCustomEntity(entityType, source));
+        }
+        public int InsertByDictionary<DbEntity>(Dictionary<string, object> source) where DbEntity : class, new()
+        {
+            return InsertByDictionary(typeof(DbEntity), source);
+        }
+        public int InsertByDictionary(Type entityType, Dictionary<string, object> source)
+        {
+            return _NonQuery(this.SqlBuilder.InsertByDictionary(entityType, source));
         }
 
         public int Update<DbEntity>(DbEntity entity) where DbEntity : class, new()
@@ -479,19 +495,7 @@ namespace ZeroDbs.Common
         }
         public int Update<DbEntity>(DbEntity entity, string appendWhere, params object[] paras) where DbEntity : class, new()
         {
-            var info = this.SqlBuilder.Update<DbEntity>(entity, appendWhere, paras);
-            var cmd = this.GetDbCommand();
-            try
-            {
-                var reval = cmd.ExecuteNonQuery(info);
-                cmd.Dispose();
-                return reval;
-            }
-            catch (Exception ex)
-            {
-                cmd.Dispose();
-                throw ex;
-            }
+            return _NonQuery(this.SqlBuilder.Update<DbEntity>(entity, appendWhere, paras));
         }
         public int Update<DbEntity>(List<DbEntity> entities) where DbEntity : class, new()
         {
@@ -522,83 +526,90 @@ namespace ZeroDbs.Common
                 throw ex;
             }
         }
-        public int UpdateFromNameValueCollection<DbEntity>(System.Collections.Specialized.NameValueCollection source) where DbEntity : class, new()
+        public int UpdateByNameValueCollection<DbEntity>(NameValueCollection source) where DbEntity : class, new()
         {
-            return UpdateFromNameValueCollection<DbEntity>(source, "");
+            return UpdateByNameValueCollection<DbEntity>(source, "");
         }
-        public int UpdateFromNameValueCollection<DbEntity>(System.Collections.Specialized.NameValueCollection source, string appendWhere, params object[] paras) where DbEntity : class, new()
+        public int UpdateByNameValueCollection<DbEntity>(NameValueCollection source, string appendWhere, params object[] paras) where DbEntity : class, new()
         {
-            var info = this.SqlBuilder.UpdateFromNameValueCollection<DbEntity>(source, appendWhere, paras);
-            var cmd = this.GetDbCommand();
-            try
-            {
-                var reval = cmd.ExecuteNonQuery(info);
-                cmd.Dispose();
-                return reval;
-            }
-            catch (Exception ex)
-            {
-                cmd.Dispose();
-                throw ex;
-            }
+            return UpdateByNameValueCollection(typeof(DbEntity), source, appendWhere, paras);
         }
-        public int UpdateFromCustomEntity<DbEntity>(object source) where DbEntity : class, new()
+        public int UpdateByNameValueCollection(Type entityType, NameValueCollection source, string appendWhere, params object[] paras)
         {
-            return UpdateFromCustomEntity<DbEntity>(source, "");
+            return _NonQuery(this.SqlBuilder.UpdateByNameValueCollection(entityType, source, appendWhere, paras));
         }
-        public int UpdateFromCustomEntity<DbEntity>(object source, string appendWhere, params object[] paras) where DbEntity : class, new()
+        public int UpdateByCustomEntity<DbEntity>(object source) where DbEntity : class, new()
         {
-            var info = this.SqlBuilder.UpdateFromCustomEntity<DbEntity>(source, appendWhere, paras);
-            var cmd = this.GetDbCommand();
-            try
-            {
-                var reval = cmd.ExecuteNonQuery(info);
-                cmd.Dispose();
-                return reval;
-            }
-            catch (Exception ex)
-            {
-                cmd.Dispose();
-                throw ex;
-            }
+            return UpdateByCustomEntity<DbEntity>(source, "");
         }
-        public int UpdateFromDictionary<DbEntity>(Dictionary<string, object> source) where DbEntity : class, new()
+        public int UpdateByCustomEntity<DbEntity>(object source, string appendWhere, params object[] paras) where DbEntity : class, new()
         {
-            return UpdateFromDictionary<DbEntity>(source, "");
+            return UpdateByCustomEntity(typeof(DbEntity), source, appendWhere, paras);
         }
-        public int UpdateFromDictionary<DbEntity>(Dictionary<string, object> source, string appendWhere, params object[] paras) where DbEntity : class, new()
+        public int UpdateByCustomEntity(Type entityType, object source, string appendWhere, params object[] paras)
         {
-            var info = this.SqlBuilder.UpdateFromDictionary<DbEntity>(source, appendWhere, paras);
-            var cmd = this.GetDbCommand();
-            try
-            {
-                var reval = cmd.ExecuteNonQuery(info);
-                cmd.Dispose();
-                return reval;
-            }
-            catch (Exception ex)
-            {
-                cmd.Dispose();
-                throw ex;
-            }
+            return _NonQuery(this.SqlBuilder.UpdateByCustomEntity(entityType, source, appendWhere, paras));
         }
+        public int UpdateByDictionary<DbEntity>(Dictionary<string, object> source) where DbEntity : class, new()
+        {
+            return UpdateByDictionary<DbEntity>(source, "");
+        }
+        public int UpdateByDictionary<DbEntity>(Dictionary<string, object> source, string appendWhere, params object[] paras) where DbEntity : class, new()
+        {
+            return UpdateByDictionary(typeof(DbEntity), source, appendWhere, paras);
+        }
+        public int UpdateByDictionary(Type entityType, Dictionary<string, object> source, string appendWhere, params object[] paras)
+        {
+            return _NonQuery(this.SqlBuilder.UpdateByDictionary(entityType, source, appendWhere, paras));
+        }
+
 
         public int Delete<DbEntity>(string where, params object[] paras) where DbEntity : class, new()
         {
-            var info = this.SqlBuilder.Delete<DbEntity>(where, paras);
-            var cmd = this.GetDbCommand();
-            try
-            {
-                var reval = cmd.ExecuteNonQuery(info);
-                cmd.Dispose();
-                return reval;
-            }
-            catch (Exception ex)
-            {
-                cmd.Dispose();
-                throw ex;
-            }
+            return _NonQuery(this.SqlBuilder.Delete<DbEntity>(where, paras));
         }
+        public int Delete<DbEntity>(DbEntity source) where DbEntity : class, new()
+        {
+            return _NonQuery(this.SqlBuilder.Delete<DbEntity>(source));
+        }
+        public int Delete(Type entityType, string where, params object[] paras)
+        {
+            return _NonQuery(this.SqlBuilder.Delete(entityType, where, paras));
+        }
+        public int DeleteByPrimaryKey<DbEntity>(object key) where DbEntity : class, new()
+        {
+            return DeleteByPrimaryKey(typeof(DbEntity), key);
+        }
+        public int DeleteByPrimaryKey(Type entityType, object key)
+        {
+            return _NonQuery(this.SqlBuilder.DeleteByPrimaryKey(entityType, key));
+        }
+        public int DeleteByCustomEntity<DbEntity>(object source) where DbEntity : class, new()
+        {
+            return DeleteByCustomEntity(typeof(DbEntity), source);
+        }
+        public int DeleteByCustomEntity(Type entityType, object source)
+        {
+            return _NonQuery(this.SqlBuilder.DeleteByCustomEntity(entityType, source));
+        }
+        public int DeleteByDictionary<DbEntity>(Dictionary<string, object> source) where DbEntity : class, new()
+        {
+            return DeleteByDictionary(typeof(DbEntity), source);
+        }
+        public int DeleteByDictionary(Type entityType, Dictionary<string, object> source)
+        {
+            return _NonQuery(this.SqlBuilder.DeleteByDictionary(entityType, source));
+        }
+        public int DeleteByNameValueCollection<DbEntity>(NameValueCollection source) where DbEntity : class, new()
+        {
+            return DeleteByNameValueCollection(typeof(DbEntity), source);
+        }
+        public int DeleteByNameValueCollection(Type entityType, NameValueCollection source)
+        {
+            return _NonQuery(this.SqlBuilder.DeleteByNameValueCollection(entityType, source));
+        }
+
+
 
     }
 }

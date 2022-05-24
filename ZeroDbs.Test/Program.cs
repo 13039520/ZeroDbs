@@ -111,9 +111,9 @@ namespace ZeroDbs.Test
             nvc.Add("ID", "1");
             nvc.Add("Password", "aaaaaa");
             nvc.Add("Email", "aaaaa@bbbb.es");
-            dbService.UpdateFromNameValueCollection<MyDbs.SqlServer001.tUser>(nvc);
-            dbService.UpdateFromNameValueCollection<MyDbs.MySql001.tUser>(nvc);
-            dbService.UpdateFromNameValueCollection<MyDbs.Sqlite001.tUser>(nvc);
+            dbService.UpdateByNameValueCollection<MyDbs.SqlServer001.tUser>(nvc);
+            dbService.UpdateByNameValueCollection<MyDbs.MySql001.tUser>(nvc);
+            dbService.UpdateByNameValueCollection<MyDbs.Sqlite001.tUser>(nvc);
             */
 
             /*
@@ -121,18 +121,18 @@ namespace ZeroDbs.Test
             dic.Add("ID", 1);
             dic.Add("Password", "aaaaaa");
             dic.Add("Email", "aaaaa@bbbb.es");
-            dbService.UpdateFromDictionary<MyDbs.SqlServer001.tUser>(dic);
-            dbService.UpdateFromDictionary<MyDbs.MySql001.tUser>(dic);
-            dbService.UpdateFromDictionary<MyDbs.Sqlite001.tUser>(dic);
+            dbService.UpdateByDictionary<MyDbs.SqlServer001.tUser>(dic);
+            dbService.UpdateByDictionary<MyDbs.MySql001.tUser>(dic);
+            dbService.UpdateByDictionary<MyDbs.Sqlite001.tUser>(dic);
             */
 
             DateTime myTime = DateTime.Now;
             var customEntity = new { ID = 1, Name = "abcdefgh2", createTime = myTime };
-            int n = dbService.UpdateFromCustomEntity<MyDbs.SqlServer001.tUser>(customEntity, "Email=@0", "user010@domain.com");//WHERE ID=@ID AND Email=@0
+            int n = dbService.UpdateByCustomEntity<MyDbs.SqlServer001.tUser>(customEntity, "Email=@0", "user010@domain.com");//WHERE ID=@ID AND Email=@0
             Console.WriteLine("{0} rows affected", n);
-            n = dbService.UpdateFromCustomEntity<MyDbs.MySql001.tUser>(customEntity);//WHERE ID=@ID
+            n = dbService.UpdateByCustomEntity<MyDbs.MySql001.tUser>(customEntity);//WHERE ID=@ID
             Console.WriteLine("{0} rows affected", n);
-            n = dbService.UpdateFromCustomEntity<MyDbs.Sqlite001.tUser>(customEntity);//WHERE ID=@ID
+            n = dbService.UpdateByCustomEntity<MyDbs.Sqlite001.tUser>(customEntity);//WHERE ID=@ID
             Console.WriteLine("{0} rows affected", n);
 
         }
@@ -292,7 +292,7 @@ namespace ZeroDbs.Test
                 var nvc = new System.Collections.Specialized.NameValueCollection();
                 nvc.Add("ID", "9");
                 nvc.Add("Email", "abcdef@ghi.jkl");
-                var sqlInfo1 = cmd.SqlBuilder.UpdateFromNameValueCollection(entityType, nvc, "");
+                var sqlInfo1 = cmd.SqlBuilder.UpdateByNameValueCollection(entityType, nvc, "");
                 var rows = cmd.ExecuteNonQuery(sqlInfo1);
                 Console.WriteLine("受影响 {0} 行", rows);
 

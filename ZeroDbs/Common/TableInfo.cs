@@ -41,7 +41,7 @@ namespace ZeroDbs.Common
                 ITableInfo temp = obj as ITableInfo;
                 return this.Name.CompareTo(temp.Name);
             }
-            throw new NotImplementedException("obj is not a ZeroDbDataTableInfo!");
+            return -1;
         }
         public object Clone()
         {

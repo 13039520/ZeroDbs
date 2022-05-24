@@ -155,7 +155,7 @@ namespace ZeroDbs.Common
             }
             return reval;
         }
-        public static void UpdateFromNameValueCollection<T>(T entity, System.Collections.Specialized.NameValueCollection source)
+        public static void UpdateByNameValueCollection<T>(T entity, System.Collections.Specialized.NameValueCollection source)
             where T : class, new()
         {
             if (entity == null) { return; }

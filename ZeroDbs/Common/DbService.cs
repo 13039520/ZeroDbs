@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Text;
 
 namespace ZeroDbs.Common
@@ -16,12 +17,12 @@ namespace ZeroDbs.Common
 
         public DbService()
         {
-            _StrCommon = new Common.StrCommon();
+            _StrCommon = new StrCommon();
         }
         public DbService(DbExecuteHandler handler)
         {
             _dbExecuteHandler = handler != null ? handler : null;
-            _StrCommon = new Common.StrCommon();
+            _StrCommon = new StrCommon();
         }
         private IDb GetDbByEntityFullName(string entityFullName)
         {
@@ -67,7 +68,7 @@ namespace ZeroDbs.Common
         public Dictionary<string, IDb> GetDbs()
         {
             var dbs = new Dictionary<string, IDb>();
-            var zeroConfigInfo = Common.DbConfigReader.GetDbConfigInfo();
+            var zeroConfigInfo = DbConfigReader.GetDbConfigInfo();
             if (zeroConfigInfo != null && zeroConfigInfo.Dbs != null && zeroConfigInfo.Dbs.Count > 0)
             {
                 foreach (var m in zeroConfigInfo.Dbs)
@@ -272,63 +273,71 @@ namespace ZeroDbs.Common
         {
             return GetDb<DbEntity>().Select<DbEntity>(where, orderby, top, fields, paras);
         }
+        public DbEntity SelectByPrimaryKey<DbEntity>(object key) where DbEntity : class, new()
+        {
+            return GetDb<DbEntity>().SelectByPrimaryKey<DbEntity>(key);
+        }
 
-        public Common.PageData<OutType> Page<DbEntity, OutType>(PageQuery query) where DbEntity : class, new() where OutType : class, new()
+        public PageData<OutType> Page<DbEntity, OutType>(PageQuery query) where DbEntity : class, new() where OutType : class, new()
         {
             return GetDb<DbEntity>().Page<DbEntity, OutType>(query);
         }
-        public Common.PageData<DbEntity> Page<DbEntity>(PageQuery query) where DbEntity : class, new()
+        public PageData<DbEntity> Page<DbEntity>(PageQuery query) where DbEntity : class, new()
         {
             return GetDb<DbEntity>().Page<DbEntity>(query);
         }
-        public Common.PageData<OutType> Page<DbEntity, OutType>(long page, long size) where DbEntity : class, new() where OutType : class, new()
+        public PageData<OutType> Page<DbEntity, OutType>(long page, long size) where DbEntity : class, new() where OutType : class, new()
         {
             return Page<DbEntity, OutType>(page, size, "");
         }
-        public Common.PageData<OutType> Page<DbEntity, OutType>(long page, long size, string where) where DbEntity : class, new() where OutType : class, new()
+        public PageData<OutType> Page<DbEntity, OutType>(long page, long size, string where) where DbEntity : class, new() where OutType : class, new()
         {
             return Page<DbEntity, OutType>(page, size, where, "");
         }
-        public Common.PageData<OutType> Page<DbEntity, OutType>(long page, long size, string where, string orderby) where DbEntity : class, new() where OutType : class, new()
+        public PageData<OutType> Page<DbEntity, OutType>(long page, long size, string where, string orderby) where DbEntity : class, new() where OutType : class, new()
         {
             return Page<DbEntity, OutType>(page, size, where, orderby, "");
         }
-        public Common.PageData<OutType> Page<DbEntity, OutType>(long page, long size, string where, string orderby, string uniqueField) where DbEntity : class, new() where OutType : class, new()
+        public PageData<OutType> Page<DbEntity, OutType>(long page, long size, string where, string orderby, string uniqueField) where DbEntity : class, new() where OutType : class, new()
         {
             return Page<DbEntity, OutType>(page, size, where, orderby, uniqueField, new object[0]);
         }
-        public Common.PageData<OutType> Page<DbEntity, OutType>(long page, long size, string where, string orderby, string uniqueField, params object[] paras) where DbEntity : class, new() where OutType : class, new()
+        public PageData<OutType> Page<DbEntity, OutType>(long page, long size, string where, string orderby, string uniqueField, params object[] paras) where DbEntity : class, new() where OutType : class, new()
         {
             return GetDb<DbEntity>().Page<DbEntity, OutType>(page, size, where, orderby, uniqueField, paras);
         }
-        public Common.PageData<DbEntity> Page<DbEntity>(long page, long size) where DbEntity : class, new()
+        public PageData<DbEntity> Page<DbEntity>(long page, long size) where DbEntity : class, new()
         {
             return Page<DbEntity>(page, size, "");
         }
-        public Common.PageData<DbEntity> Page<DbEntity>(long page, long size, string where) where DbEntity : class, new()
+        public PageData<DbEntity> Page<DbEntity>(long page, long size, string where) where DbEntity : class, new()
         {
             return Page<DbEntity>(page, size, where, "");
         }
-        public Common.PageData<DbEntity> Page<DbEntity>(long page, long size, string where, string orderby) where DbEntity : class, new()
+        public PageData<DbEntity> Page<DbEntity>(long page, long size, string where, string orderby) where DbEntity : class, new()
         {
             return Page<DbEntity>(page, size, where, orderby, new string[0]);
         }
-        public Common.PageData<DbEntity> Page<DbEntity>(long page, long size, string where, string orderby, string[] fields) where DbEntity : class, new()
+        public PageData<DbEntity> Page<DbEntity>(long page, long size, string where, string orderby, string[] fields) where DbEntity : class, new()
         {
             return Page<DbEntity>(page, size, where, orderby, fields, "");
         }
-        public Common.PageData<DbEntity> Page<DbEntity>(long page, long size, string where, string orderby, string[] fields, string uniqueField) where DbEntity : class, new()
+        public PageData<DbEntity> Page<DbEntity>(long page, long size, string where, string orderby, string[] fields, string uniqueField) where DbEntity : class, new()
         {
             return Page<DbEntity>(page, size, where, orderby, fields, uniqueField, new object[0]);
         }
-        public Common.PageData<DbEntity> Page<DbEntity>(long page, long size, string where, string orderby, string[] fields, string uniqueField, params object[] paras) where DbEntity : class, new()
+        public PageData<DbEntity> Page<DbEntity>(long page, long size, string where, string orderby, string[] fields, string uniqueField, params object[] paras) where DbEntity : class, new()
         {
             return GetDb<DbEntity>().Page<DbEntity>(page, size, where, orderby, fields, uniqueField, paras);
         }
         
         public long Count<DbEntity>(string where, params object[] paras) where DbEntity : class, new()
         {
-            return GetDb<DbEntity>().Count<DbEntity>(where, paras);
+            return Count(typeof(DbEntity), where, paras);
+        }
+        public long Count(Type entityType, string where, params object[] paras)
+        {
+            return GetDb(entityType.FullName).Count(entityType, where, paras);
         }
         public long MaxIdentityPrimaryKeyValue<DbEntity>() where DbEntity : class, new()
         {
@@ -336,8 +345,17 @@ namespace ZeroDbs.Common
         }
         public long MaxIdentityPrimaryKeyValue<DbEntity>(string where, params object[] paras) where DbEntity : class, new()
         {
-            return GetDb<DbEntity>().MaxIdentityPrimaryKeyValue<DbEntity>(where, paras);
+            return MaxIdentityPrimaryKeyValue(typeof(DbEntity), where, paras);
         }
+        public long MaxIdentityPrimaryKeyValue(Type entityType)
+        {
+            return MaxIdentityPrimaryKeyValue(entityType, "");
+        }
+        public long MaxIdentityPrimaryKeyValue(Type entityType, string where, params object[] paras)
+        {
+            return GetDb(entityType.FullName).MaxIdentityPrimaryKeyValue(entityType, where, paras);
+        }
+
         public int Insert<DbEntity>(DbEntity entity) where DbEntity : class, new()
         {
             return GetDb<DbEntity>().Insert<DbEntity>(entity);
@@ -346,17 +364,29 @@ namespace ZeroDbs.Common
         {
             return GetDb<DbEntity>().Insert<DbEntity>(entities);
         }
-        public int InsertFromNameValueCollection<DbEntity>(System.Collections.Specialized.NameValueCollection nvc) where DbEntity : class, new()
+        public int InsertByNameValueCollection<DbEntity>(NameValueCollection source) where DbEntity : class, new()
         {
-            return GetDb<DbEntity>().InsertFromNameValueCollection<DbEntity>(nvc);
+            return InsertByNameValueCollection(typeof(DbEntity), source);
         }
-        public int InsertFromCustomEntity<DbEntity>(object source) where DbEntity : class, new()
+        public int InsertByNameValueCollection(Type entityType, NameValueCollection source)
         {
-            return GetDb<DbEntity>().InsertFromCustomEntity<DbEntity>(source);
+            return GetDb(entityType.FullName).InsertByNameValueCollection(entityType, source);
         }
-        public int InsertFromDictionary<DbEntity>(Dictionary<string, object> dic) where DbEntity : class, new()
+        public int InsertByCustomEntity<DbEntity>(object source) where DbEntity : class, new()
         {
-            return GetDb<DbEntity>().InsertFromDictionary<DbEntity>(dic);
+            return InsertByCustomEntity(typeof(DbEntity), source);
+        }
+        public int InsertByCustomEntity(Type entityType, object source)
+        {
+            return GetDb(entityType.FullName).InsertByCustomEntity(entityType, source);
+        }
+        public int InsertByDictionary<DbEntity>(Dictionary<string, object> source) where DbEntity : class, new()
+        {
+            return InsertByDictionary(typeof(DbEntity), source);
+        }
+        public int InsertByDictionary(Type entityType, Dictionary<string, object> source)
+        {
+            return GetDb(entityType.FullName).InsertByCustomEntity(entityType, source);
         }
 
         public int Update<DbEntity>(DbEntity entity) where DbEntity : class, new()
@@ -375,34 +405,87 @@ namespace ZeroDbs.Common
         {
             return GetDb<DbEntity>().Update<DbEntity>(entities, appendWhere, paras);
         }
-        public int UpdateFromNameValueCollection<DbEntity>(System.Collections.Specialized.NameValueCollection source) where DbEntity : class, new()
+        public int UpdateByNameValueCollection<DbEntity>(NameValueCollection source) where DbEntity : class, new()
         {
-            return UpdateFromCustomEntity<DbEntity>(source, "");
+            return UpdateByCustomEntity<DbEntity>(source, "");
         }
-        public int UpdateFromNameValueCollection<DbEntity>(System.Collections.Specialized.NameValueCollection source, string appendWhere, params object[] paras) where DbEntity : class, new()
+        public int UpdateByNameValueCollection<DbEntity>(NameValueCollection source, string appendWhere, params object[] paras) where DbEntity : class, new()
         {
-            return GetDb<DbEntity>().UpdateFromNameValueCollection<DbEntity>(source, appendWhere, paras);
+            return UpdateByNameValueCollection(typeof(DbEntity), source, appendWhere, paras);
         }
-        public int UpdateFromCustomEntity<DbEntity>(object source) where DbEntity : class, new()
+        public int UpdateByNameValueCollection(Type entityType, NameValueCollection source, string appendWhere, params object[] paras)
         {
-            return UpdateFromCustomEntity<DbEntity>(source, "");
+            return GetDb(entityType.FullName).UpdateByNameValueCollection(entityType, source, appendWhere, paras);
         }
-        public int UpdateFromCustomEntity<DbEntity>(object source, string appendWhere, params object[] paras) where DbEntity : class, new()
+        public int UpdateByCustomEntity<DbEntity>(object source) where DbEntity : class, new()
         {
-            return GetDb<DbEntity>().UpdateFromCustomEntity<DbEntity>(source, appendWhere, paras);
+            return UpdateByCustomEntity<DbEntity>(source, "");
         }
-        public int UpdateFromDictionary<DbEntity>(Dictionary<string, object> dic) where DbEntity : class, new()
+        public int UpdateByCustomEntity<DbEntity>(object source, string appendWhere, params object[] paras) where DbEntity : class, new()
         {
-            return UpdateFromDictionary<DbEntity>(dic, "");
+            return UpdateByCustomEntity(typeof(DbEntity), source, appendWhere, paras);
         }
-        public int UpdateFromDictionary<DbEntity>(Dictionary<string, object> dic, string appendWhere, params object[] paras) where DbEntity : class, new()
+        public int UpdateByCustomEntity(Type entityType, object source, string appendWhere, params object[] paras)
         {
-            return GetDb<DbEntity>().UpdateFromDictionary<DbEntity>(dic, appendWhere, paras);
+            return GetDb(entityType.FullName).UpdateByCustomEntity(entityType, source, appendWhere, paras);
         }
+        public int UpdateByDictionary<DbEntity>(Dictionary<string, object> dic) where DbEntity : class, new()
+        {
+            return UpdateByDictionary<DbEntity>(dic, "");
+        }
+        public int UpdateByDictionary<DbEntity>(Dictionary<string, object> dic, string appendWhere, params object[] paras) where DbEntity : class, new()
+        {
+            return UpdateByDictionary(typeof(DbEntity), dic, appendWhere, paras);
+        }
+        public int UpdateByDictionary(Type entityType, Dictionary<string, object> dic, string appendWhere, params object[] paras)
+        {
+            return GetDb(entityType.FullName).UpdateByDictionary(entityType, dic, appendWhere, paras);
+        }
+
 
         public int Delete<DbEntity>(string where, params object[] paras) where DbEntity : class, new()
         {
             return GetDb<DbEntity>().Delete<DbEntity>(where, paras);
+        }
+        public int Delete<DbEntity>(DbEntity source) where DbEntity : class, new()
+        {
+            return GetDb<DbEntity>().Delete<DbEntity>(source);
+        }
+        public int Delete(Type entityType, string where, params object[] paras)
+        {
+            return GetDb(entityType.FullName).Delete(entityType, where, paras);
+        }
+        public int DeleteByPrimaryKey<DbEntity>(object key) where DbEntity : class, new()
+        {
+            return DeleteByPrimaryKey(typeof(DbEntity), key);
+        }
+        public int DeleteByPrimaryKey(Type entityType, object key)
+        {
+            return GetDb(entityType.FullName).DeleteByPrimaryKey(entityType, key);
+        }
+        public int DeleteByCustomEntity<DbEntity>(object source) where DbEntity : class, new()
+        {
+            return DeleteByCustomEntity(typeof(DbEntity), source);
+        }
+        public int DeleteByCustomEntity(Type entityType, object source)
+        {
+            return GetDb(entityType.FullName).DeleteByCustomEntity(entityType, source);
+        }
+        public int DeleteByDictionary<DbEntity>(Dictionary<string, object> source) where DbEntity : class, new()
+        {
+            return DeleteByDictionary(typeof(DbEntity), source);
+        }
+        public int DeleteByDictionary(Type entityType, Dictionary<string, object> source)
+        {
+            return GetDb(entityType.FullName).DeleteByDictionary(entityType, source);
+        }
+        public int DeleteByNameValueCollection<DbEntity>(NameValueCollection source) where DbEntity : class, new()
+        {
+            return DeleteByNameValueCollection(typeof(DbEntity), source);
+        }
+        public int DeleteByNameValueCollection(Type entityType, NameValueCollection source)
+        {
+            return GetDb(entityType.FullName).DeleteByNameValueCollection(entityType, source);
         }
 
 
