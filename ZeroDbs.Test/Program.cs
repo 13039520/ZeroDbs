@@ -277,7 +277,7 @@ namespace ZeroDbs.Test
             {
                 cmd.CommandText = cmd.SqlBuilder.Select<MyDbs.SqlServer001.tUser>(cmd.SqlBuilder.ListQuery().UseOrderby("ID DESC")).Sql;
                 var reader = cmd.ExecuteReader();
-                user = Common.DataReaderToEntity.TakeOneByEmit<MyDbs.SqlServer001.tUser>(reader);
+                user = Common.Entities.TakeOneFromDataReaderByEmit<MyDbs.SqlServer001.tUser>(reader);
             }
             if(user != null)
             {
@@ -286,7 +286,7 @@ namespace ZeroDbs.Test
             string entity = "MyDbs.SqlServer001.tUser";
             Type entityType = Type.GetType(entity);
             Console.WriteLine("获取到类型了：{0}",entityType.FullName);
-            System.Data.DataTable dt = new System.Data.DataTable();
+            System.Data.DataTable dt = null;
             using (var cmd = dbService.GetDbCommand(entity))
             {
                 var nvc = new System.Collections.Specialized.NameValueCollection();
@@ -297,13 +297,9 @@ namespace ZeroDbs.Test
                 Console.WriteLine("受影响 {0} 行", rows);
 
                 var sqlInfo = cmd.SqlBuilder.Select(entityType, listQuery);
-                cmd.CommandText = sqlInfo.Sql;
-                cmd.ParametersFromDictionary(sqlInfo.Paras);
-                var reader = cmd.ExecuteReader();
-                dt.Load(reader);
-                reader.Close();
+                dt = cmd.ExecuteQuery(sqlInfo);
             }
-            Console.WriteLine("dt.Rows.Count="+ dt.Rows.Count);
+            Console.WriteLine("dt.Rows.Count={0}", dt != null ? dt.Rows.Count : 0);
 
         }
         class MyEntity

@@ -908,7 +908,12 @@ namespace ZeroDbs.Common
                 {
                     keyCount++;
                 }
-                values.Add(ValueConvert.StrToTargetType(source[key], p.PropertyType));
+                object val;
+                if(!ValueConvert.StrToTargetType(source[key], p.PropertyType,out val))
+                {
+                    val = null;
+                }
+                values.Add(val);
                 cols.Add(col);
             }
             if (keyCount < pKeys.Count)

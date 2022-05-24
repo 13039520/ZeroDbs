@@ -22,6 +22,8 @@ namespace ZeroDbs
         int ExecuteNonQuery(string rawSql, params object[] paras);
         List<T> ExecuteQuery<T>(Common.SqlInfo info) where T : class, new();
         List<T> ExecuteQuery<T>(string rawSql, params object[] paras) where T : class, new();
+        System.Data.DataTable ExecuteQuery(string rawSql, params object[] paras);
+        System.Data.DataTable ExecuteQuery(Common.SqlInfo info);
         List<T> ExecuteReader<T>(bool useEmit = true) where T : class, new();
         /// <summary>
         /// Used for reading large quantities of data
