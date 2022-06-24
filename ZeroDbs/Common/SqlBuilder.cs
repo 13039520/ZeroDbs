@@ -573,7 +573,7 @@ namespace ZeroDbs.Common
                 object val;
                 if(!ValueConvert.StrToTargetType(source[key], col.Type, out val))
                 {
-                    val = null;
+                    throw new Exception("Cannot convert to target type");
                 }
                 values.Add(val);
                 cols.Add(col);
@@ -642,94 +642,7 @@ namespace ZeroDbs.Common
         }
         public SqlInfo Update<DbEntity>(DbEntity entity, string appendWhere, params object[] paras) where DbEntity : class, new()
         {
-            if (entity == null)
-            {
-                throw new ArgumentNullException("entity");
-            }
-            var tableInfo = this.GetTable<DbEntity>();
-            if (tableInfo.IsView)
-            {
-                throw new Exception("Target does not support update operation");
-            }
-            var pKeys = tableInfo.Colunms.FindAll(o => o.IsPrimaryKey);
-            bool hasAppendWhere = !string.IsNullOrEmpty(appendWhere);
-            if (pKeys.Count < 0)
-            {
-                if (!hasAppendWhere)
-                {
-                    throw new ArgumentNullException("The target table is missing a primary key");
-                }
-            }
-            var ps = GetPropertyInfos<DbEntity>();
-            var dic = new Dictionary<System.Reflection.PropertyInfo, IColumnInfo>();
-            int keyCount = 0;
-            for (int i = 0; i < ps.Count; i++)
-            {
-                var col = tableInfo.Colunms.Find(o => string.Equals(o.Name, ps[i].Name, StringComparison.OrdinalIgnoreCase));
-                if (col == null)
-                {
-                    throw new Exception("The " + ps[i].Name + " field does not exist in the target table");
-                }
-                if (pKeys.Contains(col))
-                {
-                    keyCount++;
-                }
-                dic.Add(ps[i], col);
-            }
-            if (!hasAppendWhere)
-            {
-                if (keyCount < pKeys.Count)
-                {
-                    throw new Exception("Input source is missing fields other than primary key fields");
-                }
-                if (keyCount == ps.Count)
-                {
-                    throw new Exception("Missing field that needs to be updated");
-                }
-            }
-
-            SqlInfo reval = new SqlInfo(dic.Count + paras.Length);
-            StringBuilder set = new StringBuilder();
-            StringBuilder where = new StringBuilder();
-            foreach (var key in dic.Keys)
-            {
-                var col = dic[key];
-                if (col.IsPrimaryKey)
-                {
-                    where.AppendFormat("{0}=@{1} AND ", GetColunmName(col.Name), col.Name);
-                }
-                else
-                {
-                    if (col.IsIdentity) { continue; }
-                    set.AppendFormat("{0}=@{1},", GetColunmName(col.Name), col.Name);
-                }
-                reval.Paras.Add(col.Name, key.GetValue(entity, null));
-            }
-            if (set.Length < 1)
-            {
-                throw new Exception("Missing field that needs to be updated");
-            }
-            set.Remove(set.Length - 1, 1);
-            bool hasPrimaryKeyWhere = where.Length > 0;
-            if (hasPrimaryKeyWhere)
-            {
-                where.Remove(where.Length - 5, 5);
-            }
-            if (hasAppendWhere)
-            {
-                if (hasPrimaryKeyWhere)
-                {
-                    where.AppendFormat(" AND {0}", appendWhere);
-                }
-                else
-                {
-                    where.Append(appendWhere);
-                }
-                SqlInfoUseParas(ref reval, paras);
-            }
-            reval.Sql = String.Format("UPDATE {0} SET {1} WHERE {2}", GetTableName(tableInfo), set, where);
-
-            return reval;
+            return UpdateByCustomEntity(typeof(DbEntity), entity, appendWhere, paras);
         }
         public SqlInfo UpdateByCustomEntity<DbEntity>(object source) where DbEntity : class, new()
         {
@@ -940,78 +853,7 @@ namespace ZeroDbs.Common
         }
         public SqlInfo UpdateByNameValueCollection<DbEntity>(NameValueCollection source) where DbEntity : class, new()
         {
-            if (source == null || source.Count < 1) { throw new ArgumentException("source"); }
-
-            var tableInfo = this.GetTable<DbEntity>();
-            if (tableInfo.IsView)
-            {
-                throw new Exception("Target does not support update operation");
-            }
-            var pKeys = tableInfo.Colunms.FindAll(o => o.IsPrimaryKey);
-            if (pKeys.Count < 1)
-            {
-                throw new Exception("Missing unique identity column");
-            }
-
-            var ps = GetPropertyInfos<DbEntity>();
-            var cols = new List<IColumnInfo>();
-            var values = new List<object>();
-            int keyCount = 0;
-            foreach (var key in source.AllKeys)
-            {
-                var col = tableInfo.Colunms.Find(o => string.Equals(o.Name, key));
-                if (col == null)
-                {
-                    throw new Exception("The " + key + " field does not exist in the target table");
-                }
-                var p = ps.Find(o => string.Equals(o.Name, key));
-                if (p == null)
-                {
-                    throw new Exception("Don't know the data type of field " + key);
-                }
-                if (col.IsPrimaryKey)
-                {
-                    keyCount++;
-                }
-                object val;
-                if(!ValueConvert.StrToTargetType(source[key], p.PropertyType,out val))
-                {
-                    val = null;
-                }
-                values.Add(val);
-                cols.Add(col);
-            }
-            if (keyCount < pKeys.Count)
-            {
-                throw new Exception("Input source is missing fields other than primary key fields");
-            }
-            if (keyCount == source.Count)
-            {
-                throw new Exception("Missing field that needs to be updated");
-            }
-
-            SqlInfo reval = new SqlInfo(values.Count);
-            StringBuilder set = new StringBuilder();
-            StringBuilder where = new StringBuilder();
-            for (int i = 0; i < values.Count; i++)
-            {
-                var col = cols[i];
-                if (col.IsPrimaryKey)
-                {
-                    where.AppendFormat("{0}=@{1} AND ", GetColunmName(col.Name), col.Name);
-                }
-                else
-                {
-                    if (col.IsIdentity) { continue; }
-                    set.AppendFormat("{0}=@{1},", GetColunmName(col.Name), col.Name);
-                }
-                reval.Paras.Add(col.Name, values[i]);
-            }
-            set.Remove(set.Length - 1, 1);
-            where.Remove(where.Length - 5, 5);
-            reval.Sql = String.Format("UPDATE {0} SET {1} WHERE {2}", GetTableName(tableInfo), set, where);
-
-            return reval;
+            return UpdateByNameValueCollection<DbEntity>(source, "");
         }
         public SqlInfo UpdateByNameValueCollection<DbEntity>(NameValueCollection source, string appendWhere, params object[] paras) where DbEntity : class, new()
         {
@@ -1058,7 +900,7 @@ namespace ZeroDbs.Common
                 object val;
                 if(!ValueConvert.StrToTargetType(source[key], col.Type, out val))
                 {
-                    val = null;
+                    throw new Exception("Cannot convert to target type");
                 }
                 values.Add(val);
                 cols.Add(col);
