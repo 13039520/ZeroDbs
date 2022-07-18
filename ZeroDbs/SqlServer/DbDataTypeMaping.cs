@@ -182,7 +182,7 @@ namespace ZeroDbs.SqlServer
                 typeMapDic.Add("smalldatetime", "DateTime");
                 typeMapDic.Add("smallint", "short");//Int16
                 typeMapDic.Add("smallmoney", "decimal");//Decimal
-                typeMapDic.Add("sql_variant", "object*");
+                typeMapDic.Add("sql_variant", "object");
                 typeMapDic.Add("text", "string");//String
                 typeMapDic.Add("time", "TimeSpan");
                 typeMapDic.Add("timestamp", "byte[]");//Byte[]
@@ -190,7 +190,7 @@ namespace ZeroDbs.SqlServer
                 typeMapDic.Add("uniqueidentifier", "Guid");
                 typeMapDic.Add("varbinary", "byte[]");//Byte[]
                 typeMapDic.Add("varchar", "string");//String
-                typeMapDic.Add("xml", "Xml");
+                typeMapDic.Add("xml", "string");
             }
             return typeMapDic;
         }

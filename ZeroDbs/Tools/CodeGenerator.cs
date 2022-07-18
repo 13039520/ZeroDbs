@@ -1,35 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Reflection;
+using System.CodeDom;
+using System.CodeDom.Compiler;
 
 namespace ZeroDbs.Tools
 {
     public class CodeGenerator
     {
-        static readonly string template = @"using System;
-using System.Collections.Generic;
-using System.Text;
-namespace %NameSpace%
-{
-    /// <summary>
-    /// %TableDescription%
-    /// </summary>
-    [Serializable]
-    public partial class %ClassName%
-    {
-        %ColumnRepeatBegin%
-        private %ColumnDotNetType% _%ColumnName%%ColumnDotNetDefaultValue%;
-        /// <summary>
-        /// %ColumnDescription%
-        /// </summary>
-        public %ColumnDotNetType% %ColumnName%
-        {
-            get { return _%ColumnName%; }
-            set { _%ColumnName% = value; }
-        }%ColumnRepeatEnd%
-
-    }
-}";
         public class SingleTableGeneratedEventArgs : EventArgs
         {
             public IDbInfo db { get; }
@@ -60,7 +39,9 @@ namespace %NameSpace%
             public string EntityProjectName { get; set; }
             public string EntityNamespace { get; set; }
             public string EntityDir { get; set; }
-            public string EntityTemplate { get; set; }
+            public string GenerateRemark { get; set; }
+            private bool _IsPartialClass = true;
+            public bool IsPartialClass { get { return _IsPartialClass; } set { _IsPartialClass = value; } }
         }
 
         public delegate void SingleTableGeneratedHandler(SingleTableGeneratedEventArgs e);
@@ -101,10 +82,6 @@ namespace %NameSpace%
                 throw new Exception("GeneratorConfig.AppProjectDir is null or empty");
             }
             this.GeneratorConfig.AppProjectDir = this.GeneratorConfig.AppProjectDir.Trim();
-            if (string.IsNullOrEmpty(GeneratorConfig.EntityTemplate))
-            {
-                GeneratorConfig.EntityTemplate = template;
-            }
 
             if (Dbs.Count < 1|| Dbs.Contains(null))
             {
@@ -115,17 +92,17 @@ namespace %NameSpace%
 
         }
 
-        private void Builder(List<IDbInfo> dbsList, Config generatorConfig)
+        private void Builder(List<IDbInfo> dbsList, Config config)
         {
             var dbs = new Common.DbService().GetDbs(dbsList);
             foreach (var key in dbs.Keys)
             {
                 var db = dbs[key];
                 var tables = db.GetTables();
-                Builder(db.Database, tables, db.Database, generatorConfig.EntityDir, generatorConfig.AppProjectDir, generatorConfig.EntityNamespace, generatorConfig.EntityTemplate);
+                Builder(db.Database, tables, db.Database, config.EntityDir, config.AppProjectDir, config.EntityNamespace, config.GenerateRemark, config.IsPartialClass);
             }
         }
-        private void Builder(IDbInfo db, List<ITableInfo> tables, IDbInfo dbInfo, string entityProjectRootDir, string targetProjectRootDir, string nameSpace, string entityTemplate = "")
+        private void Builder(IDbInfo db, List<ITableInfo> tables, IDbInfo dbInfo, string entityProjectRootDir, string targetProjectRootDir, string nameSpace, string generateRemark, bool isPartialClass)
         {
 
             string entityFileSaveDir = System.IO.Path.Combine(entityProjectRootDir, dbInfo.Key);
@@ -142,25 +119,6 @@ namespace %NameSpace%
             {
                 nameSpace += "." + dbInfo.Key;
             }
-            entityTemplate = string.IsNullOrEmpty(entityTemplate) ? template : entityTemplate;
-            if (string.IsNullOrEmpty(entityTemplate))
-            {
-                throw new Exception("template Is Null Or Empty");
-            }
-            System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(
-                entityTemplate,
-                @"%ColumnRepeatBegin%(?<temp>[\s\S]+)%ColumnRepeatEnd%",
-                System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-            if (!match.Success)
-            {
-                throw new Exception("template 缺少 ColumnLoop 片段");
-            }
-            string ColumnLoopTemplate = match.Groups["temp"].Value;
-            if (string.IsNullOrEmpty(ColumnLoopTemplate))
-            {
-                throw new Exception("template 的 ColumnLoop 片段为空");
-            }
-
             #region -- ZeroDbConfig.xml --
             if (!System.IO.File.Exists(dbConfigFilePath))
             {
@@ -206,7 +164,6 @@ namespace %NameSpace%
             #region -- tables foreach --
             foreach (var table in tables)
             {
-                string claText = entityTemplate;
                 string tDescription = table.Description;
                 if (string.IsNullOrEmpty(tDescription))
                 {
@@ -219,18 +176,17 @@ namespace %NameSpace%
                         tDescription = "TABLE:" + table.Name;
                     }
                 }
-                claText = claText.Replace("%NameSpace%", nameSpace);
-                claText = claText.Replace("%TableDescription%", tDescription);
                 string className = System.Text.RegularExpressions.Regex.Replace(table.Name, @"^(t|v|tb|view)_", "", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
                 className = FirstLetterToUpper(className);
                 className = (table.IsView ? "v" : "t") + className;
-                claText = claText.Replace("%ClassName%", className);
 
-                StringBuilder colsText = new StringBuilder();
+                EntityCodeDom codeDom = new EntityCodeDom(nameSpace, className, isPartialClass, tDescription, new string[0], new CodeAttributeDeclaration[] {
+                    new CodeAttributeDeclaration("Serializable")
+                });
+
                 foreach (var column in table.Colunms)
                 {
                     #region -- code --
-                    string colText = ColumnLoopTemplate;
                     string colDescription = column.Description;
                     string colDefaultValue = column.DefaultValue;
                     string colDotNetDataType = column.Type;
@@ -246,54 +202,21 @@ namespace %NameSpace%
                     {
                         colDescription = "[Identity]" + colDescription;
                     }
-                    if (string.IsNullOrEmpty(colDefaultValue)) { colDefaultValue = ""; }
-                    if (colDefaultValue.Length > 0)
+                    Type type = GetRealType(colDotNetDataType, column.IsNullable);
+                    if(type is null)
                     {
-                        colDefaultValue = " = " + colDefaultValue;
+                        throw new Exception("unrecognized underlying type name \""+ colDotNetDataType + "\"");
                     }
-                    if (column.IsNullable)
-                    {
-                        if (colDotNetDataType != "string" &&
-                            colDotNetDataType != "byte[]" &&
-                            colDotNetDataType != "object" &&
-                            colDotNetDataType != "object*" &&
-                            colDotNetDataType != "Xml")
-                        {
-                            colDotNetDataType = colDotNetDataType + "?";
-                        }
-                    }
-                    else
-                    {
-                        if (colDotNetDataType == "string")
-                        {
-                            if (colDefaultValue.Length < 1)
-                            {
-                                colDefaultValue = " = \"\"";
-                            }
-                        }
-                    }
-
-                    colText = colText.Replace("%ColumnDotNetType%", colDotNetDataType);
-                    colText = colText.Replace("%ColumnName%", FirstLetterToUpper(column.Name));
-                    colText = colText.Replace("%ColumnDotNetDefaultValue%", colDefaultValue);
-                    colText = colText.Replace("%ColumnDescription%", colDescription);
-
-                    colsText.Append(colText);
-
+                    codeDom.AddProperty(column.Name, type, GetInitExpression(colDotNetDataType, colDefaultValue), colDescription);
                     #endregion
                 }
-
-                claText = System.Text.RegularExpressions.Regex.Replace(
-                    claText,
-                    @"%ColumnRepeatBegin%(?<temp>[\s\S]+)%ColumnRepeatEnd%",
-                    colsText.ToString());
 
                 string filePath = System.IO.Path.Combine(entityFileSaveDir, className + ".cs");
                 if (System.IO.File.Exists(filePath))
                 {
                     System.IO.File.Delete(filePath);
                 }
-                System.IO.File.AppendAllText(filePath, claText, Encoding.UTF8);
+                System.IO.File.AppendAllText(filePath, codeDom.GenerateCSharpCode(generateRemark), Encoding.UTF8);
 
                 #region -- ZeroDbConfig.xml: /zero/dvs/dv --
                 string xpath = @"/zero/dvs/dv[@entityKey='" + nameSpace + "." + className + "' and @dbKey='" + dbInfo.Key + "']";
@@ -348,6 +271,55 @@ namespace %NameSpace%
             return str;
         }
 
+        private System.Type GetRealType(string type, bool isNullable)
+        {
+            switch (type)
+            {
+                case "long":
+                    return isNullable ? typeof(long?) : typeof(long);
+                case "int":
+                    return isNullable ? typeof(int?) : typeof(int);
+                case "short":
+                    return isNullable ? typeof(short?) : typeof(short);
+                case "byte":
+                    return isNullable ? typeof(byte?) : typeof(byte);
+                case "decimal":
+                    return isNullable ? typeof(decimal?) : typeof(decimal);
+                case "double":
+                    return isNullable ? typeof(double?) : typeof(double);
+                case "float":
+                    return isNullable ? typeof(float?) : typeof(float);
+                case "bool":
+                    return isNullable ? typeof(bool?) : typeof(bool);
+                case "DateTime":
+                    return isNullable ? typeof(DateTime?) : typeof(DateTime);
+                case "DateTimeOffset":
+                    return isNullable ? typeof(DateTimeOffset?) : typeof(DateTimeOffset);
+                case "TimeSpan":
+                    return isNullable ? typeof(TimeSpan?) : typeof(TimeSpan);
+                case "Guid":
+                    return isNullable ? typeof(Guid?) : typeof(Guid);
+                // is not value type
+                case "byte[]":
+                    return typeof(byte[]);
+                case "string":
+                    return typeof(string);
+                case "object":
+                    return typeof(object);
+            }
+            return null;
+        }
+        private CodeExpression GetInitExpression(string type, string dVal)
+        {
+            if (!string.IsNullOrEmpty(dVal))
+            {
+                if (type != "string")
+                {
+                    return new CodeSnippetExpression(dVal);
+                }
+            }
+            return null;
+        }
 
     }
 }

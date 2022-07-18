@@ -10,16 +10,16 @@ namespace ZeroDbs.Test
         static ZeroDbs.IDbService dbService = null;
         static void Main(string[] args)
         {
-            Console.WriteLine("Type.GetType(\"MyDbs.MySql001.tUser\")=" + Type.GetType("MyDbs.MySql001.tUser").Name);
+            //Console.WriteLine("Type.GetType(\"MyDbs.MySql001.tUser\")=" + Type.GetType("MyDbs.MySql001.tUser").Name);
             dbService = new ZeroDbs.Common.DbService(new Common.DbExecuteHandler((obj, e) => {
                 Console.ForegroundColor = ConsoleColor.Blue;
                 Console.WriteLine("DbKey={0}&Trans={1}&Sql=\r\n{2}\r\n&Message={3}", e.DbKey, e.TransactionInfo, e.ExecuteSql, e.Message);
                 Console.ResetColor();
             }));
-            //CodeGenerator();
+            CodeGenerator();
             //InsertTest();
-            UpdateTest();
-            QueryTest();
+            //UpdateTest();
+            //QueryTest();
         }
 
 
@@ -53,10 +53,16 @@ namespace ZeroDbs.Test
                 AppProjectName = "ZeroDbs.Test",
                 EntityDir = @"D:\Work\ZeroDbs\ZeroDbs.Test\MyDbs",
                 EntityNamespace = "MyDbs",
-                EntityProjectName = "ZeroDbs.Test"
+                EntityProjectName = "ZeroDbs.Test",
+                GenerateRemark = "Version 1.0.0\r\nDate : " + DateTime.Now.ToString("yyyy-MM-dd"),
+                IsPartialClass = false
             };
             generator.OnSingleTableGenerated += (e) => {
                 Console.WriteLine("[{0}/{1}]\t{2}\t{3}", e.tableNum, e.tableCount, e.table.Name, e.entityClassFullName);
+                foreach(var col in e.table.Colunms)
+                {
+                    Console.WriteLine("{0} {1} {2}",col.Type, col.Name,col.IsNullable);
+                }
             };
             generator.Run();
 
@@ -64,11 +70,11 @@ namespace ZeroDbs.Test
         }
         static void InsertTest()
         {
-            /*
+            /**/
             dbService.Insert(new MyDbs.SqlServer001.tUser { Name = "user004_sqlserver", Email = "user004@domain.com", Password = "123456" });
             dbService.Insert(new MyDbs.MySql001.tUser { Name = "user004_mysql", Email = "user004@domain.com", Password = "123456" });
             dbService.Insert(new MyDbs.Sqlite001.tUser { Name = "user004_sqlite", Email = "user004@domain.com", Password = "123456" });
-            */
+            
 
             var entities1 = new System.Collections.Generic.List<MyDbs.SqlServer001.tUser>
             {
@@ -106,7 +112,7 @@ namespace ZeroDbs.Test
             dbService.Update(new MyDbs.Sqlite001.tUser { ID = 1, Name = "user009_sqlite", Email = "user009@domain.com", Password = "123456789" });
             */
 
-            /*
+            /**/
             var nvc = new System.Collections.Specialized.NameValueCollection();
             nvc.Add("ID", "1");
             nvc.Add("Password", "aaaaaa");
@@ -114,9 +120,9 @@ namespace ZeroDbs.Test
             dbService.UpdateByNameValueCollection<MyDbs.SqlServer001.tUser>(nvc);
             dbService.UpdateByNameValueCollection<MyDbs.MySql001.tUser>(nvc);
             dbService.UpdateByNameValueCollection<MyDbs.Sqlite001.tUser>(nvc);
-            */
+            
 
-            /*
+            /**/
             var dic = new System.Collections.Generic.Dictionary<string, object>();
             dic.Add("ID", 1);
             dic.Add("Password", "aaaaaa");
@@ -124,7 +130,7 @@ namespace ZeroDbs.Test
             dbService.UpdateByDictionary<MyDbs.SqlServer001.tUser>(dic);
             dbService.UpdateByDictionary<MyDbs.MySql001.tUser>(dic);
             dbService.UpdateByDictionary<MyDbs.Sqlite001.tUser>(dic);
-            */
+            
 
             DateTime myTime = DateTime.Now;
             var customEntity = new { ID = 1, Name = "abcdefgh2", createTime = myTime };
@@ -258,6 +264,7 @@ namespace ZeroDbs.Test
             #endregion
 
             #region -- MaxIdentityPrimaryKeyValue --
+            
             var a = dbService.MaxIdentityPrimaryKeyValue<MyDbs.SqlServer001.tUser>();
             Console.WriteLine("MyDbs.SqlServer001.tUser.MaxIdentityPrimaryKeyValue={0}", a);
             a = dbService.MaxIdentityPrimaryKeyValue<MyDbs.SqlServer001.tUser>("ID<@0", 5);
@@ -270,8 +277,9 @@ namespace ZeroDbs.Test
             Console.WriteLine("MyDbs.Sqlite001.tUser.MaxIdentityPrimaryKeyValue={0}", a);
             a = dbService.MaxIdentityPrimaryKeyValue<MyDbs.Sqlite001.tUser>("ID<@0", 5);
             Console.WriteLine("MyDbs.Sqlite001.tUser.MaxIdentityPrimaryKeyValue(ID<5)={0}", a);
+            /**/
             #endregion
-
+            
             MyDbs.SqlServer001.tUser user = null;
             using (var cmd = dbService.GetDbCommand<MyDbs.SqlServer001.tUser>())
             {
@@ -300,6 +308,7 @@ namespace ZeroDbs.Test
                 dt = cmd.ExecuteQuery(sqlInfo);
             }
             Console.WriteLine("dt.Rows.Count={0}", dt != null ? dt.Rows.Count : 0);
+            /**/
 
         }
         class MyEntity

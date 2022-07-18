@@ -1,60 +1,105 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿// Version 1.0.0
+// Date : 2022-07-18
+
 namespace MyDbs.Sqlite001
 {
+    using System;
+    
+    
     /// <summary>
     /// TABLE:User
     /// </summary>
-    [Serializable]
-    public partial class tUser
+    [Serializable()]
+    public class tUser
     {
         
+        #region -- Members --
         private long _ID;
+        
+        private string _Name;
+        
+        private string _Email;
+        
+        private string _Password;
+        
+        private System.DateTime _CreateTime = DateTime.Now;
+        #endregion
+        
+        #region -- Properties --
         /// <summary>
         /// [Identity][PrimaryKey]INTEGER
         /// </summary>
         public long ID
         {
-            get { return _ID; }
-            set { _ID = value; }
+            get
+            {
+                return this._ID;
+            }
+            set
+            {
+                this._ID = value;
+            }
         }
-        private string _Name = "";
+        
         /// <summary>
         /// VARCHAR (50)
         /// </summary>
         public string Name
         {
-            get { return _Name; }
-            set { _Name = value; }
+            get
+            {
+                return this._Name;
+            }
+            set
+            {
+                this._Name = value;
+            }
         }
-        private string _Email = "";
+        
         /// <summary>
         /// VARCHAR (100)
         /// </summary>
         public string Email
         {
-            get { return _Email; }
-            set { _Email = value; }
+            get
+            {
+                return this._Email;
+            }
+            set
+            {
+                this._Email = value;
+            }
         }
-        private string _Password = "";
+        
         /// <summary>
         /// VARCHAR (100)
         /// </summary>
         public string Password
         {
-            get { return _Password; }
-            set { _Password = value; }
+            get
+            {
+                return this._Password;
+            }
+            set
+            {
+                this._Password = value;
+            }
         }
-        private DateTime _CreateTime = DateTime.Now;
+        
         /// <summary>
         /// DATETIME
         /// </summary>
-        public DateTime CreateTime
+        public System.DateTime CreateTime
         {
-            get { return _CreateTime; }
-            set { _CreateTime = value; }
+            get
+            {
+                return this._CreateTime;
+            }
+            set
+            {
+                this._CreateTime = value;
+            }
         }
-
+        #endregion
     }
 }

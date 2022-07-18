@@ -197,7 +197,7 @@ namespace ZeroDbs.MySql
 
                         break;
                     default:
-                        s = "object";
+                        
                         break;
                 }
             }

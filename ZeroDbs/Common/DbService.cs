@@ -407,7 +407,7 @@ namespace ZeroDbs.Common
         }
         public int UpdateByNameValueCollection<DbEntity>(NameValueCollection source) where DbEntity : class, new()
         {
-            return UpdateByCustomEntity<DbEntity>(source, "");
+            return UpdateByNameValueCollection<DbEntity>(source, "");
         }
         public int UpdateByNameValueCollection<DbEntity>(NameValueCollection source, string appendWhere, params object[] paras) where DbEntity : class, new()
         {
