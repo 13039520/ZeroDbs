@@ -122,9 +122,12 @@ namespace ZeroDbs.Tools
                 }
                 if (i == members.Count - 1)
                 {
-                    member.StartDirectives.Clear();
+                    if (i > 0)
+                    {
+                        member.StartDirectives.Clear();
+                        member.EndDirectives.Clear();
+                    }
                     member.StartDirectives.Add(new CodeRegionDirective(CodeRegionMode.None, ""));
-                    member.EndDirectives.Clear();
                     member.EndDirectives.Add(new CodeRegionDirective(CodeRegionMode.End, ""));
                 }
                 typeClass.Members.Add(member);
@@ -141,9 +144,12 @@ namespace ZeroDbs.Tools
                 }
                 if (i == members.Count - 1)
                 {
-                    member.StartDirectives.Clear();
+                    if (i > 0)
+                    {
+                        member.StartDirectives.Clear();
+                        member.EndDirectives.Clear();
+                    }
                     member.StartDirectives.Add(new CodeRegionDirective(CodeRegionMode.None, ""));
-                    member.EndDirectives.Clear();
                     member.EndDirectives.Add(new CodeRegionDirective(CodeRegionMode.End, ""));
                 }
                 typeClass.Members.Add(member);
