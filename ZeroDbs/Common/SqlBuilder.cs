@@ -349,7 +349,7 @@ namespace ZeroDbs.Common
                     {
                         throw new ArgumentNullException("Parameter '" + key + "' must have property '" + k.Name + "'");
                     }
-                    if (!string.Equals(p.PropertyType.Name, k.Type))
+                    if (!string.Equals(p.PropertyType.Name, GetBaseTypeName(k.Type)))
                     {
                         throw new ArgumentException("Property '" + p.Name + "' type error");
                     }
@@ -359,7 +359,7 @@ namespace ZeroDbs.Common
             }
             else
             {
-                if (!string.Equals(type.Name, pKeys[0].Type, StringComparison.OrdinalIgnoreCase))
+                if (!string.Equals(type.Name, GetBaseTypeName(pKeys[0].Type), StringComparison.OrdinalIgnoreCase))
                 {
                     throw new ArgumentNullException("Wrong data type for parameter");
                 }
@@ -380,6 +380,32 @@ namespace ZeroDbs.Common
             }
             reval.Sql = string.Format("SELECT {0} FROM {1} WHERE {2}", string.Join(",", fields), GetTableName(table), where);
             return reval;
+        }
+        private string GetBaseTypeName(string type)
+        {
+            
+            switch (type)
+            {
+                case "short":
+                    return "Int16";
+                case "int":
+                    return "Int32";
+                case "long":
+                    return "Int64";
+                case "float":
+                    return "Single";
+                case "double":
+                    return "Double";
+                case "decimal":
+                    return "Decimal";
+                case "string":
+                    return "String";
+                case "bool":
+                    return "Boolean";
+                case "byte":
+                    return "Byte";
+            }
+            return type;
         }
 
         public string Insert<DbEntity>() where DbEntity : class, new()

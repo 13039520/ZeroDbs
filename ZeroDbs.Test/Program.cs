@@ -16,10 +16,10 @@ namespace ZeroDbs.Test
                 Console.WriteLine("DbKey={0}&Trans={1}&Sql=\r\n{2}\r\n&Message={3}", e.DbKey, e.TransactionInfo, e.ExecuteSql, e.Message);
                 Console.ResetColor();
             }));
-            CodeGenerator();
+            //CodeGenerator();
             //InsertTest();
             //UpdateTest();
-            //QueryTest();
+            QueryTest();
         }
 
 
@@ -309,6 +309,12 @@ namespace ZeroDbs.Test
             }
             Console.WriteLine("dt.Rows.Count={0}", dt != null ? dt.Rows.Count : 0);
             /**/
+            var ttt = dbService.SelectByPrimaryKey<MyDbs.SqlServer001.tUser>(1);
+            if(ttt != null)
+            {
+                Console.WriteLine("dbService.SelectByPrimaryKey<MyDbs.SqlServer001.tUser>(1)：");
+                Console.WriteLine("{0}\t{1}\t{2}\t{3}", ttt.ID, ttt.Name, ttt.Email, ttt.CreateTime);
+            }
 
         }
         class MyEntity
