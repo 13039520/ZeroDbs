@@ -81,12 +81,12 @@ namespace ZeroDbs.Logs
             {
                 logFilePre = "Trace";
             }
-            logFilePre = logFilePre.ToLower();
+            //logFilePre = logFilePre.ToLower();
             if (!logFilePre.EndsWith("-"))
             {
                 logFilePre = logFilePre + "-";
             }
-            logFilePre = logFilePre.Substring(0, 1).ToUpper() + logFilePre.Substring(1);
+            //logFilePre = logFilePre.Substring(0, 1).ToUpper() + logFilePre.Substring(1);
             return logFilePre;
         }
         public static System.Collections.Generic.List<string> GetLogFilePreList()
