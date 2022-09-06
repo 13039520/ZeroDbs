@@ -113,7 +113,7 @@ namespace ZeroDbs.Common
                 T obj = new T();
                 foreach (var index in dic.Keys)
                 {
-                    if (reader.IsDBNull(index)) { continue; }
+                    if (reader.IsDBNull(index) || dic[index].Setter is null) { continue; }
                     dic[index].Setter(obj, reader.GetValue(index));
                 }
                 rowNum++;

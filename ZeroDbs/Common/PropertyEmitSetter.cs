@@ -47,6 +47,7 @@ namespace ZeroDbs.Common
         }
         static ZeroEntityPropertyEmitSetter CreateSetter(PropertyInfo property, Type delegateType)
         {
+            if (!property.CanWrite) { return null; }
             var type = property.DeclaringType;
             var dm = new DynamicMethod("", null, new[] { typeof(object), typeof(object) }, type);
             //=== IL ===
