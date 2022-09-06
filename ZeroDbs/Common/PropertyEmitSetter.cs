@@ -47,24 +47,27 @@ namespace ZeroDbs.Common
         }
         static ZeroEntityPropertyEmitSetter CreateSetter(PropertyInfo property, Type delegateType)
         {
-            if (!property.CanWrite) { return null; }
-            var type = property.DeclaringType;
-            var dm = new DynamicMethod("", null, new[] { typeof(object), typeof(object) }, type);
-            //=== IL ===
-            var il = dm.GetILGenerator();
-            il.Emit(OpCodes.Ldarg_0);
-            il.Emit(OpCodes.Ldarg_1);
-            if (property.PropertyType.IsValueType)
+            if (property.CanWrite)
             {
-                il.Emit(OpCodes.Unbox_Any, property.PropertyType);
+                var type = property.DeclaringType;
+                var dm = new DynamicMethod("", null, new[] { typeof(object), typeof(object) }, type);
+                //=== IL ===
+                var il = dm.GetILGenerator();
+                il.Emit(OpCodes.Ldarg_0);
+                il.Emit(OpCodes.Ldarg_1);
+                if (property.PropertyType.IsValueType)
+                {
+                    il.Emit(OpCodes.Unbox_Any, property.PropertyType);
+                }
+                else
+                {
+                    il.Emit(OpCodes.Castclass, property.PropertyType);
+                }
+                il.Emit(OpCodes.Callvirt, property.GetSetMethod());
+                il.Emit(OpCodes.Ret);
+                return (ZeroEntityPropertyEmitSetter)dm.CreateDelegate(delegateType);
             }
-            else
-            {
-                il.Emit(OpCodes.Castclass, property.PropertyType);
-            }
-            il.Emit(OpCodes.Callvirt, property.GetSetMethod());
-            il.Emit(OpCodes.Ret);
-            return (ZeroEntityPropertyEmitSetter)dm.CreateDelegate(delegateType);
+            return null;
         }
 
     }
