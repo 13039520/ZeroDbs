@@ -364,6 +364,10 @@ namespace ZeroDbs.Common
         {
             return GetDb<DbEntity>().Insert<DbEntity>(entities);
         }
+        public int Insert<DbEntity>(List<DbEntity> entities, int mergeLimit) where DbEntity : class, new()
+        {
+            return GetDb<DbEntity>().Insert<DbEntity>(entities, mergeLimit);
+        }
         public int InsertByNameValueCollection<DbEntity>(NameValueCollection source) where DbEntity : class, new()
         {
             return InsertByNameValueCollection(typeof(DbEntity), source);

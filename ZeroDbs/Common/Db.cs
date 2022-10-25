@@ -441,28 +441,44 @@ namespace ZeroDbs.Common
         }
         public int Insert<DbEntity>(List<DbEntity> entities) where DbEntity : class, new()
         {
-            var info = this.SqlBuilder.Insert<DbEntity>();
-            var ts = this.GetDbTransactionScope(System.Data.IsolationLevel.ReadUncommitted);
-            try
+            return Insert<DbEntity>(entities, 0);
+        }
+        public int Insert<DbEntity>(List<DbEntity> entities, int mergeLimit) where DbEntity : class, new()
+        {
+            int reval = 0;
+            if (mergeLimit < 1)
             {
-                int reval = 0;
-                ts.Execute((cmd) =>
+                var sql = this.SqlBuilder.Insert<DbEntity>();
+                using (var ts = this.GetDbTransactionScope(System.Data.IsolationLevel.ReadUncommitted))
                 {
-                    cmd.CommandText = info;
-                    foreach (var entity in entities)
+                    ts.Execute((cmd) =>
                     {
-                        cmd.ParametersFromEntity(entity);
-                        reval += cmd.ExecuteNonQuery();
-                    }
-                });
-                ts.Complete(true);
-                return reval;
+                        cmd.CommandText = sql;
+                        foreach (var entity in entities)
+                        {
+                            cmd.ParametersFromEntity(entity);
+                            reval += cmd.ExecuteNonQuery();
+                        }
+                    });
+                    ts.Complete(true);
+                }
             }
-            catch (Exception ex)
+            else
             {
-                ts.Dispose();
-                throw ex;
+                var infos = this.SqlBuilder.Insert<DbEntity>(entities, mergeLimit);
+                using (var ts = this.GetDbTransactionScope(System.Data.IsolationLevel.ReadUncommitted))
+                {
+                    ts.Execute((cmd) =>
+                    {
+                        foreach (var info in infos)
+                        {
+                            reval += cmd.ExecuteNonQuery(info);
+                        }
+                    });
+                    ts.Complete(true);
+                }
             }
+            return reval;
         }
         public int InsertByNameValueCollection<DbEntity>(NameValueCollection source) where DbEntity : class, new()
         {

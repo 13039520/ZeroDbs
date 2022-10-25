@@ -17,9 +17,9 @@ namespace ZeroDbs.Test
                 Console.ResetColor();
             }));
             //CodeGenerator();
-            //InsertTest();
+            InsertTest();
             //UpdateTest();
-            QueryTest();
+            //QueryTest();
         }
 
 
@@ -68,41 +68,32 @@ namespace ZeroDbs.Test
 
             Console.WriteLine("Generated successfully.");
         }
-        static void InsertTest()
+        static void InsertTest(int beginNum = 1000)
         {
-            /**/
-            dbService.Insert(new MyDbs.SqlServer001.tUser { Name = "user004_sqlserver", Email = "user004@domain.com", Password = "123456" });
-            dbService.Insert(new MyDbs.MySql001.tUser { Name = "user004_mysql", Email = "user004@domain.com", Password = "123456" });
-            dbService.Insert(new MyDbs.Sqlite001.tUser { Name = "user004_sqlite", Email = "user004@domain.com", Password = "123456" });
-            
+            /*string num = beginNum.ToString().PadLeft(3, '0');
+            dbService.Insert(new MyDbs.SqlServer001.tUser { Name = "user" + num + "_sqlserver", Email = "user" + num + "@domain.com", Password = "123456" });
+            dbService.Insert(new MyDbs.MySql001.tUser { Name = "user" + num + "_mysql", Email = "user" + num + "@domain.com", Password = "123456" });
+            dbService.Insert(new MyDbs.Sqlite001.tUser { Name = "user" + num + "_sqlite", Email = "user" + num + "@domain.com", Password = "123456" });
+            beginNum++;*/
 
-            var entities1 = new System.Collections.Generic.List<MyDbs.SqlServer001.tUser>
+            var entities1 = new System.Collections.Generic.List<MyDbs.SqlServer001.tUser>();
+            var entities2 = new System.Collections.Generic.List<MyDbs.MySql001.tUser>();
+            var entities3 = new System.Collections.Generic.List<MyDbs.Sqlite001.tUser>();
+            int endNum = beginNum + 10000;
+            for (int i = beginNum; i < endNum; i++)
             {
-                new MyDbs.SqlServer001.tUser{Name ="user005_sqlserver", Email="user005@domain.com", Password="123456"},
-                new MyDbs.SqlServer001.tUser{Name ="user006_sqlserver", Email="user006@domain.com", Password="123456"},
-                new MyDbs.SqlServer001.tUser{Name ="user007_sqlserver", Email="user007@domain.com", Password="123456"},
-                new MyDbs.SqlServer001.tUser{Name ="user008_sqlserver", Email="user008@domain.com", Password="123456"},
-                new MyDbs.SqlServer001.tUser{Name ="user009_sqlserver", Email="user009@domain.com", Password="123456"}
-            };
-            dbService.Insert(entities1);
-            var entities2 = new System.Collections.Generic.List<MyDbs.MySql001.tUser>
-            {
-                new MyDbs.MySql001.tUser{Name ="user005_sqlserver", Email="user005@domain.com", Password="123456"},
-                new MyDbs.MySql001.tUser{Name ="user006_sqlserver", Email="user006@domain.com", Password="123456"},
-                new MyDbs.MySql001.tUser{Name ="user007_sqlserver", Email="user007@domain.com", Password="123456"},
-                new MyDbs.MySql001.tUser{Name ="user008_sqlserver", Email="user008@domain.com", Password="123456"},
-                new MyDbs.MySql001.tUser{Name ="user009_sqlserver", Email="user009@domain.com", Password="123456"}
-            };
-            dbService.Insert(entities2);
-            var entities3 = new System.Collections.Generic.List<MyDbs.Sqlite001.tUser>
-            {
-                new MyDbs.Sqlite001.tUser{Name ="user005_sqlserver", Email="user005@domain.com", Password="123456"},
-                new MyDbs.Sqlite001.tUser{Name ="user006_sqlserver", Email="user006@domain.com", Password="123456"},
-                new MyDbs.Sqlite001.tUser{Name ="user007_sqlserver", Email="user007@domain.com", Password="123456"},
-                new MyDbs.Sqlite001.tUser{Name ="user008_sqlserver", Email="user008@domain.com", Password="123456"},
-                new MyDbs.Sqlite001.tUser{Name ="user009_sqlserver", Email="user009@domain.com", Password="123456"}
-            };
-            dbService.Insert(entities3);
+                string num = i.ToString().PadLeft(3, '0');
+                entities1.Add(new MyDbs.SqlServer001.tUser { Name = "user" + num + "_sqlserver", Email = "user" + num + "@domain.com", Password = "123456" });
+                //entities2.Add(new MyDbs.MySql001.tUser { Name = "user" + num + "_mysql", Email = "user" + num + "@domain.com", Password = "123456" });
+                //entities3.Add(new MyDbs.Sqlite001.tUser { Name = "user" + num + "_sqlite", Email = "user" + num + "@domain.com", Password = "123456" });
+            }
+            System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+            stopwatch.Start();
+            dbService.Insert(entities1, 100);
+            stopwatch.Stop();
+            Console.WriteLine("ElapsedMilliseconds=>{0}", stopwatch.ElapsedMilliseconds);
+            //dbService.Insert(entities2, 30);
+            //dbService.Insert(entities3, 30);
         }
         static void UpdateTest()
         {

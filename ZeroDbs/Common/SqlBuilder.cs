@@ -456,6 +456,58 @@ namespace ZeroDbs.Common
             reval.Sql = String.Format("INSERT INTO {0}({1}) VALUES({2})", GetTableName(tableInfo), field, value);
             return reval;
         }
+        public List<SqlInfo> Insert<DbEntity>(List<DbEntity> entities, int mergeLimit = 10) where DbEntity : class, new()
+        {
+            var tableInfo = this.GetTable<DbEntity>();
+            if (tableInfo.IsView)
+            {
+                throw new Exception("Target does not support insert operation");
+            }
+            if (mergeLimit < 1) { mergeLimit = 1; }
+            var ps = GetPropertyInfos<DbEntity>();
+            List<SqlInfo> sqlInfos = new List<SqlInfo>();
+            StringBuilder field = new StringBuilder();
+            StringBuilder value = new StringBuilder();
+            int colunmCount = tableInfo.Colunms.Count;
+            List<string> sqlList = new List<string>(mergeLimit);
+            int rowIndex = 0;
+            SqlInfo reval = new SqlInfo(10);
+            for (int i = 0; i < entities.Count; i++)
+            {
+                int colIndex = 0;
+                foreach (var col in tableInfo.Colunms)
+                {
+                    if (col.IsIdentity) { continue; }
+                    var p = ps.Find(o => string.Equals(o.Name, col.Name, StringComparison.OrdinalIgnoreCase));
+                    if (p == null) { continue; }
+                    field.AppendFormat("{0},", GetColunmName(col.Name));
+                    value.AppendFormat("@{0}_{1},", rowIndex, colIndex);
+                    reval.Paras.Add(string.Format("@{0}_{1}", rowIndex, colIndex), p.GetValue(entities[i], null));
+                    colIndex++;
+                }
+                field.Remove(field.Length - 1, 1);
+                value.Remove(value.Length - 1, 1);
+                sqlList.Add(String.Format("INSERT INTO {0}({1}) VALUES({2});", GetTableName(tableInfo), field, value));
+                field.Clear();
+                value.Clear();
+
+                rowIndex++;
+                if (rowIndex < mergeLimit)
+                {
+                    if (i + 1 < entities.Count)
+                    {
+                        continue;
+                    }
+                }
+                reval.Sql=String.Join("\r\n",sqlList.ToArray());
+                sqlInfos.Add(reval);
+                sqlList.Clear();
+                rowIndex = 0;
+                reval = new SqlInfo(mergeLimit * colunmCount);
+            }
+            
+            return sqlInfos;
+        }
         public SqlInfo InsertByCustomEntity<DbEntity>(object source) where DbEntity : class, new()
         {
             Type type = typeof(DbEntity);

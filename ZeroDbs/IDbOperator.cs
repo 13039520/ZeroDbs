@@ -44,6 +44,7 @@ namespace ZeroDbs
 
         int Insert<DbEntity>(DbEntity entity) where DbEntity : class, new();
         int Insert<DbEntity>(List<DbEntity> entities) where DbEntity : class, new();
+        int Insert<DbEntity>(List<DbEntity> entities, int mergeLimit) where DbEntity : class, new();
         int InsertByNameValueCollection<DbEntity>(System.Collections.Specialized.NameValueCollection source) where DbEntity : class, new();
         int InsertByNameValueCollection(Type entityFullName, System.Collections.Specialized.NameValueCollection source);
         int InsertByCustomEntity<DbEntity>(object source) where DbEntity : class, new();
