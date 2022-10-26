@@ -17,9 +17,9 @@ namespace ZeroDbs.Test
                 Console.ResetColor();
             }));
             //CodeGenerator();
-            InsertTest();
+            //InsertTest();
             //UpdateTest();
-            //QueryTest();
+            QueryTest();
         }
 
 
@@ -147,9 +147,9 @@ namespace ZeroDbs.Test
                 Fields = new string[0],
                 UniqueField = ""
             };*/
-            var query = new ZeroDbs.Common.PageQuery().UsePage(1).UseSize(5).UseWhere("ID>@0").UseParas(2).UseOrderby("ID DESC");
+            var query = new ZeroDbs.Common.PageQuery().UsePage(2).UseSize(10).UseWhere("ID>@0").UseParas(2).UseOrderby("ID DESC");
             var page1 = dbService.Page<MyDbs.SqlServer001.tUser,MyEntity>(query);
-            Console.WriteLine("MyDbs.SqlServer001.tUser:");
+            Console.WriteLine("MyDbs.SqlServer001.tUser(page1):");
             if (page1.Total > 0)
             {
                 foreach (MyEntity m in page1.Items)
@@ -162,7 +162,7 @@ namespace ZeroDbs.Test
                 Console.WriteLine("no data");
             }
             var page2 = dbService.Page<MyDbs.MySql001.tUser>(query);
-            Console.WriteLine("MyDbs.MySql001.tUser:");
+            Console.WriteLine("MyDbs.MySql001.tUser(page2):");
             if (page2.Total > 0)
             {
                 foreach (MyDbs.MySql001.tUser m in page2.Items)
@@ -175,7 +175,7 @@ namespace ZeroDbs.Test
                 Console.WriteLine("no data");
             }
             var page3 = dbService.Page<MyDbs.Sqlite001.tUser>(query);
-            Console.WriteLine("MyDbs.Sqlite001.tUser:");
+            Console.WriteLine("MyDbs.Sqlite001.tUser(page3):");
             if (page3.Total > 0)
             {
                 foreach (MyDbs.Sqlite001.tUser m in page3.Items)
@@ -270,42 +270,6 @@ namespace ZeroDbs.Test
             Console.WriteLine("MyDbs.Sqlite001.tUser.MaxIdentityPrimaryKeyValue(ID<5)={0}", a);
             /**/
             #endregion
-            
-            MyDbs.SqlServer001.tUser user = null;
-            using (var cmd = dbService.GetDbCommand<MyDbs.SqlServer001.tUser>())
-            {
-                cmd.CommandText = cmd.SqlBuilder.Select<MyDbs.SqlServer001.tUser>(cmd.SqlBuilder.ListQuery().UseOrderby("ID DESC")).Sql;
-                var reader = cmd.ExecuteReader();
-                user = Common.Entities.TakeOneFromDataReaderByEmit<MyDbs.SqlServer001.tUser>(reader);
-            }
-            if(user != null)
-            {
-                Console.WriteLine("MyDbs.SqlServer001.tUser=>{0}\t{1}\t{2}\t{3}", user.ID,user.Name,user.Email,user.CreateTime);
-            }
-            string entity = "MyDbs.SqlServer001.tUser";
-            Type entityType = Type.GetType(entity);
-            Console.WriteLine("获取到类型了：{0}",entityType.FullName);
-            System.Data.DataTable dt = null;
-            using (var cmd = dbService.GetDbCommand(entity))
-            {
-                var nvc = new System.Collections.Specialized.NameValueCollection();
-                nvc.Add("ID", "9");
-                nvc.Add("Email", "abcdef@ghi.jkl");
-                var sqlInfo1 = cmd.SqlBuilder.UpdateByNameValueCollection(entityType, nvc, "");
-                var rows = cmd.ExecuteNonQuery(sqlInfo1);
-                Console.WriteLine("受影响 {0} 行", rows);
-
-                var sqlInfo = cmd.SqlBuilder.Select(entityType, listQuery);
-                dt = cmd.ExecuteQuery(sqlInfo);
-            }
-            Console.WriteLine("dt.Rows.Count={0}", dt != null ? dt.Rows.Count : 0);
-            /**/
-            var ttt = dbService.SelectByPrimaryKey<MyDbs.SqlServer001.tUser>(1);
-            if(ttt != null)
-            {
-                Console.WriteLine("dbService.SelectByPrimaryKey<MyDbs.SqlServer001.tUser>(1)：");
-                Console.WriteLine("{0}\t{1}\t{2}\t{3}", ttt.ID, ttt.Name, ttt.Email, ttt.CreateTime);
-            }
 
         }
         class MyEntity

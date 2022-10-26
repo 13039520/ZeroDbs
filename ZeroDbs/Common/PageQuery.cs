@@ -36,7 +36,7 @@ namespace ZeroDbs.Common
         {
             if (size > 0)
             {
-                _Size = Size;
+                _Size = size;
             }
             return this;
         }

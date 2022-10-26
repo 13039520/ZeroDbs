@@ -174,17 +174,9 @@ namespace ZeroDbs.Common
         {
             string[] fields = PropertyInfoCache.GetPropertyInfoList<OutType>().Select(o => o.Name).ToArray();
             var info = SqlBuilder.Select<DbEntity>(where, orderby, top, fields, paras);
-            var cmd = GetDbCommand();
-            try
+            using (var cmd = GetDbCommand())
             {
-                List<OutType> reval = cmd.ExecuteQuery<OutType>(info);
-                cmd.Dispose();
-                return reval;
-            }
-            catch (Exception ex)
-            {
-                cmd.Dispose();
-                throw ex;
+                return cmd.ExecuteQuery<OutType>(info);
             }
         }
         public List<DbEntity> Select<DbEntity>() where DbEntity : class, new()
@@ -210,17 +202,9 @@ namespace ZeroDbs.Common
         public List<DbEntity> Select<DbEntity>(string where, string orderby, int top, string[] fields, params object[] paras) where DbEntity : class, new()
         {
             var info = SqlBuilder.Select<DbEntity>(where, orderby, top, fields, paras);
-            var cmd = GetDbCommand();
-            try
+            using (var cmd = GetDbCommand())
             {
-                List<DbEntity> reval = cmd.ExecuteQuery<DbEntity>(info);
-                cmd.Dispose();
-                return reval;
-            }
-            catch (Exception ex)
-            {
-                cmd.Dispose();
-                throw ex;
+                return cmd.ExecuteQuery<DbEntity>(info);
             }
         }
         public DbEntity SelectByPrimaryKey<DbEntity>(object key) where DbEntity : class, new()
@@ -329,34 +313,32 @@ namespace ZeroDbs.Common
         {
             var countSql = SqlBuilder.Count<DbEntity>(where,paras);
             var info = SqlBuilder.Page<DbEntity>(page, size, where, orderby, fields, uniqueField,paras);
-            var cmd = this.GetDbCommand();
-            try
+            PageData<DbEntity> reval = new PageData<DbEntity>();
+            using (var cmd = this.GetDbCommand())
             {
                 cmd.CommandText = countSql.Sql;
                 cmd.ParametersFromDictionary(countSql.Paras);
                 var obj = cmd.ExecuteScalar();
                 long total = Convert.ToInt64(obj);
+                reval.Total = total;
                 if (total < 1)
                 {
-                    cmd.Dispose();
-                    return new PageData<DbEntity> { Total = total, Items = new List<DbEntity>() };
+                    reval.Items = new List<DbEntity>();
                 }
-                long pages = total % size == 0 ? total / size : (total / size + 1);
-                if (page > pages)
+                else
                 {
-                    cmd.Dispose();
-                    return new PageData<DbEntity> { Total = total, Items = new List<DbEntity>() };
+                    long pages = total % size == 0 ? total / size : (total / size + 1);
+                    if (page > pages)
+                    {
+                        reval.Items = new List<DbEntity>();
+                    }
+                    else
+                    {
+                        reval.Items = cmd.ExecuteQuery<DbEntity>(info);
+                    }
                 }
-                var reval = cmd.ExecuteQuery<DbEntity>(info);
-                cmd.Dispose();
-
-                return new PageData<DbEntity> { Total = total, Items = reval };
             }
-            catch (Exception ex)
-            {
-                cmd.Dispose();
-                throw ex;
-            }
+            return reval;
         }
 
 
@@ -397,42 +379,31 @@ namespace ZeroDbs.Common
         }
         public long MaxIdentityPrimaryKeyValue(Type entityType, string where, params object[] paras)
         {
+            long reval = 0;
             var info = this.SqlBuilder.MaxIdentityPrimaryKeyValue(entityType, where, paras);
-            var cmd = this.GetDbCommand();
-            try
+            using (var cmd = this.GetDbCommand())
             {
                 cmd.CommandText = info.Sql;
                 cmd.ParametersFromDictionary(info.Paras);
-                var reval = cmd.ExecuteScalar();
-                cmd.Dispose();
-                if (reval is null || reval is DBNull)
+                var obj = cmd.ExecuteScalar();
+                if (obj is null || obj is DBNull)
                 {
-                    return 0;
+                    reval = 0;
                 }
-                return Convert.ToInt64(reval);
+                reval = Convert.ToInt64(obj);
             }
-            catch (Exception ex)
-            {
-                cmd.Dispose();
-                throw ex;
-            }
+            return reval;
         }
 
 
         protected int _NonQuery(SqlInfo info)
         {
-            var cmd = this.GetDbCommand();
-            try
+            int reval = 0;
+            using (var cmd = this.GetDbCommand())
             {
-                var reval = cmd.ExecuteNonQuery(info);
-                cmd.Dispose();
-                return reval;
+                reval = cmd.ExecuteNonQuery(info);
             }
-            catch (Exception ex)
-            {
-                cmd.Dispose();
-                throw ex;
-            }
+            return reval;
         }
 
         public int Insert<DbEntity>(DbEntity entity) where DbEntity : class, new()
@@ -521,8 +492,7 @@ namespace ZeroDbs.Common
         {
             if(entities == null || entities.Count < 1) { return 0; }
             var info = this.SqlBuilder.Update<DbEntity>(entities[0], appendWhere, paras);
-            var ts = this.GetDbTransactionScope(System.Data.IsolationLevel.ReadUncommitted);
-            try
+            using (var ts = this.GetDbTransactionScope(System.Data.IsolationLevel.ReadUncommitted))
             {
                 int reval = 0;
                 ts.Execute((cmd) =>
@@ -535,11 +505,6 @@ namespace ZeroDbs.Common
                 });
                 ts.Complete(true);
                 return reval;
-            }
-            catch (Exception ex)
-            {
-                ts.Dispose();
-                throw ex;
             }
         }
         public int UpdateByNameValueCollection<DbEntity>(NameValueCollection source) where DbEntity : class, new()
