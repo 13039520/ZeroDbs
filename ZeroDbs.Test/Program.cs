@@ -32,19 +32,19 @@ namespace ZeroDbs.Test
             {
                 ConnectionString = "Data Source=.;Initial Catalog=ZeroTestDb;User ID=sa;Password=123456;TrustServerCertificate=True;",
                 Key = "SqlServer001",
-                Type = Common.DbType.SqlServer
+                Type = "SqlServer"
             });
             generator.Dbs.Add(new ZeroDbs.Common.DbInfo
             {
                 ConnectionString = "Host=localhost;Port=3306;Database=zerotestdb;User ID=root;Password=123456;",
                 Key = "MySql001",
-                Type = Common.DbType.MySql
+                Type = "MySql"
             });
             generator.Dbs.Add(new ZeroDbs.Common.DbInfo
             {
                 ConnectionString = "Data Source=D:\\Program Files\\SQLiteStudio\\ZeroTestDb.db3;version=3;datetimeformat=CurrentCulture",
                 Key = "Sqlite001",
-                Type = Common.DbType.Sqlite
+                Type = "Sqlite"
             });
             generator.GeneratorConfig = new ZeroDbs.Tools.CodeGenerator.Config
             {

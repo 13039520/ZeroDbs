@@ -11,35 +11,15 @@ namespace ZeroDbs.Common
     /// </summary>
     public abstract class Db : IDb
     {
-        private IDataTypeMaping dataTypeMaping = null;
-        private IDbInfo database = null;
-        private SqlBuilder sqlBuilder = null;
-        public IDbInfo Database { get { return database; } }
+        protected IDbInfo dbInfo = null;
+        protected SqlBuilder sqlBuilder = null;
+        protected IDataTypeMaping dataTypeMaping = null;
+        public IDbInfo DbInfo { get { return dbInfo; } }
         public SqlBuilder SqlBuilder { get { return sqlBuilder; } }
         public IDataTypeMaping DataTypeMaping { get { return dataTypeMaping; } }
 
         public event DbExecuteHandler OnDbExecuteSqlEvent = null;
-        public Db(IDbInfo database)
-        {
-            this.database = database;
-            switch (this.database.Type)
-            {
-                case DbType.SqlServer:
-                    this.sqlBuilder = new SqlServer.SqlBuilder(this);
-                    this.dataTypeMaping = new SqlServer.DbDataTypeMaping();
-                    break;
-                case DbType.MySql:
-                    this.sqlBuilder = new MySql.SqlBuilder(this);
-                    this.dataTypeMaping = new MySql.DbDataTypeMaping();
-                    break;
-                case DbType.Sqlite:
-                    this.sqlBuilder = new Sqlite.SqlBuilder(this);
-                    this.dataTypeMaping = new Sqlite.DbDataTypeMaping();
-                    break;
-                default:
-                    throw new Exception("Unsupported database type");
-            }
-        }
+        
         public void FireZeroDbExecuteSqlEvent(DbExecuteArgs args)
         {
             if (this.OnDbExecuteSqlEvent != null)
@@ -54,7 +34,7 @@ namespace ZeroDbs.Common
             {
                 return false;
             }
-            return null != temp.Find(o => string.Equals(o.Key, Database.Key, StringComparison.OrdinalIgnoreCase));
+            return null != temp.Find(o => string.Equals(o.Key, DbInfo.Key, StringComparison.OrdinalIgnoreCase));
         }
         protected bool IsMappingToDbKey(string entityFullName)
         {
@@ -63,7 +43,7 @@ namespace ZeroDbs.Common
             {
                 return false;
             }
-            return null != temp.Find(o => string.Equals(o.Key, Database.Key, StringComparison.OrdinalIgnoreCase));
+            return null != temp.Find(o => string.Equals(o.Key, DbInfo.Key, StringComparison.OrdinalIgnoreCase));
         }
 
         public virtual System.Data.Common.DbConnection GetDbConnection()
@@ -91,7 +71,7 @@ namespace ZeroDbs.Common
                 conn.Open();
             }
             var cmd = conn.CreateCommand();
-            return new DbCommand(Database.Key, cmd, this.OnDbExecuteSqlEvent, this.SqlBuilder);
+            return new DbCommand(DbInfo.Key, cmd, this.OnDbExecuteSqlEvent, this.SqlBuilder);
         }
         public IDbCommand GetDbCommand(System.Data.Common.DbTransaction transaction)
         {
@@ -103,7 +83,7 @@ namespace ZeroDbs.Common
             cmd.Connection = transaction.Connection;
             cmd.Transaction = transaction;
 
-            return new DbCommand(Database.Key, cmd, this.OnDbExecuteSqlEvent, this.SqlBuilder);
+            return new DbCommand(DbInfo.Key, cmd, this.OnDbExecuteSqlEvent, this.SqlBuilder);
         }
         public IDbTransactionScope GetDbTransactionScope(System.Data.IsolationLevel level, string identification = "", string groupId = "")
         {
@@ -133,7 +113,7 @@ namespace ZeroDbs.Common
         {
             if (!IsMappingToDbKey<DbEntity>())
             {
-                throw new Exception("类型" + typeof(DbEntity).FullName + "没有映射到" + Database.Key + "上");
+                throw new Exception("类型" + typeof(DbEntity).FullName + "没有映射到" + DbInfo.Key + "上");
             }
             return GetDbCommand();
         }
@@ -141,7 +121,7 @@ namespace ZeroDbs.Common
         {
             if (!IsMappingToDbKey<DbEntity>())
             {
-                throw new Exception("类型" + typeof(DbEntity).FullName + "没有映射到" + Database.Key + "上");
+                throw new Exception("类型" + typeof(DbEntity).FullName + "没有映射到" + DbInfo.Key + "上");
             }
             return GetDbTransactionScope(level, identification, groupId);
         }

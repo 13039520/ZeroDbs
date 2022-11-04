@@ -82,24 +82,24 @@ namespace ZeroDbs.Common
                     if (isSuccess)
                     {
                         this.dbTransaction.Commit();
-                        FireEvent(new DbExecuteArgs(db.Database.Key, "", transactionInfo, DbExecuteSqlType.TRANSACTION, "TRANSACTION Commit"));
+                        FireEvent(new DbExecuteArgs(db.DbInfo.Key, "", transactionInfo, DbExecuteSqlType.TRANSACTION, "TRANSACTION Commit"));
                     }
                     else
                     {
                         this.dbTransaction.Rollback();
                         if (string.IsNullOrEmpty(executeExceptionMsg))
                         {
-                            FireEvent(new DbExecuteArgs(db.Database.Key, "", transactionInfo, DbExecuteSqlType.TRANSACTION, "TRANSACTION Rollback"));
+                            FireEvent(new DbExecuteArgs(db.DbInfo.Key, "", transactionInfo, DbExecuteSqlType.TRANSACTION, "TRANSACTION Rollback"));
                         }
                         else
                         {
-                            FireEvent(new DbExecuteArgs(db.Database.Key, "", transactionInfo, DbExecuteSqlType.TRANSACTION, "TRANSACTION Rollback(" + executeExceptionMsg + ")"));
+                            FireEvent(new DbExecuteArgs(db.DbInfo.Key, "", transactionInfo, DbExecuteSqlType.TRANSACTION, "TRANSACTION Rollback(" + executeExceptionMsg + ")"));
                         }
                     }
                 }
                 else
                 {
-                    FireEvent(new DbExecuteArgs(db.Database.Key, "", transactionInfo, DbExecuteSqlType.TRANSACTION, "TRANSACTION Complete"));
+                    FireEvent(new DbExecuteArgs(db.DbInfo.Key, "", transactionInfo, DbExecuteSqlType.TRANSACTION, "TRANSACTION Complete"));
                 }
             }
             Dispose();

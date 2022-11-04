@@ -15,7 +15,6 @@ namespace ZeroDbs.SqlServer
         {
             Dictionary<string, string> mapDic = GetTypeMapDic();
             string t = dbDataTypeName.ToLower();
-            //如果不存在于哈希表中则多半是用户自定义的数据类型，默认用string代替
             return mapDic.ContainsKey(t) ? mapDic[t].ToString() : "object";
         }
         public string GetDotNetDefaultValue(string defaultVal, string dbDataTypeName, long maxLength)
@@ -159,7 +158,6 @@ namespace ZeroDbs.SqlServer
                     return typeMapDic;
                 }
                 typeMapDic = new Dictionary<string, string>();
-                //System.Collections.Specialized ht = new System.Collections.Hashtable();
                 typeMapDic.Add("bigint", "long");//Int64 long
                 typeMapDic.Add("binary", "byte[]");//Byte[]
                 typeMapDic.Add("bit", "bool");//Boolean

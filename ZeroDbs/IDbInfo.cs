@@ -10,6 +10,6 @@ namespace ZeroDbs
     {
         string Key { get; }
         string ConnectionString { get; }
-        Common.DbType Type { get; }
+        string Type { get; }
     }
 }

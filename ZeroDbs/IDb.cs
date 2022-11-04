@@ -6,7 +6,7 @@ namespace ZeroDbs
 {
     public interface IDb: IDbOperator
     {
-        IDbInfo Database { get; }
+        IDbInfo DbInfo { get; }
         Common.SqlBuilder SqlBuilder { get; }
         IDataTypeMaping DataTypeMaping { get; }
         event Common.DbExecuteHandler OnDbExecuteSqlEvent;

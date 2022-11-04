@@ -99,7 +99,7 @@ namespace ZeroDbs.Tools
             {
                 var db = dbs[key];
                 var tables = db.GetTables();
-                Builder(db.Database, tables, db.Database, config.EntityDir, config.AppProjectDir, config.EntityNamespace, config.GenerateRemark, config.IsPartialClass);
+                Builder(db.DbInfo, tables, db.DbInfo, config.EntityDir, config.AppProjectDir, config.EntityNamespace, config.GenerateRemark, config.IsPartialClass);
             }
         }
         private void Builder(IDbInfo db, List<ITableInfo> tables, IDbInfo dbInfo, string entityProjectRootDir, string targetProjectRootDir, string nameSpace, string generateRemark, bool isPartialClass)

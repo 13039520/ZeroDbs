@@ -86,19 +86,19 @@ namespace ZeroDbs.Common
                 {
                     continue;
                 }
-                DbType type1 = DbType.Unknow;
+                string type1 = "";
                 type = type.Trim();
                 if (string.Equals(type, "SqlServer", StringComparison.OrdinalIgnoreCase))
                 {
-                    type1 = DbType.SqlServer;
+                    type1 = "SqlServer";
                 }
                 else if (string.Equals(type, "MySql", StringComparison.OrdinalIgnoreCase))
                 {
-                    type1 = DbType.MySql;
+                    type1 = "MySql";
                 }
                 else if (string.Equals(type, "Sqlite", StringComparison.OrdinalIgnoreCase))
                 {
-                    type1 = DbType.Sqlite;
+                    type1 = "Sqlite";
                 }
                 else
                 {

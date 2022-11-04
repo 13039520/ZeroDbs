@@ -45,7 +45,7 @@ namespace ZeroDbs.Common
             {
                 return reval;
             }
-            throw new Exception("类型" + typeof(DbEntity).FullName + "没有映射到" + ZeroDb.Database.Key + "上");
+            throw new Exception("类型" + typeof(DbEntity).FullName + "没有映射到" + ZeroDb.DbInfo.Key + "上");
         }
         public ITableInfo GetTable(string entityFullName)
         {
@@ -54,7 +54,7 @@ namespace ZeroDbs.Common
             {
                 return reval;
             }
-            throw new Exception("类型" + entityFullName + "没有映射到" + ZeroDb.Database.Key + "上");
+            throw new Exception("类型" + entityFullName + "没有映射到" + ZeroDb.DbInfo.Key + "上");
         }
         public virtual string[] GetUniqueFieldName(ITableInfo tableInfo)
         {

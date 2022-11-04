@@ -6,22 +6,48 @@ namespace ZeroDbs.Common
 {
     public static class DbFactory
     {
-        public static IDb Create(IDbInfo dbConfig)
+        public delegate Db DbCreateHandler(IDbInfo dbInfo);
+        public class DbCreater
         {
-            IDb db = null;
-            switch (dbConfig.Type)
+            public string DbType { get; set; }
+            public DbCreateHandler Create { get; set; }
+        }
+        private static List<DbCreater> dbCreaters = new List<DbCreater>();
+        private static object dbCreatersLock = new object();
+        private static bool initializationFlag = false;
+        private static void Initialization()
+        {
+            if (initializationFlag) { return; }
+            initializationFlag = true;
+            TryAddDbCreater("SqlServer", (dnInfo) => { return new SqlServer.Db(dnInfo); });
+            TryAddDbCreater("MySql", (dnInfo) => { return new MySql.Db(dnInfo); });
+            TryAddDbCreater("Sqlite", (dnInfo) => { return new Sqlite.Db(dnInfo); });
+        }
+
+        public static bool TryAddDbCreater(string dbType, DbCreateHandler create)
+        {
+            lock (dbCreatersLock)
             {
-                case DbType.SqlServer:
-                    db = new SqlServer.Db(dbConfig);
-                    break;
-                case DbType.MySql:
-                    db = new MySql.Db(dbConfig);
-                    break;
-                case DbType.Sqlite:
-                    db = new Sqlite.Db(dbConfig);
-                    break;
+                if (null == dbCreaters.Find(o => o.DbType.Equals(dbType, StringComparison.OrdinalIgnoreCase)))
+                {
+                    dbCreaters.Add(new DbCreater { DbType = dbType, Create = create });
+                    return true;
+                }
+                return false;
             }
-            return db;
+        }
+        public static IDb Create(IDbInfo dbInfo)
+        {
+            if (!initializationFlag)
+            {
+                Initialization();
+            }
+            var creater=dbCreaters.Find(o=>o.DbType.Equals(dbInfo.Type, StringComparison.OrdinalIgnoreCase));
+            if (creater != null)
+            {
+                return creater.Create(dbInfo);
+            }
+            return null;
         }
         public static IDb Create(IDbInfo dbConfig, Common.DbExecuteHandler dbExecuteSqlEvent)
         {

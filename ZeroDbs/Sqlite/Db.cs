@@ -8,14 +8,16 @@ namespace ZeroDbs.Sqlite
 {
     internal class Db: Common.Db
     {
-        public Db(IDbInfo database):base(database)
+        public Db(IDbInfo dbInfo) :base()
         {
-
+            this.dbInfo = dbInfo;
+            this.sqlBuilder = new SqlBuilder(this);
+            this.dataTypeMaping = new DbDataTypeMaping();
         }
 
         public override System.Data.Common.DbConnection GetDbConnection()
         {
-            return new SQLiteConnection(Database.ConnectionString);
+            return new SQLiteConnection(DbInfo.ConnectionString);
         }
         public override ITableInfo GetTable<DbEntity>()
         {
@@ -25,7 +27,7 @@ namespace ZeroDbs.Sqlite
         {
             if (!IsMappingToDbKey(entityFullName))
             {
-                throw new Exception("类型" + entityFullName + "没有映射到" + Database.Key + "上");
+                throw new Exception("类型" + entityFullName + "没有映射到" + DbInfo.Key + "上");
             }
             string key = entityFullName;
             var value = Common.DbDataviewStructCache.Get(key);
@@ -37,7 +39,7 @@ namespace ZeroDbs.Sqlite
             var cmd = this.GetDbCommand();
             try
             {
-                var dv = Common.DbMapping.GetDbTableEntityMapByEntityFullName(entityFullName).Find(o => string.Equals(o.DbKey, Database.Key, StringComparison.OrdinalIgnoreCase));
+                var dv = Common.DbMapping.GetDbTableEntityMapByEntityFullName(entityFullName).Find(o => string.Equals(o.DbKey, DbInfo.Key, StringComparison.OrdinalIgnoreCase));
                 string getTableOrViewSql = "select * from sqlite_master where name='" + dv.TableName + "' and type IN('table','view')";
 
                 Common.TableInfo dbDataTableInfo = null;
