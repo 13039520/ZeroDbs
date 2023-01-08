@@ -370,7 +370,10 @@ namespace ZeroDbs.Common
                 {
                     reval = 0;
                 }
-                reval = Convert.ToInt64(obj);
+                else
+                {
+                    reval = Convert.ToInt64(obj);
+                }
             }
             return reval;
         }

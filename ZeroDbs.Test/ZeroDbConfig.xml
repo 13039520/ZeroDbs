@@ -6,7 +6,7 @@
     <db dbKey="Sqlite001" dbConnectionString="Data Source=D:\Program Files\SQLiteStudio\ZeroTestDb.db3;version=3;datetimeformat=CurrentCulture" dbType="Sqlite" />
   </dbs>
   <dvs>
-    <dv dbKey="SqlServer001" tableName="User" entityKey="MyDbs.SqlServer001.tUser" />
+	<dv dbKey="SqlServer001" tableName="User" entityKey="MyDbs.SqlServer001.tUser" />
     <dv dbKey="MySql001" tableName="user" entityKey="MyDbs.MySql001.tUser" />
     <dv dbKey="Sqlite001" tableName="User" entityKey="MyDbs.Sqlite001.tUser" />
   </dvs>
