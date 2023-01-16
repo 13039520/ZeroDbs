@@ -211,13 +211,17 @@ namespace ZeroDbs.Common
         {
             return new DbTransactionScopeCollection();
         }
-        public bool AddZeroDbMapping<DbEntity>(string dbKey, string tableName) where DbEntity : class
+        public bool AddTableMapping<DbEntity>(string dbKey, string tableName) where DbEntity : class
         {
-            return AddZeroDbMapping(typeof(DbEntity).FullName, dbKey, tableName);
+            return AddTableMapping(typeof(DbEntity).FullName, dbKey, tableName);
         }
-        public bool AddZeroDbMapping(string entityFullName, string dbKey, string tableName)
+        public bool AddTableMapping(string entityFullName, string dbKey, string tableName)
         {
             return DbConfigReader.AddTableMapping(entityFullName, dbKey, tableName);
+        }
+        public bool AddDbConfig(string dbKey, string dbType, string dbConnectionString)
+        {
+            return DbConfigReader.AddDbConfig(dbKey, dbType, dbConnectionString);
         }
 
 

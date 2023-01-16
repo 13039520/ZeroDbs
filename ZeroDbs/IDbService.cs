@@ -21,8 +21,9 @@ namespace ZeroDbs
         IDbTransactionScopeCollection GetDbTransactionScopeCollection();
 
 
-        bool AddZeroDbMapping<DbEntity>(string dbKey, string tableName) where DbEntity : class;
-        bool AddZeroDbMapping(string entityFullName, string dbKey, string tableName);
+        bool AddTableMapping<DbEntity>(string dbKey, string tableName) where DbEntity : class;
+        bool AddTableMapping(string entityFullName, string dbKey, string tableName);
+        bool AddDbConfig(string dbKey, string dbType, string dbConnectionString);
 
     }
 }

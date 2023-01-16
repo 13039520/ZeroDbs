@@ -8,6 +8,14 @@ namespace ZeroDbs.Test
     class Program
     {
         static ZeroDbs.IDbService dbService = null;
+        public class Device
+        {
+            public string Key { get; set; }
+            public string ParentKey { get; set; }
+            public string Name { get; set; }
+            public string Type { get; set; }
+            public string RuntimeState { get; set; }
+        }
         static void Main(string[] args)
         {
             //Console.WriteLine("Type.GetType(\"MyDbs.MySql001.tUser\")=" + Type.GetType("MyDbs.MySql001.tUser").Name);
@@ -16,6 +24,10 @@ namespace ZeroDbs.Test
                 Console.WriteLine("DbKey={0}&Trans={1}&Sql=\r\n{2}\r\n&Message={3}", e.DbKey, e.TransactionInfo, e.ExecuteSql, e.Message);
                 Console.ResetColor();
             }));
+
+            dbService.AddDbConfig("Sqlite002", "Sqlite", "Data Source=D:\\Program Files\\SQLiteStudio\\Database\\DeviceInfo.db;version=3;datetimeformat=CurrentCulture");
+            dbService.AddTableMapping<Device>("Sqlite002", "Device");
+
             //CodeGenerator();
             //InsertTest();
             //UpdateTest();
@@ -42,7 +54,7 @@ namespace ZeroDbs.Test
             });
             generator.Dbs.Add(new ZeroDbs.Common.DbInfo
             {
-                ConnectionString = "Data Source=D:\\Program Files\\SQLiteStudio\\ZeroTestDb.db3;version=3;datetimeformat=CurrentCulture",
+                ConnectionString = "Data Source=D:\\Program Files\\SQLiteStudio\\database\\ZeroTestDb.db3;version=3;datetimeformat=CurrentCulture",
                 Key = "Sqlite001",
                 Type = "Sqlite"
             });
@@ -136,7 +148,11 @@ namespace ZeroDbs.Test
         static void QueryTest()
         {
             #region -- page --
-
+            var devices = dbService.Select<Device>();
+            foreach(var d in devices)
+            {
+                Console.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}", d.Key, d.ParentKey, d.Name, d.Type, d.RuntimeState);
+            }
             /*var query = new ZeroDbs.Common.PageQuery
             {
                 Page = 1,

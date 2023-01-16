@@ -6,7 +6,7 @@ namespace ZeroDbs.Common
 {
     public static class DbFactory
     {
-        public delegate Db DbCreateHandler(IDbInfo dbInfo);
+        public delegate IDb DbCreateHandler(IDbInfo dbInfo);
         public class DbCreater
         {
             public string DbType { get; set; }
@@ -19,9 +19,9 @@ namespace ZeroDbs.Common
         {
             if (initializationFlag) { return; }
             initializationFlag = true;
-            TryAddDbCreater("SqlServer", (dnInfo) => { return new SqlServer.Db(dnInfo); });
-            TryAddDbCreater("MySql", (dnInfo) => { return new MySql.Db(dnInfo); });
-            TryAddDbCreater("Sqlite", (dnInfo) => { return new Sqlite.Db(dnInfo); });
+            TryAddDbCreater("SqlServer", (dbInfo) => { return new SqlServer.Db(dbInfo); });
+            TryAddDbCreater("MySql", (dbInfo) => { return new MySql.Db(dbInfo); });
+            TryAddDbCreater("Sqlite", (dbInfo) => { return new Sqlite.Db(dbInfo); });
         }
 
         public static bool TryAddDbCreater(string dbType, DbCreateHandler create)

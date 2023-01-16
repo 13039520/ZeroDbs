@@ -3,7 +3,7 @@
   <dbs>
     <db dbKey="SqlServer001" dbConnectionString="Data Source=.;Initial Catalog=ZeroTestDb;User ID=sa;Password=123456;TrustServerCertificate=True;" dbType="SqlServer" />
     <db dbKey="MySql001" dbConnectionString="Host=localhost;Port=3306;Database=zerotestdb;User ID=root;Password=123456;" dbType="MySql" />
-    <db dbKey="Sqlite001" dbConnectionString="Data Source=D:\Program Files\SQLiteStudio\ZeroTestDb.db3;version=3;datetimeformat=CurrentCulture" dbType="Sqlite" />
+    <db dbKey="Sqlite001" dbConnectionString="Data Source=D:\Program Files\SQLiteStudio\Database\ZeroTestDb.db3;version=3;datetimeformat=CurrentCulture" dbType="Sqlite" />
   </dbs>
   <dvs>
 	<dv dbKey="SqlServer001" tableName="User" entityKey="MyDbs.SqlServer001.tUser" />

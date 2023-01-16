@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml.Linq;
 
 namespace ZeroDbs.Common
 {
@@ -23,9 +24,24 @@ namespace ZeroDbs.Common
             var config = GetDbConfigInfo();
             lock (_lock)
             {
-                if (config.Dbs.Find(o => o.Key == dbKey) == null) { return false; }
-                if (config.Dvs.Find(o => o.TableName == tableName) == null) { return false; }
+                if (config.Dbs.Find(o => string.Equals(o.Key, dbKey, StringComparison.OrdinalIgnoreCase)) == null) { return false; }
+                var table = config.Dvs.Find(o => string.Equals(o.DbKey, dbKey, StringComparison.OrdinalIgnoreCase) && string.Equals(o.TableName, tableName, StringComparison.OrdinalIgnoreCase));
+                if (table != null) { return false; }
                 config.Dvs.Add(new DbTableEntityMap { DbKey = dbKey, EntityKey = entityFullName, TableName = tableName, IsStandardMapping = false });
+            }
+            return true;
+        }
+        public static bool AddDbConfig(string dbKey, string dbType, string dbConnectionString)
+        {
+            if (string.IsNullOrEmpty(dbKey) || string.IsNullOrEmpty(dbType) || string.IsNullOrEmpty(dbConnectionString))
+            {
+                return false;
+            }
+            var config = GetDbConfigInfo();
+            lock (_lock)
+            {
+                if (config.Dbs.Find(o => string.Equals(o.Key, dbKey, StringComparison.OrdinalIgnoreCase)) != null) { return false; }
+                config.Dbs.Add(new DbInfo {  Key = dbKey, Type = dbType, ConnectionString = dbConnectionString });
             }
             return true;
         }
@@ -45,7 +61,11 @@ namespace ZeroDbs.Common
         }
         private static DbConfigInfo ReadFile()
         {
-            DbConfigInfo temp = new DbConfigInfo();
+            DbConfigInfo temp = new DbConfigInfo
+            {
+                Dbs = new List<DbInfo>(),
+                Dvs = new List<DbTableEntityMap>()
+            };
             if (string.IsNullOrEmpty(filePath))
             {
                 var dir = AppDomain.CurrentDomain.BaseDirectory;
@@ -53,23 +73,22 @@ namespace ZeroDbs.Common
                 System.IO.FileInfo[] files = directoryInfo.GetFiles(fileName, System.IO.SearchOption.AllDirectories);
                 if (files == null || files.Length < 1)
                 {
-                    throw new Exception("Missing configuration file");
+                    return temp;
                 }
                 filePath = files[0].FullName;
             }
             System.IO.FileInfo fileInfo = new System.IO.FileInfo(filePath);
             if (!fileInfo.Exists)
             {
-                throw new Exception("Missing configuration file");
+                return temp;
             }
             System.Xml.XmlDocument xmlDocument = new System.Xml.XmlDocument();
             xmlDocument.Load(filePath);
             System.Xml.XmlNodeList xmlNodeList = xmlDocument.SelectNodes(@"/zero/dbs/db");
             if (xmlNodeList == null || xmlNodeList.Count < 1)
             {
-                throw new Exception("Missing \"db\" configuration section");
+                return temp;
             }
-            temp.Dbs = new List<DbInfo>();
             foreach (System.Xml.XmlNode node in xmlNodeList)
             {
                 System.Xml.XmlAttribute dbKey = node.Attributes["dbKey"];
@@ -122,7 +141,6 @@ namespace ZeroDbs.Common
                 return null;
             }
             xmlNodeList = xmlDocument.SelectNodes(@"/zero/dvs/dv");
-            temp.Dvs = new List<DbTableEntityMap>();
             if (xmlNodeList == null || xmlNodeList.Count < 1)
             {
                 return temp;
