@@ -105,21 +105,8 @@ namespace ZeroDbs.Common
                 {
                     continue;
                 }
-                string type1 = "";
                 type = type.Trim();
-                if (string.Equals(type, "SqlServer", StringComparison.OrdinalIgnoreCase))
-                {
-                    type1 = "SqlServer";
-                }
-                else if (string.Equals(type, "MySql", StringComparison.OrdinalIgnoreCase))
-                {
-                    type1 = "MySql";
-                }
-                else if (string.Equals(type, "Sqlite", StringComparison.OrdinalIgnoreCase))
-                {
-                    type1 = "Sqlite";
-                }
-                else
+                if(string.IsNullOrEmpty(type))
                 {
                     continue;
                 }
@@ -133,7 +120,7 @@ namespace ZeroDbs.Common
                 {
                     ConnectionString = conn,
                     Key = key,
-                    Type = type1
+                    Type = type
                 });
             }
             if (temp.Dbs.Count < 1)

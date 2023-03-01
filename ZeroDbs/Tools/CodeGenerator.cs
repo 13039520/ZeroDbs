@@ -187,27 +187,30 @@ namespace ZeroDbs.Tools
                 foreach (var column in table.Colunms)
                 {
                     #region -- code --
-                    string colDescription = column.Description;
-                    string colDefaultValue = column.DefaultValue;
-                    string colDotNetDataType = column.Type;
-                    if (string.IsNullOrEmpty(colDescription))
+                    string des = column.Description;
+                    string dValue = column.DefaultValue;
+                    string dotnetDataType = column.Type;
+                    if (string.IsNullOrEmpty(des))
                     {
-                        colDescription = column.Name;
+                        des = column.Name;
                     }
                     if (column.IsPrimaryKey)
                     {
-                        colDescription = "[PrimaryKey]" + colDescription;
+                        des = "[PrimaryKey]" + des;
                     }
                     if (column.IsIdentity)
                     {
-                        colDescription = "[Identity]" + colDescription;
+                        des = "[Identity]" + des;
                     }
-                    Type type = GetRealType(colDotNetDataType, column.IsNullable);
-                    if(type is null)
+                    Type type = GetRealType(dotnetDataType, column.IsNullable);
+                    if (type != null)
                     {
-                        throw new Exception("unrecognized underlying type name \""+ colDotNetDataType + "\"");
+                        codeDom.AddProperty(column.Name, type, GetInitExpression(dotnetDataType, dValue), des);
                     }
-                    codeDom.AddProperty(column.Name, type, GetInitExpression(colDotNetDataType, colDefaultValue), colDescription);
+                    else
+                    {
+                        codeDom.AddProperty(column.Name, dotnetDataType, GetInitExpression(dotnetDataType, dValue), des);
+                    }
                     #endregion
                 }
 
@@ -275,36 +278,33 @@ namespace ZeroDbs.Tools
         {
             switch (type)
             {
-                case "long":
+                case "System.Int64":
                     return isNullable ? typeof(long?) : typeof(long);
-                case "int":
+                case "System.Int32":
                     return isNullable ? typeof(int?) : typeof(int);
-                case "short":
+                case "System.Int16":
                     return isNullable ? typeof(short?) : typeof(short);
-                case "byte":
+                case "System.Byte":
                     return isNullable ? typeof(byte?) : typeof(byte);
-                case "decimal":
+                case "System.Decimal":
                     return isNullable ? typeof(decimal?) : typeof(decimal);
-                case "double":
+                case "System.Double":
                     return isNullable ? typeof(double?) : typeof(double);
-                case "float":
+                case "System.Single":
                     return isNullable ? typeof(float?) : typeof(float);
-                case "bool":
+                case "System.Boolean":
                     return isNullable ? typeof(bool?) : typeof(bool);
-                case "DateTime":
+                case "System.DateTime":
                     return isNullable ? typeof(DateTime?) : typeof(DateTime);
-                case "DateTimeOffset":
+                case "System.DateTimeOffset":
                     return isNullable ? typeof(DateTimeOffset?) : typeof(DateTimeOffset);
-                case "TimeSpan":
+                case "TSystem.TimeSpan":
                     return isNullable ? typeof(TimeSpan?) : typeof(TimeSpan);
-                case "Guid":
+                case "System.Guid":
                     return isNullable ? typeof(Guid?) : typeof(Guid);
-                // is not value type
-                case "byte[]":
-                    return typeof(byte[]);
-                case "string":
+                case "System.String":
                     return typeof(string);
-                case "object":
+                case "System.Object":
                     return typeof(object);
             }
             return null;
@@ -313,7 +313,7 @@ namespace ZeroDbs.Tools
         {
             if (!string.IsNullOrEmpty(dVal))
             {
-                if (type != "string")
+                if (type != "System.String")
                 {
                     return new CodeSnippetExpression(dVal);
                 }

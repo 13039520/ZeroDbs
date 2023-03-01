@@ -6,12 +6,6 @@ namespace ZeroDbs.Common
 {
     public static class DbFactory
     {
-        public delegate IDb DbCreateHandler(IDbInfo dbInfo);
-        public class DbCreater
-        {
-            public string DbType { get; set; }
-            public DbCreateHandler Create { get; set; }
-        }
         private static List<DbCreater> dbCreaters = new List<DbCreater>();
         private static object dbCreatersLock = new object();
         private static bool initializationFlag = false;

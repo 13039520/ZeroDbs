@@ -193,11 +193,12 @@ namespace ZeroDbs.Tools
             if (string.IsNullOrEmpty(name)) { return; }
             if (pNames.Find(o => o.Equals(name, StringComparison.OrdinalIgnoreCase)) != null) { return; }
 
+            CodeTypeReference ctr = new CodeTypeReference(type);
             string memberName = "_" + name;
             //创建成员
             CodeMemberField menber = new CodeMemberField();
             menber.Attributes = MemberAttributes.Private;
-            menber.Type = new CodeTypeReference(type);
+            menber.Type = ctr;
             menber.Name = memberName;
             if (initExpression != null)
             {
@@ -211,7 +212,65 @@ namespace ZeroDbs.Tools
             property.Name = name;
             property.HasGet = true;
             property.HasSet = true;
-            property.Type = new CodeTypeReference(type);
+            property.Type = ctr;
+
+            List<CodeCommentStatement> codeComments = CreateSummaryCodeCommentStatements(comments);
+            if (codeComments.Count > 0)
+            {
+                foreach (CodeCommentStatement codeComment in codeComments)
+                {
+                    property.Comments.Add(codeComment);
+                }
+            }
+            if (codeAttributeDeclarations != null && codeAttributeDeclarations.Length > 0)
+            {
+                foreach (var attr in codeAttributeDeclarations)
+                {
+                    property.CustomAttributes.Add(attr);
+                }
+            }
+            property.GetStatements.Add(new CodeMethodReturnStatement(
+                new CodeFieldReferenceExpression(
+                new CodeThisReferenceExpression(), memberName)));
+            property.SetStatements.Add(new CodeAssignStatement(
+                new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), memberName), //left
+                new CodePropertySetValueReferenceExpression()) //right
+                );
+            properties.Add(property);
+        }
+        /// <summary>
+        /// 添加属性
+        /// </summary>
+        /// <param name="name">属性名称</param>
+        /// <param name="typeFullName">属性数据类型</param>
+        /// <param name="initExpression">属性初始默认值</param>
+        /// <param name="comments">属性文档型注释</param>
+        /// <param name="codeAttributeDeclarations">特性集合</param>
+        public void AddProperty(string name, string typeFullName, CodeExpression initExpression, string comments, CodeAttributeDeclaration[] codeAttributeDeclarations = null)
+        {
+            if (string.IsNullOrEmpty(name)) { return; }
+            if (pNames.Find(o => o.Equals(name, StringComparison.OrdinalIgnoreCase)) != null) { return; }
+
+            string memberName = "_" + name;
+            CodeTypeReference ctr = new CodeTypeReference(typeFullName);
+            //创建成员
+            CodeMemberField menber = new CodeMemberField();
+            menber.Attributes = MemberAttributes.Private;
+            menber.Type = ctr;
+            menber.Name = memberName;
+            if (initExpression != null)
+            {
+                menber.InitExpression = initExpression;
+            }
+            members.Add(menber);
+
+            //创建属性访问器
+            CodeMemberProperty property = new CodeMemberProperty();
+            property.Attributes = MemberAttributes.Public | MemberAttributes.Final;
+            property.Name = name;
+            property.HasGet = true;
+            property.HasSet = true;
+            property.Type = ctr;
 
             List<CodeCommentStatement> codeComments = CreateSummaryCodeCommentStatements(comments);
             if (codeComments.Count > 0)

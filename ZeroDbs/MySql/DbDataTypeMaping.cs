@@ -18,33 +18,44 @@ namespace ZeroDbs.MySql
             switch (dbDataTypeName)
             {
                 case "int":
-                    s = "int";
+                    s = "Int32";
                     break;
                 case "tinyint":
-                    //s = "byte";
-                    //一律映射为bool型
-                    s = "bool";
+                    if (maxLength != 1)
+                    {
+                        s = "Byte";
+                    }
+                    else
+                    {
+                        s = "Boolean";
+                    }
                     break;
                 case "smallint":
-                    s = "short";
+                    s = "Int16";
                     break;
                 case "mediumint":
-                    s = "int";
+                    s = "Int32";
                     break;
                 case "bigint":
-                    s = "long";
+                    s = "Int64";
                     break;
                 case "decimal":
-                    s = "decimal";
+                    s = "Decimal";
                     break;
                 case "float":
-                    s = "float";
+                    s = "Single";
                     break;
                 case "double":
-                    s = "double";
+                    s = "Double";
                     break;
                 case "bit":
-                    s = "bool";
+                    s = "Boolean";
+                    break;
+                case "boolean":
+                    s = "Boolean";
+                    break;
+                case "bool":
+                    s = "Boolean";
                     break;
                 case "date":
                     s = "DateTime";
@@ -59,7 +70,7 @@ namespace ZeroDbs.MySql
                     s = "DateTime";
                     break;
                 case "year":
-                    s = "string";//有效数字范围：1901-2155
+                    s = "String";//有效数字范围：1901-2155
                     break;
                 case "char":
                     if (maxLength == 36)
@@ -68,35 +79,35 @@ namespace ZeroDbs.MySql
                     }
                     else
                     {
-                        s = "string";
+                        s = "String";
                     }
                     break;
                 case "varchar":
-                    s = "string";
+                    s = "String";
                     break;
                 case "tinytext":
-                    s = "string";
+                    s = "String";
                     break;
                 case "text":
-                    s = "string";
+                    s = "String";
                     break;
                 case "mediumtext":
-                    s = "string";
+                    s = "String";
                     break;
                 case "longtext":
-                    s = "string";
+                    s = "String";
                     break;
                 case "binary":
-                    s = "byte[]";
+                    s = "Byte[]";
                     break;
                 case "varbinary":
-                    s = "byte[]";
+                    s = "Byte[]";
                     break;
                 default:
-                    s = "object";
+                    s = "Object";
                     break;
             }
-            return s;
+            return string.Format("System.{0}",s);
         }
         public string GetDotNetDefaultValue(string defaultVal, string dbDataTypeName, long maxLength)
         {

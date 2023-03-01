@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ZeroDbs.Common
 {
-    internal static class DbDataviewStructCache
+    public static class DbDataviewStructCache
     {
         class StructCache
         {

@@ -442,14 +442,17 @@ namespace ZeroDbs.Common
             SqlInfo reval = new SqlInfo(tableInfo.Colunms.Count);
             StringBuilder field = new StringBuilder();
             StringBuilder value = new StringBuilder();
+            int num = 0;
             foreach (var col in tableInfo.Colunms)
             {
                 if (col.IsIdentity) { continue; }
                 var p = ps.Find(o => string.Equals(o.Name, col.Name, StringComparison.OrdinalIgnoreCase));
                 if (p == null) { continue; }
                 field.AppendFormat("{0},", GetColunmName(col.Name));
-                value.AppendFormat("@{0},", col.Name);
-                reval.Paras.Add(col.Name, p.GetValue(source, null));
+                string pName = string.Format("@{0}", num);
+                value.AppendFormat("{0},", pName);
+                reval.Paras.Add(pName, p.GetValue(source, null));
+                num++;
             }
             field.Remove(field.Length - 1, 1);
             value.Remove(value.Length - 1, 1);

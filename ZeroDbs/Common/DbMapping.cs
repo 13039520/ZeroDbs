@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace ZeroDbs.Common
 {
-    static class DbMapping
+    public static class DbMapping
     {
         private static DbConfigInfo GetDbConfigInfo()
         {

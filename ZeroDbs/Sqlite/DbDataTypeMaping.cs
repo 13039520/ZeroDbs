@@ -6,6 +6,13 @@ namespace ZeroDbs.Sqlite
 {
     internal class DbDataTypeMaping: IDataTypeMaping
     {
+        List<string> rawTypeNames = new List<string>();
+        List<string> dotnetTypeNames = new List<string>();
+        public DbDataTypeMaping()
+        {
+            rawTypeNames.AddRange("int,tinyint,smallint,mediumint,bigint,integer,unsigned big int,int2,int8,character,varchar,varying character,char,nchar,native character,nvarchar,text,clob,string,real,double,double precision,float,numeric,decimal,boolean,date,time,datetime,blob,none".Split(','));
+            dotnetTypeNames.AddRange("Int32,Int32,Int32,Int32,Int64,Int64,Int64,Int32,Int32,String,String,String,String,String,String,String,String,String,String,Double,Double,Double,Single,Decimal,Decimal,Boolean,DateTime,DateTime,DateTime,Byte[],Object".Split(','));
+        }
         public string GetDotNetTypeString(int dbDataTypeIntValue, long maxLength)
         {
             string s = Enum.GetName(typeof(System.Data.SqlDbType), dbDataTypeIntValue);
@@ -13,10 +20,14 @@ namespace ZeroDbs.Sqlite
         }
         public string GetDotNetTypeString(string dbDataTypeName, long maxLength)
         {
-            Dictionary<string, string> mapDic = GetTypeMapDic();
-            string t = System.Text.RegularExpressions.Regex.Replace(dbDataTypeName, @"\s\(\d+\)$", "").ToLower();
-            if (mapDic.ContainsKey(t)) { return mapDic[t]; }
-            return "object";
+            int index = rawTypeNames.IndexOf(dbDataTypeName);
+            if (index < 0) { return "System.Object"; }
+            string s = rawTypeNames[index];
+            if (s.IndexOf('.') < 0)
+            {
+                s = String.Format("System.{0}", s);
+            }
+            return s;
         }
         public string GetDotNetDefaultValue(string defaultVal, string dbDataTypeName, long maxLength)
         {
@@ -127,73 +138,11 @@ namespace ZeroDbs.Sqlite
                     case "blob":
                         s = "null";
                         break;
-                    case "none"://object
-
-                        break;
-                    default:
-
-                        break;
                 }
             }
             return s;
         }
 
-        private static Dictionary<string, string> typeMapDic = null;
-        private static object _lock = new object();
-        private Dictionary<string,string> GetTypeMapDic()
-        {
-            if (typeMapDic != null)
-            {
-                return typeMapDic;
-            }
-            lock (_lock)
-            {
-                if (typeMapDic != null)
-                {
-                    return typeMapDic;
-                }
-                typeMapDic = new Dictionary<string, string>();
-
-                typeMapDic.Add("int", "int");
-                typeMapDic.Add("tinyint", "int");
-                typeMapDic.Add("smallint", "int");
-                typeMapDic.Add("mediumint", "int");
-                typeMapDic.Add("bigint", "long");
-                typeMapDic.Add("integer", "long");
-                typeMapDic.Add("unsigned big int", "long");
-                typeMapDic.Add("int2", "int");
-                typeMapDic.Add("int8", "int");
-
-                typeMapDic.Add("character", "string");
-                typeMapDic.Add("varchar", "string");
-                typeMapDic.Add("varying character", "string");
-                typeMapDic.Add("char", "string");
-                typeMapDic.Add("nchar", "string");
-                typeMapDic.Add("native character", "string");
-                typeMapDic.Add("nvarchar", "string");
-                typeMapDic.Add("text", "string");
-                typeMapDic.Add("clob", "string");
-                typeMapDic.Add("string", "string");
-
-                typeMapDic.Add("real", "double");
-                typeMapDic.Add("double", "double");
-                typeMapDic.Add("double precision", "double");
-                typeMapDic.Add("float", "float");
-
-                typeMapDic.Add("numeric", "decimal");
-                typeMapDic.Add("decimal", "decimal");
-                typeMapDic.Add("boolean", "bool");
-                typeMapDic.Add("date", "DateTime");
-                typeMapDic.Add("time", "DateTime");
-                typeMapDic.Add("datetime", "DateTime");
-
-                typeMapDic.Add("blob", "byte[]");
-                typeMapDic.Add("none", "object");
-
-
-            }
-            return typeMapDic;
-        }
         private string GetStringDefaultValue(string val)
         {
             if (!string.IsNullOrEmpty(val))

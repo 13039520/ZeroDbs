@@ -6,6 +6,13 @@ namespace ZeroDbs.SqlServer
 {
     internal class DbDataTypeMaping: IDataTypeMaping
     {
+        List<string> rawTypeNames = new List<string>();
+        List<string> dotnetTypeNames = new List<string>();
+        public DbDataTypeMaping()
+        {
+            rawTypeNames.AddRange("bigint,binary,bit,char,date,datetime,datetime2,datetimeoffset,decimal,float,geography,geometry,hierarchyid,imageint,money,nchar,ntext,numeric,nvarchar,real,smalldatetime,smallint,smallmoney,sql_variant,text,time,timestamp,tinyint,uniqueidentifier,varbinary,varchar,xml".Split(','));
+            dotnetTypeNames.AddRange("Int64,Byte[],Boolean,String,DateTime,DateTime,DateTime,DateTimeOffset,Decimal,Double,Byte[],Byte[],Byte[],Byte[],Int32,Decimal,String,String,Decimal,String,Single,DateTime,Int16,Decimal,Object,String,TimeSpan,Byte[],Byte,Guid,Byte[],String,String".Split(','));
+        }
         public string GetDotNetTypeString(int dbDataTypeIntValue, long maxLength)
         {
             string s = Enum.GetName(typeof(System.Data.SqlDbType), dbDataTypeIntValue);
@@ -13,9 +20,14 @@ namespace ZeroDbs.SqlServer
         }
         public string GetDotNetTypeString(string dbDataTypeName, long maxLength)
         {
-            Dictionary<string, string> mapDic = GetTypeMapDic();
-            string t = dbDataTypeName.ToLower();
-            return mapDic.ContainsKey(t) ? mapDic[t].ToString() : "object";
+            int index = rawTypeNames.IndexOf(dbDataTypeName);
+            if (index < 0) { return "System.Object"; }
+            string s = dotnetTypeNames[index];
+            if (s.IndexOf('.') < 0)
+            {
+                s = String.Format("System.{0}", s);
+            }
+            return s;
         }
         public string GetDotNetDefaultValue(string defaultVal, string dbDataTypeName, long maxLength)
         {
@@ -26,9 +38,6 @@ namespace ZeroDbs.SqlServer
                 {
                     case "bigint"://Int64 long
                         s = GetNumberDefaultValue(defaultVal, "L");
-                        break;
-                    case "binary"://byte[]
-
                         break;
                     case "bit"://bool
                         if (!string.IsNullOrEmpty(defaultVal))
@@ -56,17 +65,11 @@ namespace ZeroDbs.SqlServer
                     case "datetime2"://DateTime
                         s = GetDateTimeDefaultValue(defaultVal);
                         break;
-                    case "datetimeoffset"://DateTimeOffset
-
-                        break;
                     case "decimal"://decimal
                         s = GetNumberDefaultValue(defaultVal, "M");
                         break;
                     case "float"://double
                         s = GetNumberDefaultValue(defaultVal, "D");
-                        break;
-                    case "image"://byte[]
-
                         break;
                     case "int"://Int32
                         s = GetNumberDefaultValue(defaultVal, "");
@@ -89,9 +92,6 @@ namespace ZeroDbs.SqlServer
                     case "real"://Single float
                         s = GetNumberDefaultValue(defaultVal, "F");
                         break;
-                    case "rowversion"://Byte[]
-
-                        break;
                     case "smalldatetime"://DateTime
                         s = GetDateTimeDefaultValue(defaultVal);
                         break;
@@ -101,20 +101,11 @@ namespace ZeroDbs.SqlServer
                     case "smallmoney"://decimal
                         s = GetNumberDefaultValue(defaultVal, "M");
                         break;
-                    case "sql_variant"://Object*
-
-                        break;
                     case "text"://string
                         s = GetStringDefaultValue(defaultVal);
                         break;
-                    case "time"://TimeSpan
-
-                        break;
-                    case "timestamp"://byte[]
-
-                        break;
                     case "tinyint"://byte
-
+                        s = GetNumberDefaultValue(defaultVal, "");
                         break;
                     case "uniqueidentifier"://Guid
                         if (System.Text.RegularExpressions.Regex.IsMatch(defaultVal, @"newid\(\)", System.Text.RegularExpressions.RegexOptions.IgnoreCase))
@@ -126,71 +117,12 @@ namespace ZeroDbs.SqlServer
                             s = "System.Guid.Empty";
                         }
                         break;
-                    case "varbinary"://byte[]
-
-                        break;
                     case "varchar"://string
                         s = GetStringDefaultValue(defaultVal);
-                        break;
-                    case "xml"://Xml
-
-                        break;
-                    default:
-
                         break;
                 }
             }
             return s;
-        }
-
-        private static Dictionary<string, string> typeMapDic = null;
-        private static object _lock = new object();
-        private Dictionary<string,string> GetTypeMapDic()
-        {
-            if (typeMapDic != null)
-            {
-                return typeMapDic;
-            }
-            lock (_lock)
-            {
-                if (typeMapDic != null)
-                {
-                    return typeMapDic;
-                }
-                typeMapDic = new Dictionary<string, string>();
-                typeMapDic.Add("bigint", "long");//Int64 long
-                typeMapDic.Add("binary", "byte[]");//Byte[]
-                typeMapDic.Add("bit", "bool");//Boolean
-                typeMapDic.Add("char", "string");//String
-                typeMapDic.Add("date", "DateTime");
-                typeMapDic.Add("datetime", "DateTime");
-                typeMapDic.Add("datetime2", "DateTime");
-                typeMapDic.Add("datetimeoffset", "DateTimeOffset");
-                typeMapDic.Add("decimal", "decimal");//Decimal
-                typeMapDic.Add("float", "double");//Double
-                typeMapDic.Add("image", "byte[]");//Byte[]
-                typeMapDic.Add("int", "int");//Int32
-                typeMapDic.Add("money", "decimal");//Decimal
-                typeMapDic.Add("nchar", "string");//String
-                typeMapDic.Add("ntext", "string");//String
-                typeMapDic.Add("numeric", "decimal");//Decimal
-                typeMapDic.Add("nvarchar", "string");
-                typeMapDic.Add("real", "float");//Single
-                typeMapDic.Add("rowversion", "byte[]");
-                typeMapDic.Add("smalldatetime", "DateTime");
-                typeMapDic.Add("smallint", "short");//Int16
-                typeMapDic.Add("smallmoney", "decimal");//Decimal
-                typeMapDic.Add("sql_variant", "object");
-                typeMapDic.Add("text", "string");//String
-                typeMapDic.Add("time", "TimeSpan");
-                typeMapDic.Add("timestamp", "byte[]");//Byte[]
-                typeMapDic.Add("tinyint", "byte");//Byte
-                typeMapDic.Add("uniqueidentifier", "Guid");
-                typeMapDic.Add("varbinary", "byte[]");//Byte[]
-                typeMapDic.Add("varchar", "string");//String
-                typeMapDic.Add("xml", "string");
-            }
-            return typeMapDic;
         }
         private string GetStringDefaultValue(string val)
         {

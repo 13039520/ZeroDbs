@@ -18,8 +18,12 @@ namespace ZeroDbs.Test
         }
         static void Main(string[] args)
         {
-            //Console.WriteLine("Type.GetType(\"MyDbs.MySql001.tUser\")=" + Type.GetType("MyDbs.MySql001.tUser").Name);
-            dbService = new ZeroDbs.Common.DbService(new Common.DbExecuteHandler((obj, e) => {
+            /*dbService = new ZeroDbs.Common.DbService(new Common.DbExecuteHandler((obj, e) => {
+                Console.ForegroundColor = ConsoleColor.Blue;
+                Console.WriteLine("DbKey={0}&Trans={1}&Sql=\r\n{2}\r\n&Message={3}", e.DbKey, e.TransactionInfo, e.ExecuteSql, e.Message);
+                Console.ResetColor();
+            }));*/
+            dbService = ZeroDbs.Factory.GetDbService(new Common.DbExecuteHandler((obj, e) => {
                 Console.ForegroundColor = ConsoleColor.Blue;
                 Console.WriteLine("DbKey={0}&Trans={1}&Sql=\r\n{2}\r\n&Message={3}", e.DbKey, e.TransactionInfo, e.ExecuteSql, e.Message);
                 Console.ResetColor();
