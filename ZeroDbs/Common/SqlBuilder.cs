@@ -349,20 +349,12 @@ namespace ZeroDbs.Common
                     {
                         throw new ArgumentNullException("Parameter '" + key + "' must have property '" + k.Name + "'");
                     }
-                    if (!string.Equals(p.PropertyType.Name, GetBaseTypeName(k.Type)))
-                    {
-                        throw new ArgumentException("Property '" + p.Name + "' type error");
-                    }
                     var val = p.GetValue(key, null);
                     dic.Add(k, val);
                 }
             }
             else
             {
-                if (!string.Equals(type.Name, GetBaseTypeName(pKeys[0].Type), StringComparison.OrdinalIgnoreCase))
-                {
-                    throw new ArgumentNullException("Wrong data type for parameter");
-                }
                 dic.Add(pKeys[0], key);
             }
             SqlInfo reval = new SqlInfo(dic.Count);

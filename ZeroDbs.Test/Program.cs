@@ -291,6 +291,12 @@ namespace ZeroDbs.Test
             /**/
             #endregion
 
+            var ttt = dbService.SelectByPrimaryKey<MyDbs.SqlServer001.tUser>(145);
+            if(ttt != null)
+            {
+                Console.WriteLine("{0},{1}", ttt.ID, ttt.Name);
+            }
+
         }
         class MyEntity
         {
