@@ -10,7 +10,7 @@ namespace ZeroDbs.SqlServer
         List<string> dotnetTypeNames = new List<string>();
         public DbDataTypeMaping()
         {
-            rawTypeNames.AddRange("bigint,binary,bit,char,date,datetime,datetime2,datetimeoffset,decimal,float,geography,geometry,hierarchyid,imageint,money,nchar,ntext,numeric,nvarchar,real,smalldatetime,smallint,smallmoney,sql_variant,text,time,timestamp,tinyint,uniqueidentifier,varbinary,varchar,xml".Split(','));
+            rawTypeNames.AddRange("bigint,binary,bit,char,date,datetime,datetime2,datetimeoffset,decimal,float,geography,geometry,hierarchyid,image,int,money,nchar,ntext,numeric,nvarchar,real,smalldatetime,smallint,smallmoney,sql_variant,text,time,timestamp,tinyint,uniqueidentifier,varbinary,varchar,xml".Split(','));
             dotnetTypeNames.AddRange("Int64,Byte[],Boolean,String,DateTime,DateTime,DateTime,DateTimeOffset,Decimal,Double,Byte[],Byte[],Byte[],Byte[],Int32,Decimal,String,String,Decimal,String,Single,DateTime,Int16,Decimal,Object,String,TimeSpan,Byte[],Byte,Guid,Byte[],String,String".Split(','));
         }
         public string GetDotNetTypeString(int dbDataTypeIntValue, long maxLength)
