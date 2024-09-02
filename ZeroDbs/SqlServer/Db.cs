@@ -18,11 +18,19 @@ namespace ZeroDbs.SqlServer
             this.sqlBuilder = new SqlBuilder(this);
             this.dataTypeMaping = new DbDataTypeMaping();
         }
-        public override System.Data.Common.DbConnection GetDbConnection()
+        public override System.Data.Common.DbConnection GetDbConnection(bool useSecondDb = false)
         {
 #if NET40
+            if(useSecondDb && !string.IsNullOrEmpty(DbInfo.ConnectionString2))
+            {
+                return new System.Data.SqlClient.SqlConnection(DbInfo.ConnectionString2);
+            }
             return new System.Data.SqlClient.SqlConnection(DbInfo.ConnectionString);
 #else
+            if (useSecondDb && !string.IsNullOrEmpty(DbInfo.ConnectionString2))
+            {
+                return new Microsoft.Data.SqlClient.SqlConnection(DbInfo.ConnectionString2);
+            }
             return new  Microsoft.Data.SqlClient.SqlConnection(DbInfo.ConnectionString);
 #endif
         }

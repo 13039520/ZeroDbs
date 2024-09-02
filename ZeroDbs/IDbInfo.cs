@@ -10,6 +10,7 @@ namespace ZeroDbs
     {
         string Key { get; }
         string ConnectionString { get; }
+        string ConnectionString2 { get; }
         string Type { get; }
     }
 }

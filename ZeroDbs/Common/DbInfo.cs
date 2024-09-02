@@ -8,6 +8,7 @@ namespace ZeroDbs.Common
     {
         public string Key { get; set; }
         public string ConnectionString { get; set; }
+        public string ConnectionString2 { get; set; }
         public string Type { get; set; }
     }
 }

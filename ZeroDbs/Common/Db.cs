@@ -46,7 +46,7 @@ namespace ZeroDbs.Common
             return null != temp.Find(o => string.Equals(o.Key, DbInfo.Key, StringComparison.OrdinalIgnoreCase));
         }
 
-        public virtual System.Data.Common.DbConnection GetDbConnection()
+        public virtual System.Data.Common.DbConnection GetDbConnection(bool useSecondDb=false)
         {
             throw new NotImplementedException();
         }
@@ -63,9 +63,9 @@ namespace ZeroDbs.Common
             throw new NotImplementedException();
         }
 
-        public IDbCommand GetDbCommand()
+        public IDbCommand GetDbCommand(bool useSecondDb = false)
         {
-            var conn = this.GetDbConnection();
+            var conn = this.GetDbConnection(useSecondDb);
             if (conn.State != System.Data.ConnectionState.Open)
             {
                 conn.Open();
@@ -154,7 +154,7 @@ namespace ZeroDbs.Common
         {
             string[] fields = PropertyInfoCache.GetPropertyInfoList<OutType>().Select(o => o.Name).ToArray();
             var info = SqlBuilder.Select<DbEntity>(where, orderby, top, fields, paras);
-            using (var cmd = GetDbCommand())
+            using (var cmd = GetDbCommand(string.IsNullOrEmpty(DbInfo.ConnectionString2) == false))
             {
                 return cmd.ExecuteQuery<OutType>(info);
             }
@@ -182,7 +182,7 @@ namespace ZeroDbs.Common
         public List<DbEntity> Select<DbEntity>(string where, string orderby, int top, string[] fields, params object[] paras) where DbEntity : class, new()
         {
             var info = SqlBuilder.Select<DbEntity>(where, orderby, top, fields, paras);
-            using (var cmd = GetDbCommand())
+            using (var cmd = GetDbCommand(string.IsNullOrEmpty(DbInfo.ConnectionString2) == false))
             {
                 return cmd.ExecuteQuery<DbEntity>(info);
             }
@@ -190,7 +190,7 @@ namespace ZeroDbs.Common
         public DbEntity SelectByPrimaryKey<DbEntity>(object key) where DbEntity : class, new()
         {
             var info = SqlBuilder.SelectByPrimaryKey<DbEntity>(key);
-            var cmd = GetDbCommand();
+            var cmd = GetDbCommand(string.IsNullOrEmpty(DbInfo.ConnectionString2) == false);
             try
             {
                 DbEntity reval = null;
@@ -239,7 +239,7 @@ namespace ZeroDbs.Common
             string[] fields = PropertyInfoCache.GetPropertyInfoList<OutType>().Select(o => o.Name).ToArray();
             var countSql = SqlBuilder.Count<DbEntity>(where, paras);
             var info = SqlBuilder.Page<DbEntity>(page, size, where, orderby, fields, uniqueField, paras);
-            var cmd = this.GetDbCommand();
+            var cmd = this.GetDbCommand(string.IsNullOrEmpty(DbInfo.ConnectionString2) == false);
             try
             {
                 cmd.CommandText = countSql.Sql;
@@ -294,7 +294,7 @@ namespace ZeroDbs.Common
             var countSql = SqlBuilder.Count<DbEntity>(where,paras);
             var info = SqlBuilder.Page<DbEntity>(page, size, where, orderby, fields, uniqueField,paras);
             PageData<DbEntity> reval = new PageData<DbEntity>();
-            using (var cmd = this.GetDbCommand())
+            using (var cmd = this.GetDbCommand(string.IsNullOrEmpty(DbInfo.ConnectionString2) == false))
             {
                 cmd.CommandText = countSql.Sql;
                 cmd.ParametersFromDictionary(countSql.Paras);

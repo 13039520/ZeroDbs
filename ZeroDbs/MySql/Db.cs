@@ -15,8 +15,12 @@ namespace ZeroDbs.MySql
             this.dataTypeMaping = new DbDataTypeMaping();
         }
 
-        public override System.Data.Common.DbConnection GetDbConnection()
+        public override System.Data.Common.DbConnection GetDbConnection(bool useSecondDb = false)
         {
+            if (useSecondDb && !string.IsNullOrEmpty(DbInfo.ConnectionString2))
+            {
+                return new MySqlConnection(DbInfo.ConnectionString2);
+            }
             return new MySqlConnection(DbInfo.ConnectionString);
         }
         public override ITableInfo GetTable<DbEntity>()

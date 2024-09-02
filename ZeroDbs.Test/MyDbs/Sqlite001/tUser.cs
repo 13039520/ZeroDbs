@@ -1,5 +1,5 @@
 ﻿// Version 1.0.0
-// Date : 2022-07-18
+// Date : 2024-05-31
 
 namespace MyDbs.Sqlite001
 {
@@ -22,7 +22,7 @@ namespace MyDbs.Sqlite001
         
         private string _Password;
         
-        private System.DateTime _CreateTime = DateTime.Now;
+        private System.DateTime _CreateTime;
         #endregion
         
         #region -- Properties --

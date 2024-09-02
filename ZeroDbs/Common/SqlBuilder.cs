@@ -973,7 +973,7 @@ namespace ZeroDbs.Common
                 object val;
                 if(!ValueConvert.StrToTargetType(source[key], col.Type, out val))
                 {
-                    throw new Exception("Cannot convert to target type");
+                    throw new Exception("Cannot convert to target type(" + col.Type + ")");
                 }
                 values.Add(val);
                 cols.Add(col);

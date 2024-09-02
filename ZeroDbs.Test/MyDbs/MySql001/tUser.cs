@@ -1,5 +1,5 @@
 ﻿// Version 1.0.0
-// Date : 2022-07-18
+// Date : 2024-05-31
 
 namespace MyDbs.MySql001
 {
@@ -14,18 +14,48 @@ namespace MyDbs.MySql001
     {
         
         #region -- Members --
+        private System.DateTime _CreateTime = DateTime.Now;
+        
+        private string _Email;
+        
         private int _ID;
         
         private string _Name;
         
-        private string _Email;
-        
         private string _Password;
-        
-        private System.DateTime _CreateTime = DateTime.Now;
         #endregion
         
         #region -- Properties --
+        /// <summary>
+        /// CreateTime
+        /// </summary>
+        public System.DateTime CreateTime
+        {
+            get
+            {
+                return this._CreateTime;
+            }
+            set
+            {
+                this._CreateTime = value;
+            }
+        }
+        
+        /// <summary>
+        /// Email
+        /// </summary>
+        public string Email
+        {
+            get
+            {
+                return this._Email;
+            }
+            set
+            {
+                this._Email = value;
+            }
+        }
+        
         /// <summary>
         /// [Identity][PrimaryKey]ID
         /// </summary>
@@ -57,21 +87,6 @@ namespace MyDbs.MySql001
         }
         
         /// <summary>
-        /// Email
-        /// </summary>
-        public string Email
-        {
-            get
-            {
-                return this._Email;
-            }
-            set
-            {
-                this._Email = value;
-            }
-        }
-        
-        /// <summary>
         /// Password
         /// </summary>
         public string Password
@@ -83,21 +98,6 @@ namespace MyDbs.MySql001
             set
             {
                 this._Password = value;
-            }
-        }
-        
-        /// <summary>
-        /// CreateTime
-        /// </summary>
-        public System.DateTime CreateTime
-        {
-            get
-            {
-                return this._CreateTime;
-            }
-            set
-            {
-                this._CreateTime = value;
             }
         }
         #endregion

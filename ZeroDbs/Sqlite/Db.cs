@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using System.Data.SQLite;
+using MySql.Data.MySqlClient;
 
 namespace ZeroDbs.Sqlite
 {
@@ -15,8 +16,12 @@ namespace ZeroDbs.Sqlite
             this.dataTypeMaping = new DbDataTypeMaping();
         }
 
-        public override System.Data.Common.DbConnection GetDbConnection()
+        public override System.Data.Common.DbConnection GetDbConnection(bool useSecondDb = false)
         {
+            if (useSecondDb && !string.IsNullOrEmpty(DbInfo.ConnectionString2))
+            {
+                return new SQLiteConnection(DbInfo.ConnectionString2);
+            }
             return new SQLiteConnection(DbInfo.ConnectionString);
         }
         public override ITableInfo GetTable<DbEntity>()
@@ -82,16 +87,36 @@ namespace ZeroDbs.Sqlite
                 while (reader.Read())
                 {
                     ZeroDbs.Common.ColumnInfo column = new ZeroDbs.Common.ColumnInfo();
+
+                    string type = reader["type"].ToString();
+                    var match = System.Text.RegularExpressions.Regex.Match(type, @"^(?<type>\w+)(\s*\((?<num1>\d+)(,\s*(?<num2>\d+))?\))?");
+                    if (!match.Success)
+                    {
+                        break;
+                    }
+                    string typeStrOnly = match.Groups["type"].Value;
+                    string num1 = match.Groups["num1"].Value;
+                    string num2 = match.Groups["num2"].Value;
+                    int decimalDigits = 0;
+                    long maxLength = 0;
+                    if (!string.IsNullOrEmpty(num1))
+                    {
+                        maxLength = Convert.ToInt64(num1);
+                    }
+                    if (!string.IsNullOrEmpty(num2))
+                    {
+                        decimalDigits = Convert.ToInt32(num2);
+                    }
                     column.Name = reader["name"].ToString();
-                    column.MaxLength = 0;
+                    column.MaxLength = maxLength;
                     column.Byte = 0;
-                    column.DecimalDigits = 0;
+                    column.DecimalDigits = decimalDigits;
                     column.DefaultValue = this.DataTypeMaping.GetDotNetDefaultValue(reader["dflt_value"].ToString(), reader["type"].ToString(), column.MaxLength);
-                    column.Description = reader["type"].ToString();
+                    column.Description = type;
                     column.IsIdentity = IdentityNames.Contains(column.Name);
                     column.IsNullable = "0" == reader["notnull"].ToString();
                     column.IsPrimaryKey = "0" != reader["pk"].ToString();
-                    column.Type = this.DataTypeMaping.GetDotNetTypeString(reader["Type"].ToString(), column.MaxLength);
+                    column.Type = this.DataTypeMaping.GetDotNetTypeString(typeStrOnly, column.MaxLength);
 
                     dbDataTableInfo.Colunms.Add(column);
                 }
@@ -160,20 +185,40 @@ namespace ZeroDbs.Sqlite
                     while (reader.Read())
                     {
                         ZeroDbs.Common.ColumnInfo column = new ZeroDbs.Common.ColumnInfo();
+                        
+                        string type = reader["type"].ToString();
+                        var match = System.Text.RegularExpressions.Regex.Match(type, @"^(?<type>\w+)(\s*\((?<num1>\d+)(,\s*(?<num2>\d+))?\))?");
+                        if (!match.Success)
+                        {
+                            break;
+                        }
+                        string typeStrOnly = match.Groups["type"].Value;
+                        string num1 = match.Groups["num1"].Value;
+                        string num2 = match.Groups["num2"].Value;
+                        int decimalDigits = 0;
+                        long maxLength = 0;
+                        if(!string.IsNullOrEmpty(num1))
+                        {
+                            maxLength=Convert.ToInt64(num1);
+                        }
+                        if(!string.IsNullOrEmpty(num2))
+                        {
+                            decimalDigits = Convert.ToInt32(num2);
+                        }
                         column.Name = reader["name"].ToString();
-                        column.MaxLength = 0;
+                        column.MaxLength = maxLength;
                         column.Byte = 0;
-                        column.DecimalDigits = 0;
+                        column.DecimalDigits = decimalDigits;
                         column.DefaultValue = this.DataTypeMaping.GetDotNetDefaultValue(reader["dflt_value"].ToString(), reader["type"].ToString(), column.MaxLength);
-                        column.Description = reader["type"].ToString();
+                        column.Description = type;
                         column.IsIdentity = IdentityNames.Contains(column.Name);
                         column.IsNullable = "0" == reader["notnull"].ToString();
                         column.IsPrimaryKey = "0" != reader["pk"].ToString();
-                        column.Type = this.DataTypeMaping.GetDotNetTypeString(reader["Type"].ToString(), column.MaxLength);
+                        column.Type = this.DataTypeMaping.GetDotNetTypeString(typeStrOnly, column.MaxLength);
                         
 
                         m.Colunms.Add(column);
-                    }
+                    }/**/
                     reader.Close();
                     reader.Dispose();
                 }

@@ -5,12 +5,12 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <PackageIcon>favicon.png</PackageIcon>
     <Authors>ruzi</Authors>
-    <AssemblyVersion>3.9.9.0</AssemblyVersion>
-    <FileVersion>3.9.9.0</FileVersion>
-    <Version>3.9.9.0</Version>
+    <AssemblyVersion>4.0.0.0</AssemblyVersion>
+    <FileVersion>4.0.0.0</FileVersion>
+    <Version>4.0.0.0</Version>
     <Description>Database access library of .net40/.netcoreapp3.1/.net5/.net6, Support SqlServer/MySql/Sqlite.</Description>
     <PackageProjectUrl>https://github.com/13039520/ZeroDbs</PackageProjectUrl>
-    <PackageReleaseNotes>Fix data type mapping for Sql Server</PackageReleaseNotes>
+    <PackageReleaseNotes>Add master-slave database logic and fix known bugs</PackageReleaseNotes>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
   <ItemGroup>

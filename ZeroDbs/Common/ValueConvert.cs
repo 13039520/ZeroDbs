@@ -267,7 +267,13 @@ namespace ZeroDbs.Common
         }
         public static bool StrToTargetType(string str, string typeName, out object result)
         {
-            string s1 = typeName.ToLower();
+            string tName = typeName;
+            int lastIndex= tName.LastIndexOf('.');
+            if (lastIndex > -1)
+            {
+                tName = tName.Substring(lastIndex + 1);
+            }
+            string s1= tName.ToLower();
             if (s1 == "string")
             {
                 return StrToTargetType(str, typeof(string), out result);
@@ -338,7 +344,12 @@ namespace ZeroDbs.Common
             {
                 return StrToTargetType(str, typeof(char), out result);
             }
-            Type type = Type.GetType("System." + typeName);
+            //不接受object类型
+            /*if (s1 == "object"){
+                result = str;
+                return true;
+            }*/
+            Type type = Type.GetType("System." + tName);
             if(type != null)
             {
                 return StrToTargetType(str, type, out result);

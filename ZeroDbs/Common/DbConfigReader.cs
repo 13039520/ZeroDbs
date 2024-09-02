@@ -31,7 +31,7 @@ namespace ZeroDbs.Common
             }
             return true;
         }
-        public static bool AddDbConfig(string dbKey, string dbType, string dbConnectionString)
+        public static bool AddDbConfig(string dbKey, string dbType, string dbConnectionString, string dbConnectionString2 = "")
         {
             if (string.IsNullOrEmpty(dbKey) || string.IsNullOrEmpty(dbType) || string.IsNullOrEmpty(dbConnectionString))
             {
@@ -41,7 +41,7 @@ namespace ZeroDbs.Common
             lock (_lock)
             {
                 if (config.Dbs.Find(o => string.Equals(o.Key, dbKey, StringComparison.OrdinalIgnoreCase)) != null) { return false; }
-                config.Dbs.Add(new DbInfo {  Key = dbKey, Type = dbType, ConnectionString = dbConnectionString });
+                config.Dbs.Add(new DbInfo {  Key = dbKey, Type = dbType, ConnectionString = dbConnectionString, ConnectionString2 = dbConnectionString2 });
             }
             return true;
         }
@@ -93,6 +93,7 @@ namespace ZeroDbs.Common
             {
                 System.Xml.XmlAttribute dbKey = node.Attributes["dbKey"];
                 System.Xml.XmlAttribute dbConnectionString = node.Attributes["dbConnectionString"];
+                System.Xml.XmlAttribute dbConnectionString2 = node.Attributes["dbConnectionString2"];
                 System.Xml.XmlAttribute dbType = node.Attributes["dbType"];
                 if (dbKey == null || dbConnectionString == null || dbType == null)
                 {
@@ -100,6 +101,7 @@ namespace ZeroDbs.Common
                 }
                 string key = dbKey.Value;
                 string conn = dbConnectionString.Value;
+                string conn2 = dbConnectionString2 != null ? dbConnectionString2.Value : "";
                 string type = dbType.Value;
                 if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(conn) || string.IsNullOrEmpty(type))
                 {
@@ -119,6 +121,7 @@ namespace ZeroDbs.Common
                 temp.Dbs.Add(new DbInfo
                 {
                     ConnectionString = conn,
+                    ConnectionString2 = conn2,
                     Key = key,
                     Type = type
                 });
