@@ -1,22 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
 using System.Text;
 
 namespace ZeroDbs
 {
     public interface IDbCommand : IDisposable
     {
+        string DbKey { get; }
+        string DbType { get; }
         string TransactionInfo { get; set; }
         string CommandText { get; set; }
         int CommandTimeout { get; set; }
-        bool IsCheckCommandText { get; set; }
         System.Data.Common.DbParameterCollection Parameters { get; }
         System.Data.CommandType CommandType { get; set; }
         System.Data.Common.DbConnection DbConnection { get; }
         Common.SqlBuilder SqlBuilder { get; }
         System.Data.Common.DbParameter CreateParameter();
-        System.Data.Common.DbParameter CreateParameter(string parameterName, object value);
-        System.Data.Common.DbParameter CreateParameter(string parameterName, System.Data.DbType dbType, int size, object value);
+        System.Data.Common.DbParameter CreateParameter(string pName, object pValue);
+        System.Data.Common.DbParameter CreateParameter(string pName, System.Data.DbType dbType, int size, object pValue);
         int ExecuteNonQuery();
         int ExecuteNonQuery(Common.SqlInfo info);
         int ExecuteNonQuery(string rawSql, params object[] paras);

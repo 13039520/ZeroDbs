@@ -4,32 +4,123 @@ using System.Text;
 
 namespace ZeroDbs.SqlServer
 {
-    internal class DbDataTypeMaping: IDataTypeMaping
+    internal class DbDataTypeMaping: IDbDataTypeMaping
     {
-        List<string> rawTypeNames = new List<string>();
-        List<string> dotnetTypeNames = new List<string>();
-        public DbDataTypeMaping()
+        public Type GetDotNetType(string dbDataTypeName, long maxLength)
         {
-            rawTypeNames.AddRange("bigint,binary,bit,char,date,datetime,datetime2,datetimeoffset,decimal,float,geography,geometry,hierarchyid,image,int,money,nchar,ntext,numeric,nvarchar,real,smalldatetime,smallint,smallmoney,sql_variant,text,time,timestamp,tinyint,uniqueidentifier,varbinary,varchar,xml".Split(','));
-            dotnetTypeNames.AddRange("Int64,Byte[],Boolean,String,DateTime,DateTime,DateTime,DateTimeOffset,Decimal,Double,Byte[],Byte[],Byte[],Byte[],Int32,Decimal,String,String,Decimal,String,Single,DateTime,Int16,Decimal,Object,String,TimeSpan,Byte[],Byte,Guid,Byte[],String,String".Split(','));
-        }
-        public string GetDotNetTypeString(int dbDataTypeIntValue, long maxLength)
-        {
-            string s = Enum.GetName(typeof(System.Data.SqlDbType), dbDataTypeIntValue);
-            return GetDotNetTypeString(s, maxLength);
-        }
-        public string GetDotNetTypeString(string dbDataTypeName, long maxLength)
-        {
-            int index = rawTypeNames.IndexOf(dbDataTypeName);
-            if (index < 0) { return "System.Object"; }
-            string s = dotnetTypeNames[index];
-            if (s.IndexOf('.') < 0)
+            Type type;
+            switch (dbDataTypeName)
             {
-                s = String.Format("System.{0}", s);
+                case "bigint":
+                    type = typeof(long);
+                    break;
+                case "binary":
+                    type = typeof(byte[]);
+                    break;
+                case "bit":
+                    type = typeof(bool);
+                    break;
+                case "char":
+                    type = typeof(string);
+                    break;
+                case "date":
+                    type = typeof(DateTime);
+                    break;
+                case "datetime":
+                    type = typeof(DateTime);
+                    break;
+                case "datetime2":
+                    type = typeof(DateTime);
+                    break;
+                case "datetimeoffset":
+                    type = typeof(DateTimeOffset);
+                    break;
+                case "decimal":
+                    type = typeof(decimal);
+                    break;
+                case "float":
+                    type = typeof(double);
+                    break;
+                case "geography":
+                    type = typeof(byte[]);
+                    break;
+                case "geometry":
+                    type = typeof(byte[]);
+                    break;
+                case "hierarchyid":
+                    type = typeof(byte[]);
+                    break;
+                case "image":
+                    type = typeof(byte[]);
+                    break;
+                case "int":
+                    type = typeof(int);
+                    break;
+                case "money":
+                    type = typeof(decimal);
+                    break;
+                case "nchar":
+                    type = typeof(string);
+                    break;
+                case "ntext":
+                    type = typeof(string);
+                    break;
+                case "numeric":
+                    type = typeof(decimal);
+                    break;
+                case "nvarchar":
+                    type = typeof(string);
+                    break;
+                case "real":
+                    type = typeof(float);
+                    break;
+                case "smalldatetime":
+                    type = typeof(DateTime);
+                    break;
+                case "smallint":
+                    type = typeof(short);
+                    break;
+                case "smallmoney":
+                    type = typeof(decimal);
+                    break;
+                case "sql_variant":
+                    type = typeof(object);
+                    break;
+                case "text":
+                    type = typeof(string);
+                    break;
+                case "time":
+                    type = typeof(TimeSpan);
+                    break;
+                case "timestamp":
+                    type = typeof(byte[]);
+                    break;
+                case "tinyint":
+                    type = typeof(byte);
+                    break;
+                case "uniqueidentifier":
+                    type = typeof(Guid);
+                    break;
+                case "varbinary":
+                    type = typeof(byte[]);
+                    break;
+                case "varchar":
+                    type = typeof(string);
+                    break;
+                case "xml":
+                    type = typeof(string);
+                    break;
+                default:
+                    type = typeof(object);
+                    break;
             }
-            return s;
+            return type;
         }
-        public string GetDotNetDefaultValue(string defaultVal, string dbDataTypeName, long maxLength)
+        public string GetDotNetTypeFullName(string dbDataTypeName, long maxLength)
+        {
+            return GetDotNetType(dbDataTypeName, maxLength).FullName;
+        }
+        public string GetDotNetDefaultValueText(string defaultVal, string dbDataTypeName, long maxLength)
         {
             string s = string.Empty;
             if (!string.IsNullOrEmpty(defaultVal))

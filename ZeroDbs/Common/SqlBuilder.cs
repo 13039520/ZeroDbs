@@ -373,32 +373,6 @@ namespace ZeroDbs.Common
             reval.Sql = string.Format("SELECT {0} FROM {1} WHERE {2}", string.Join(",", fields), GetTableName(table), where);
             return reval;
         }
-        private string GetBaseTypeName(string type)
-        {
-            
-            switch (type)
-            {
-                case "short":
-                    return "Int16";
-                case "int":
-                    return "Int32";
-                case "long":
-                    return "Int64";
-                case "float":
-                    return "Single";
-                case "double":
-                    return "Double";
-                case "decimal":
-                    return "Decimal";
-                case "string":
-                    return "String";
-                case "bool":
-                    return "Boolean";
-                case "byte":
-                    return "Byte";
-            }
-            return type;
-        }
 
         public string Insert<DbEntity>() where DbEntity : class, new()
         {
@@ -459,49 +433,65 @@ namespace ZeroDbs.Common
                 throw new Exception("Target does not support insert operation");
             }
             if (mergeLimit < 1) { mergeLimit = 1; }
-            var ps = GetPropertyInfos<DbEntity>();
-            List<SqlInfo> sqlInfos = new List<SqlInfo>();
+            int lisCount = entities.Count;
+            List<SqlInfo> reval = new List<SqlInfo>();
+            if (lisCount < 1) { return reval; }
+            var properties = GetPropertyInfos<DbEntity>();
+            
             StringBuilder field = new StringBuilder();
-            StringBuilder value = new StringBuilder();
-            int colunmCount = tableInfo.Colunms.Count;
-            List<string> sqlList = new List<string>(mergeLimit);
-            int rowIndex = 0;
-            SqlInfo reval = new SqlInfo(10);
-            for (int i = 0; i < entities.Count; i++)
+            List<IColumnInfo> cols = tableInfo.Colunms.FindAll(o=>o.IsIdentity == false);
+            List<System.Reflection.PropertyInfo> ps= new List<System.Reflection.PropertyInfo>();
+            for(int i = cols.Count - 1; i > -1; i--)
             {
-                int colIndex = 0;
-                foreach (var col in tableInfo.Colunms)
+                var p = properties.Find(o => string.Equals(o.Name, cols[i].Name, StringComparison.OrdinalIgnoreCase));
+                if (p == null) {
+                    cols.RemoveAt(i);
+                    continue;
+                }
+                ps.Add(p);
+                field.AppendFormat("{0},", GetColunmName(cols[i].Name));
+            }
+            if (cols.Count < 1)
+            {
+                throw new Exception("It is not mapped to any column.");
+            }
+            field.Remove(field.Length - 1, 1);
+            int colCount = cols.Count;
+            int rowIndex = 0;
+            string insertPart = string.Format("INSERT INTO {0}({1}) VALUES", GetTableName(tableInfo), field);
+            StringBuilder valuePart = new StringBuilder();
+            SqlInfo sql = new SqlInfo(mergeLimit * colCount);
+            int colIndex = 0;
+            for (int i = 0; i < lisCount; i++)
+            {
+                valuePart.Append("(");
+                for (int j = 0; j < colCount; j++)
                 {
-                    if (col.IsIdentity) { continue; }
-                    var p = ps.Find(o => string.Equals(o.Name, col.Name, StringComparison.OrdinalIgnoreCase));
-                    if (p == null) { continue; }
-                    field.AppendFormat("{0},", GetColunmName(col.Name));
-                    value.AppendFormat("@{0}_{1},", rowIndex, colIndex);
-                    reval.Paras.Add(string.Format("@{0}_{1}", rowIndex, colIndex), p.GetValue(entities[i], null));
+                    valuePart.AppendFormat("@{0},", colIndex);
+                    sql.Paras.Add(string.Format("@{0}", colIndex), ps[j].GetValue(entities[i], null));
                     colIndex++;
                 }
-                field.Remove(field.Length - 1, 1);
-                value.Remove(value.Length - 1, 1);
-                sqlList.Add(String.Format("INSERT INTO {0}({1}) VALUES({2});", GetTableName(tableInfo), field, value));
-                field.Clear();
-                value.Clear();
+                valuePart.Remove(valuePart.Length - 1, 1);
+                valuePart.Append("),");
 
                 rowIndex++;
                 if (rowIndex < mergeLimit)
                 {
-                    if (i + 1 < entities.Count)
+                    if (i + 1 < lisCount)
                     {
                         continue;
                     }
                 }
-                reval.Sql=String.Join("\r\n",sqlList.ToArray());
-                sqlInfos.Add(reval);
-                sqlList.Clear();
+                valuePart.Remove(valuePart.Length - 1, 1);
+                valuePart.Append(";");
+                sql.Sql=string.Format("{0}{1}", insertPart, valuePart);
+                reval.Add(sql);
+                valuePart.Clear();
                 rowIndex = 0;
-                reval = new SqlInfo(mergeLimit * colunmCount);
+                colIndex = 0;
+                sql = new SqlInfo(mergeLimit * colCount);
             }
-            
-            return sqlInfos;
+            return reval;
         }
         public SqlInfo InsertByCustomEntity<DbEntity>(object source) where DbEntity : class, new()
         {

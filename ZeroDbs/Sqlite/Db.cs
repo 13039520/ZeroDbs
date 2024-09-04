@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using System.Data.SQLite;
-using MySql.Data.MySqlClient;
 
 namespace ZeroDbs.Sqlite
 {
@@ -81,7 +80,7 @@ namespace ZeroDbs.Sqlite
                 }
 
                 string getColumnInfoSql = "PRAGMA table_info(" + dv.TableName + ")";
-                cmd.IsCheckCommandText = false;
+
                 cmd.CommandText = getColumnInfoSql;
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
@@ -111,12 +110,12 @@ namespace ZeroDbs.Sqlite
                     column.MaxLength = maxLength;
                     column.Byte = 0;
                     column.DecimalDigits = decimalDigits;
-                    column.DefaultValue = this.DataTypeMaping.GetDotNetDefaultValue(reader["dflt_value"].ToString(), reader["type"].ToString(), column.MaxLength);
+                    column.DefaultValue = this.DataTypeMaping.GetDotNetDefaultValueText(reader["dflt_value"].ToString(), reader["type"].ToString(), column.MaxLength);
                     column.Description = type;
                     column.IsIdentity = IdentityNames.Contains(column.Name);
                     column.IsNullable = "0" == reader["notnull"].ToString();
                     column.IsPrimaryKey = "0" != reader["pk"].ToString();
-                    column.Type = this.DataTypeMaping.GetDotNetTypeString(typeStrOnly, column.MaxLength);
+                    column.Type = this.DataTypeMaping.GetDotNetTypeFullName(typeStrOnly, column.MaxLength);
 
                     dbDataTableInfo.Colunms.Add(column);
                 }
@@ -133,7 +132,7 @@ namespace ZeroDbs.Sqlite
             catch (Exception ex)
             {
                 cmd.Dispose();
-                throw ex;
+                throw;
             }
         }
         public override List<ITableInfo> GetTables()
@@ -175,8 +174,6 @@ namespace ZeroDbs.Sqlite
                 reader.Close();
                 reader.Dispose();
 
-                cmd.IsCheckCommandText = false;
-
                 foreach (ZeroDbs.Common.TableInfo m in List)
                 {
                     string sql = "PRAGMA table_info("+m.Name+")";
@@ -209,12 +206,12 @@ namespace ZeroDbs.Sqlite
                         column.MaxLength = maxLength;
                         column.Byte = 0;
                         column.DecimalDigits = decimalDigits;
-                        column.DefaultValue = this.DataTypeMaping.GetDotNetDefaultValue(reader["dflt_value"].ToString(), reader["type"].ToString(), column.MaxLength);
+                        column.DefaultValue = this.DataTypeMaping.GetDotNetDefaultValueText(reader["dflt_value"].ToString(), reader["type"].ToString(), column.MaxLength);
                         column.Description = type;
                         column.IsIdentity = IdentityNames.Contains(column.Name);
                         column.IsNullable = "0" == reader["notnull"].ToString();
                         column.IsPrimaryKey = "0" != reader["pk"].ToString();
-                        column.Type = this.DataTypeMaping.GetDotNetTypeString(typeStrOnly, column.MaxLength);
+                        column.Type = this.DataTypeMaping.GetDotNetTypeFullName(typeStrOnly, column.MaxLength);
                         
 
                         m.Colunms.Add(column);
@@ -230,7 +227,7 @@ namespace ZeroDbs.Sqlite
             catch (Exception ex)
             {
                 cmd.Dispose();
-                throw ex;
+                throw;
             }
         }
         

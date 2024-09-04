@@ -8,7 +8,7 @@ namespace ZeroDbs
     {
         IDbInfo DbInfo { get; }
         Common.SqlBuilder SqlBuilder { get; }
-        IDataTypeMaping DataTypeMaping { get; }
+        IDbDataTypeMaping DataTypeMaping { get; }
         event Common.DbExecuteHandler OnDbExecuteSqlEvent;
         void FireZeroDbExecuteSqlEvent(Common.DbExecuteArgs args);
         System.Data.Common.DbConnection GetDbConnection(bool useSecondDb = false);

@@ -5,111 +5,111 @@ using MySql.Data.MySqlClient;
 
 namespace ZeroDbs.MySql
 {
-    internal class DbDataTypeMaping : IDataTypeMaping
+    internal class DbDataTypeMaping : IDbDataTypeMaping
     {
-        public string GetDotNetTypeString(int dbDataTypeIntValue, long maxLength)
+        public Type GetDotNetType(string dbDataTypeName, long maxLength)
         {
-            string s = Enum.GetName(typeof(MySqlDbType), dbDataTypeIntValue);
-            return GetDotNetTypeString(s, maxLength);
-        }
-        public string GetDotNetTypeString(string dbDataTypeName, long maxLength)
-        {
-            string s = "";
+            Type type;
             switch (dbDataTypeName)
             {
                 case "int":
-                    s = "Int32";
+                    type = typeof(int);
                     break;
                 case "tinyint":
                     if (maxLength != 1)
                     {
-                        s = "Byte";
+                        type = typeof(byte);
                     }
                     else
                     {
-                        s = "Boolean";
+                        type = typeof(bool);
                     }
                     break;
                 case "smallint":
-                    s = "Int16";
+                    type = typeof(short);
                     break;
                 case "mediumint":
-                    s = "Int32";
+                    type = typeof(int);
                     break;
                 case "bigint":
-                    s = "Int64";
+                    type = typeof(long);
                     break;
                 case "decimal":
-                    s = "Decimal";
+                    type = typeof(decimal);
                     break;
                 case "float":
-                    s = "Single";
+                    type = typeof(float);
                     break;
                 case "double":
-                    s = "Double";
+                    type = typeof(double);
                     break;
                 case "bit":
-                    s = "Boolean";
+                    type = typeof(bool);
                     break;
                 case "boolean":
-                    s = "Boolean";
+                    type = typeof(bool);
                     break;
                 case "bool":
-                    s = "Boolean";
+                    type = typeof(bool);
                     break;
                 case "date":
-                    s = "DateTime";
+                    type = typeof(DateTime);
                     break;
                 case "datetime":
-                    s = "DateTime";
+                    type = typeof(DateTime);
                     break;
                 case "timestamp":
-                    s = "DateTime"; //"TimeSpan";
+                    type = typeof(DateTime); //"TimeSpan";
                     break;
                 case "time":
-                    s = "DateTime";
+                    type = typeof(DateTime);
                     break;
-                case "year":
-                    s = "String";//有效数字范围：1901-2155
+                case "year"://有效数字范围：1901-2155
+                    type = typeof(string);
                     break;
                 case "char":
                     if (maxLength == 36)
                     {
-                        s = "Guid";
+                        type = typeof(Guid);
                     }
                     else
                     {
-                        s = "String";
+                        type = typeof(string);
                     }
                     break;
                 case "varchar":
-                    s = "String";
+                    type = typeof(string);
                     break;
                 case "tinytext":
-                    s = "String";
+                    type = typeof(string);
                     break;
                 case "text":
-                    s = "String";
+                    type = typeof(string);
                     break;
                 case "mediumtext":
-                    s = "String";
+                    type = typeof(string);
                     break;
                 case "longtext":
-                    s = "String";
+                    type = typeof(string);
                     break;
                 case "binary":
-                    s = "Byte[]";
+                    type = typeof(byte[]);
                     break;
                 case "varbinary":
-                    s = "Byte[]";
+                    type = typeof(byte[]);
                     break;
                 default:
-                    s = "Object";
+                    type = typeof(object);
                     break;
             }
-            return string.Format("System.{0}",s);
+            return type;
         }
-        public string GetDotNetDefaultValue(string defaultVal, string dbDataTypeName, long maxLength)
+        public string GetDotNetTypeFullName(string dbDataTypeName, long maxLength)
+        {
+            return GetDotNetType(dbDataTypeName, maxLength).FullName;
+        }
+        
+        public string GetDotNetDefaultValueText(string defaultVal, string dbDataTypeName, long maxLength)
         {
             string s = string.Empty;
             if (!string.IsNullOrEmpty(defaultVal))

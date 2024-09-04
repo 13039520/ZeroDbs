@@ -4,86 +4,86 @@ using System.Text;
 
 namespace ZeroDbs.Sqlite
 {
-    internal class DbDataTypeMaping: IDataTypeMaping
+    internal class DbDataTypeMaping: IDbDataTypeMaping
     {
-        public string GetDotNetTypeString(int dbDataTypeIntValue, long maxLength)
+        public Type GetDotNetType(string dbDataTypeName, long maxLength)
         {
-            throw new Exception("不受支持");
-        }
-        public string GetDotNetTypeString(string dbDataTypeName, long maxLength)
-        {
-            string s = "";
+            Type type;
             switch (dbDataTypeName)
             {
                 case "INTEGER":
-                    s = "Int64";
+                    type = typeof(long);
                     break;
                 case "BIGINT":
-                    s = "Int64";
+                    type = typeof(long);
                     break;
                 case "BLOB":
-                    s = "Byte[]";
+                    type = typeof(byte[]);
                     break;
                 case "BOOLEAN":
-                    s = "Boolean";
+                    type = typeof(bool);
                     break;
                 case "CHAR":
                     if (maxLength == 36)
                     {
-                        s = "Guid";
+                        type = typeof(Guid);
                     }
                     else
                     {
-                        s = "String";
+                        type = typeof(string);
                     }
                     break;
                 case "DATE":
-                    s = "DateTime";
+                    type = typeof(DateTime);
                     break;
                 case "DATETIME":
-                    s = "DateTime";
+                    type = typeof(DateTime);
                     break;
                 case "DECIMAL":
-                    s = "Decimal";
+                    type = typeof(decimal);
                     break;
                 case "DOUBLE":
-                    s = "Double";
+                    type = typeof(double);
                     break;
                 case "INT":
-                    s = "Int32";
+                    type = typeof(int);
                     break;
                 case "NUMERIC":
-                    s = "Decimal";
+                    type = typeof(decimal);
                     break;
                 case "REAL":
-                    s = "Double";
+                    type = typeof(double);
                     break;
                 case "STRING":
-                    s = "String";
+                    type = typeof(string);
                     break;
                 case "TEXT":
-                    s = "String";
+                    type = typeof(string);
                     break;
                 case "TIME":
-                    s = "DateTime";
+                    type = typeof(DateTime);
                     break;
                 case "VARCHAR":
                     if (maxLength == 36)
                     {
-                        s = "Guid";
+                        type = typeof(Guid);
                     }
                     else
                     {
-                        s = "String";
+                        type = typeof(string);
                     }
                     break;
                 default:
-                    s = "Object";
+                    type = typeof(object);
                     break;
             }
-            return string.Format("System.{0}", s);
+            return type;
         }
-        public string GetDotNetDefaultValue(string defaultVal, string dbDataTypeName, long maxLength)
+        public string GetDotNetTypeFullName(string dbDataTypeName, long maxLength)
+        {
+            return GetDotNetType(dbDataTypeName, maxLength).FullName;
+        }
+        public string GetDotNetDefaultValueText(string defaultVal, string dbDataTypeName, long maxLength)
         {
             return string.Empty;
         }

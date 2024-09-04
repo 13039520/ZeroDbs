@@ -13,10 +13,10 @@ namespace ZeroDbs.Common
     {
         protected IDbInfo dbInfo = null;
         protected SqlBuilder sqlBuilder = null;
-        protected IDataTypeMaping dataTypeMaping = null;
+        protected IDbDataTypeMaping dataTypeMaping = null;
         public IDbInfo DbInfo { get { return dbInfo; } }
         public SqlBuilder SqlBuilder { get { return sqlBuilder; } }
-        public IDataTypeMaping DataTypeMaping { get { return dataTypeMaping; } }
+        public IDbDataTypeMaping DataTypeMaping { get { return dataTypeMaping; } }
 
         public event DbExecuteHandler OnDbExecuteSqlEvent = null;
         
@@ -62,6 +62,14 @@ namespace ZeroDbs.Common
         {
             throw new NotImplementedException();
         }
+        public IDbCommand CreateDbCommand(System.Data.Common.DbCommand cmd, IDbParameterCreator dbParameterCreator)
+        {
+            return new DbCommand(this.DbInfo, cmd, this.OnDbExecuteSqlEvent, this.SqlBuilder, dbParameterCreator);
+        }
+        public virtual IDbCommand CreateDbCommand(System.Data.Common.DbCommand cmd)
+        {
+            return CreateDbCommand(cmd, null);
+        }
 
         public IDbCommand GetDbCommand(bool useSecondDb = false)
         {
@@ -71,7 +79,7 @@ namespace ZeroDbs.Common
                 conn.Open();
             }
             var cmd = conn.CreateCommand();
-            return new DbCommand(DbInfo.Key, cmd, this.OnDbExecuteSqlEvent, this.SqlBuilder);
+            return CreateDbCommand(cmd);
         }
         public IDbCommand GetDbCommand(System.Data.Common.DbTransaction transaction)
         {
@@ -83,7 +91,7 @@ namespace ZeroDbs.Common
             cmd.Connection = transaction.Connection;
             cmd.Transaction = transaction;
 
-            return new DbCommand(DbInfo.Key, cmd, this.OnDbExecuteSqlEvent, this.SqlBuilder);
+            return CreateDbCommand(cmd);
         }
         public IDbTransactionScope GetDbTransactionScope(System.Data.IsolationLevel level, string identification = "", string groupId = "")
         {
@@ -103,9 +111,9 @@ namespace ZeroDbs.Common
                 conn.Close();
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                throw e;
+                throw;
             }
         }
 
@@ -206,7 +214,7 @@ namespace ZeroDbs.Common
             catch (Exception ex)
             {
                 cmd.Dispose();
-                throw ex;
+                throw;
             }
         }
 
@@ -266,7 +274,7 @@ namespace ZeroDbs.Common
             {
                 cmd.Dispose();
 
-                throw ex;
+                throw;
             }
         }
         public PageData<DbEntity> Page<DbEntity>(long page, long size) where DbEntity : class, new()
@@ -342,7 +350,7 @@ namespace ZeroDbs.Common
             catch (Exception ex)
             {
                 cmd.Dispose();
-                throw ex;
+                throw;
             }
         }
         public long MaxIdentityPrimaryKeyValue<DbEntity>() where DbEntity : class, new()
@@ -395,42 +403,22 @@ namespace ZeroDbs.Common
         }
         public int Insert<DbEntity>(List<DbEntity> entities) where DbEntity : class, new()
         {
-            return Insert<DbEntity>(entities, 0);
+            return Insert<DbEntity>(entities, 10);
         }
         public int Insert<DbEntity>(List<DbEntity> entities, int mergeLimit) where DbEntity : class, new()
         {
             int reval = 0;
-            if (mergeLimit < 1)
+            var infos = this.SqlBuilder.Insert<DbEntity>(entities, mergeLimit);
+            using (var ts = this.GetDbTransactionScope(System.Data.IsolationLevel.ReadUncommitted))
             {
-                var sql = this.SqlBuilder.Insert<DbEntity>();
-                using (var ts = this.GetDbTransactionScope(System.Data.IsolationLevel.ReadUncommitted))
+                ts.Execute((cmd) =>
                 {
-                    ts.Execute((cmd) =>
+                    foreach (var info in infos)
                     {
-                        cmd.CommandText = sql;
-                        foreach (var entity in entities)
-                        {
-                            cmd.ParametersFromEntity(entity);
-                            reval += cmd.ExecuteNonQuery();
-                        }
-                    });
-                    ts.Complete(true);
-                }
-            }
-            else
-            {
-                var infos = this.SqlBuilder.Insert<DbEntity>(entities, mergeLimit);
-                using (var ts = this.GetDbTransactionScope(System.Data.IsolationLevel.ReadUncommitted))
-                {
-                    ts.Execute((cmd) =>
-                    {
-                        foreach (var info in infos)
-                        {
-                            reval += cmd.ExecuteNonQuery(info);
-                        }
-                    });
-                    ts.Complete(true);
-                }
+                        reval += cmd.ExecuteNonQuery(info);
+                    }
+                });
+                ts.Complete(true);
             }
             return reval;
         }

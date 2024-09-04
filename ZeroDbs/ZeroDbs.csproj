@@ -5,10 +5,10 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <PackageIcon>favicon.png</PackageIcon>
     <Authors>ruzi</Authors>
-    <AssemblyVersion>4.0.0.0</AssemblyVersion>
-    <FileVersion>4.0.0.0</FileVersion>
-    <Version>4.0.0.0</Version>
-    <Description>Database access library of .net40/.netcoreapp3.1/.net5/.net6, Support SqlServer/MySql/Sqlite.</Description>
+    <AssemblyVersion>4.1.0.0</AssemblyVersion>
+    <FileVersion>4.1.0.0</FileVersion>
+    <Version>4.1.0.0</Version>
+    <Description>Database access library of .net40/.netcoreapp3.1/.net5/.net6, Support SqlServer/MySql/Sqlite/PostgreSql.</Description>
     <PackageProjectUrl>https://github.com/13039520/ZeroDbs</PackageProjectUrl>
     <PackageReleaseNotes>Add master-slave database logic and fix known bugs</PackageReleaseNotes>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -25,6 +25,9 @@
     <PackageReference Include="MySql.Data">
       <Version>6.8.8</Version>
     </PackageReference>
+	<PackageReference Include="Npgsql">
+      <Version>2.2.7</Version>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
@@ -36,6 +39,9 @@
     </PackageReference>
     <PackageReference Include="MySql.Data">
       <Version>8.0.28</Version>
+    </PackageReference>
+    <PackageReference Include="Npgsql">
+      <Version>9.0.4</Version>
     </PackageReference>
     <PackageReference Include="System.Data.SqlClient">
       <Version>4.8.6</Version>
@@ -55,6 +61,9 @@
     <PackageReference Include="System.Data.SqlClient">
       <Version>4.8.6</Version>
     </PackageReference>
+	<PackageReference Include="Npgsql">
+		<Version>8.0.8</Version>
+	</PackageReference>
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
@@ -70,6 +79,9 @@
 		<PackageReference Include="System.Data.SqlClient">
 		  <Version>4.8.6</Version>
 		</PackageReference>
+	  <PackageReference Include="Npgsql">
+		  <Version>8.0.8</Version>
+	  </PackageReference>
   </ItemGroup>
 
   <ItemGroup>

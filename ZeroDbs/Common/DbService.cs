@@ -45,11 +45,12 @@ namespace ZeroDbs.Common
                     if (!_dbInstanceDic.ContainsKey(info.Key))
                     {
                         IDb db = DbFactory.Create(info, _dbExecuteHandler);
-                        if (db != null)
+                        if (db is null)
                         {
-                            _dbInstanceDic.Add(info.Key, db);
-                            reval = db;
+                            throw new Exception(string.Format("Unable to create IDb object for \"{0}\" type database(dbKey={1}).", info.Type, info.Key));
                         }
+                        _dbInstanceDic.Add(info.Key, db);
+                        reval = db;
                     }
                     else
                     {
@@ -223,7 +224,8 @@ namespace ZeroDbs.Common
         {
             return DbConfigReader.AddDbConfig(dbKey, dbType, dbConnectionString);
         }
-
+        public Common.PageQuery PageQuery() {  return new Common.PageQuery(); }
+        public Common.ListQuery ListQuery(){ return new Common.ListQuery(); }
 
         public List<Target> Select<DbEntity, Target>(ListQuery query) where DbEntity : class, new() where Target : class, new()
         {

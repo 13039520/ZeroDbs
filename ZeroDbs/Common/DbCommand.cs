@@ -11,89 +11,74 @@ namespace ZeroDbs.Common
         private string commandText = "";
         private string transactionInfo = "";
         private System.Data.CommandType commandType = System.Data.CommandType.Text;
-        private string dbKey = "";
         private bool isCheckCommandText = true;
-        private Common.SqlBuilder sqlBuilder = null;
-        private bool hasDbExecuteHandler = false;
+        private readonly Common.SqlBuilder sqlBuilder = null;
+        private readonly bool hasDbExecuteHandler = false;
+        private readonly IDbInfo dbInfo=null;
+        private readonly IDbParameterCreator dbParameterCreator = null;
 
         public string TransactionInfo { get { return transactionInfo; } set { transactionInfo = value; } }
         public string CommandText { get { return commandText; } set { commandText = value; } }
         public int CommandTimeout { get { return commandTimeout; } set { commandTimeout = value; } }
-        public bool IsCheckCommandText { get { return isCheckCommandText; } set { isCheckCommandText = value; } }
         public System.Data.Common.DbParameterCollection Parameters { get { return dbCommand.Parameters; } }
         public System.Data.CommandType CommandType { get { return commandType; } set { commandType = value; } }
         public System.Data.Common.DbConnection DbConnection { get { return dbCommand.Connection; } }
         public Common.SqlBuilder SqlBuilder { get { return sqlBuilder; } }
-        public string DbKey { get { return dbKey; } }
+        public string DbKey { get { return dbInfo.Key; } }
+        public string DbType { get { return dbInfo.Type; } }
 
         private event DbExecuteHandler OnDbExecute;
         protected void FireExecuteSql(DbExecuteSqlType type, string msg = "OK")
         {
             try
             {
-                OnDbExecute(this, new DbExecuteArgs(dbKey,commandText,transactionInfo,type,msg));
+                if (hasDbExecuteHandler)
+                {
+                    OnDbExecute(this, new DbExecuteArgs(DbKey, commandText, transactionInfo, type, msg));
+                }
             }
             catch { }
         }
-        public DbCommand(string dbKey, System.Data.Common.DbCommand dbCommand, DbExecuteHandler dbExecuteHandler, SqlBuilder sqlBuilder)
+        public DbCommand(IDbInfo dbInfo, System.Data.Common.DbCommand dbCommand, DbExecuteHandler dbExecuteHandler, SqlBuilder sqlBuilder, IDbParameterCreator dbParameterCreator)
         {
+            this.dbInfo = dbInfo;
             this.OnDbExecute = dbExecuteHandler;
-            this.dbKey = dbKey;
             this.dbCommand = dbCommand;
             this.sqlBuilder = sqlBuilder;
+            this.dbParameterCreator = dbParameterCreator != null ? dbParameterCreator : new DbParameterCreator(dbCommand);
             this.hasDbExecuteHandler = dbExecuteHandler != null;
+        }
+        private string ParameterNameCorrect(string pName)
+        {
+            return pName[0] == '@' ? pName : string.Format("@{0}", pName);
         }
         public System.Data.Common.DbParameter CreateParameter()
         {
-            return dbCommand.CreateParameter();
+            return this.dbParameterCreator.Create();
         }
-        public System.Data.Common.DbParameter CreateParameter(string parameterName, object value)
+        public System.Data.Common.DbParameter CreateParameter(string pName, object pValue)
         {
-            var parameter = CreateParameter();
-            parameter.ParameterName = parameterName[0] == '@' ? parameterName : String.Format("@{0}", parameterName);
-            parameter.Value = value is null ? DBNull.Value : value;
-            return parameter;
+            return this.dbParameterCreator.Create(ParameterNameCorrect(pName), pValue);
         }
-        public System.Data.Common.DbParameter CreateParameter(string parameterName, System.Data.DbType dbType, int size, object value)
+        public System.Data.Common.DbParameter CreateParameter(string pName, System.Data.DbType dbType, int size, object pValue)
         {
-            var parameter = CreateParameter();
-            parameter.ParameterName = parameterName[0] == '@' ? parameterName : String.Format("@{0}", parameterName);
-            parameter.Value = value is null ? DBNull.Value : value;
-            parameter.DbType = dbType;
-            parameter.Size = size;
-            return parameter;
+            return this.dbParameterCreator.Create(ParameterNameCorrect(pName), dbType, size, pValue);
         }
         public int ExecuteNonQuery()
         {
             try
             {
-                if (IsCheckCommandText && CommandType == System.Data.CommandType.Text)
-                {
-                    string msg = "";
-                    if(!Common.SqlCheck.IsInsertSql(CommandText, ref msg)
-                        && Common.SqlCheck.IsDeleteSql(CommandText, ref msg)
-                        && Common.SqlCheck.IsUpdateSql(CommandText, ref msg))
-                    {
-                        throw new Exception("不符合INSERT|DELETE|UPDATE命令模式");
-                    }
-                }
                 dbCommand.CommandText = CommandText;
                 dbCommand.CommandTimeout = CommandTimeout;
                 dbCommand.CommandType = CommandType;
-                if (hasDbExecuteHandler)
-                {
-                    FireExecuteSql(DbExecuteSqlType.NONQUERY);
-                }
-                
+                FireExecuteSql(DbExecuteSqlType.NONQUERY);
+
                 return dbCommand.ExecuteNonQuery();
             }
             catch (Exception ex)
             {
-                if (hasDbExecuteHandler)
-                {
-                    FireExecuteSql(DbExecuteSqlType.NONQUERY,ex.Message);
-                }
-                throw ex;
+                FireExecuteSql(DbExecuteSqlType.NONQUERY, ex.Message);
+                throw;
             }
         }
         public int ExecuteNonQuery(string rawSql, params object[] paras)
@@ -122,22 +107,11 @@ namespace ZeroDbs.Common
         {
             try
             {
-                if (IsCheckCommandText && CommandType == System.Data.CommandType.Text)
-                {
-                    string msg = "";
-                    if(!Common.SqlCheck.IsSelectSql(CommandText, ref msg))
-                    {
-                        throw new Exception(msg);
-                    }
-                }
                 dbCommand.CommandText = CommandText;
                 dbCommand.CommandTimeout = CommandTimeout;
                 dbCommand.CommandType = CommandType;
                 System.Data.Common.DbDataReader dr = dbCommand.ExecuteReader();
-                if (hasDbExecuteHandler)
-                {
-                    FireExecuteSql(DbExecuteSqlType.QUERY);
-                }
+                FireExecuteSql(DbExecuteSqlType.QUERY);
                 return useEmit ? Entities.ListFromDataReaderByEmit<T>(dr) : Entities.ListFromDataReader<T>(dr);
             }
             catch (Exception ex)
@@ -146,7 +120,7 @@ namespace ZeroDbs.Common
                 {
                     FireExecuteSql(DbExecuteSqlType.QUERY, ex.Message);
                 }
-                throw ex;
+                throw;
             }
         }
         public System.Data.DataTable ExecuteQuery(string rawSql, params object[] paras)
@@ -168,22 +142,11 @@ namespace ZeroDbs.Common
         {
             try
             {
-                if (IsCheckCommandText && CommandType == System.Data.CommandType.Text)
-                {
-                    string msg = "";
-                    if (!Common.SqlCheck.IsSelectSql(CommandText, ref msg))
-                    {
-                        throw new Exception(msg);
-                    }
-                }
                 dbCommand.CommandText = CommandText;
                 dbCommand.CommandTimeout = CommandTimeout;
                 dbCommand.CommandType = CommandType;
                 System.Data.Common.DbDataReader dr = dbCommand.ExecuteReader();
-                if (hasDbExecuteHandler)
-                {
-                    FireExecuteSql(DbExecuteSqlType.QUERY);
-                }
+                FireExecuteSql(DbExecuteSqlType.QUERY);
                 if (useEmit)
                 {
                     Entities.ListFromDataReaderByEmit<T>(dr, action);
@@ -195,72 +158,41 @@ namespace ZeroDbs.Common
             }
             catch (Exception ex)
             {
-                if (hasDbExecuteHandler)
-                {
-                    FireExecuteSql(DbExecuteSqlType.QUERY, ex.Message);
-                }
-                throw ex;
+                FireExecuteSql(DbExecuteSqlType.QUERY, ex.Message);
+                throw;
             }
         }
         public System.Data.IDataReader ExecuteReader()
         {
             try
             {
-                if (IsCheckCommandText && CommandType == System.Data.CommandType.Text)
-                {
-                    string msg = "";
-                    if (!Common.SqlCheck.IsSelectSql(CommandText, ref msg))
-                    {
-                        throw new Exception(msg);
-                    }
-                }
                 dbCommand.CommandText = CommandText;
                 dbCommand.CommandTimeout = CommandTimeout;
                 dbCommand.CommandType = CommandType;
                 System.Data.Common.DbDataReader dr = dbCommand.ExecuteReader();
-                if (hasDbExecuteHandler)
-                {
-                    FireExecuteSql(DbExecuteSqlType.QUERY);
-                }
+                FireExecuteSql(DbExecuteSqlType.QUERY);
                 return dr;
             }
             catch (Exception ex)
             {
-                if (hasDbExecuteHandler)
-                {
-                    FireExecuteSql(DbExecuteSqlType.QUERY, ex.Message);
-                }
-                throw ex;
+                FireExecuteSql(DbExecuteSqlType.QUERY, ex.Message);
+                throw;
             }
         }
         public object ExecuteScalar()
         {
             try
             {
-                if (IsCheckCommandText && CommandType == System.Data.CommandType.Text)
-                {
-                    string msg = "";
-                    if (!Common.SqlCheck.IsSelectSql(CommandText, ref msg))
-                    {
-                        throw new Exception(msg);
-                    }
-                }
                 dbCommand.CommandText = CommandText;
                 dbCommand.CommandTimeout = CommandTimeout;
                 dbCommand.CommandType = CommandType;
-                if (hasDbExecuteHandler)
-                {
-                    FireExecuteSql(DbExecuteSqlType.QUERY);
-                }
+                FireExecuteSql(DbExecuteSqlType.QUERY);
                 return dbCommand.ExecuteScalar();
             }
             catch (Exception ex)
             {
-                if (hasDbExecuteHandler)
-                {
-                    FireExecuteSql(DbExecuteSqlType.QUERY, ex.Message);
-                }
-                throw ex;
+                FireExecuteSql(DbExecuteSqlType.QUERY, ex.Message);
+                throw;
             }
         }
         
@@ -272,10 +204,6 @@ namespace ZeroDbs.Common
             foreach (System.Reflection.PropertyInfo p in ps)
             {
                 object value = p.GetValue(entity, null);
-                if (value == null)
-                {
-                    value = DBNull.Value;
-                }
                 Parameters.Add(CreateParameter(p.Name, value));
             }
         }
@@ -283,13 +211,9 @@ namespace ZeroDbs.Common
         {
             Parameters.Clear();
             if (paras.Length < 1) { return; }
-            for(int i=0; i < paras.Length; i++)
+            for (int i = 0; i < paras.Length; i++)
             {
                 object value = paras[i];
-                if (value == null)
-                {
-                    value = DBNull.Value;
-                }
                 Parameters.Add(CreateParameter(i.ToString(), value));
             }
         }
@@ -299,10 +223,6 @@ namespace ZeroDbs.Common
             foreach (string key in dic.Keys)
             {
                 object value = dic[key];
-                if (value == null)
-                {
-                    value = DBNull.Value;
-                }
                 Parameters.Add(CreateParameter(key, value));
             }
         }

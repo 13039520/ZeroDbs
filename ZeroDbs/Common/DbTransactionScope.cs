@@ -62,7 +62,7 @@ namespace ZeroDbs.Common
                     executeExceptionMsg = ex.Message;
                     Complete(false);
                     //抛出异常让DbTransactionScopeCollections能够捕获并及时中断可能存在的后续的其它事务
-                    throw ex;
+                    throw;
                 }
             }
         }

@@ -1,35 +1,33 @@
 ﻿// Version 1.0.0
 // Date : 2025-11-19
 
-namespace MyDbs.Sqlite001
+namespace MyDbs.Pg001
 {
     using System;
     
     
     /// <summary>
-    /// TABLE:User
+    /// 用户表
     /// </summary>
     [Serializable()]
     public class tUser
     {
         
         #region -- Members --
-        private long _ID;
+        private int _ID;
         
         private string _Name;
         
-        private string _Email;
-        
         private string _Password;
         
-        private System.DateTime _CreateTime;
+        private System.Nullable<System.DateTime> _CreateTime;
         #endregion
         
         #region -- Properties --
         /// <summary>
-        /// [Identity][PrimaryKey]INTEGER
+        /// [Identity][PrimaryKey]int4(integer)
         /// </summary>
-        public long ID
+        public int ID
         {
             get
             {
@@ -42,7 +40,7 @@ namespace MyDbs.Sqlite001
         }
         
         /// <summary>
-        /// VARCHAR (50)
+        /// text(text)
         /// </summary>
         public string Name
         {
@@ -57,22 +55,7 @@ namespace MyDbs.Sqlite001
         }
         
         /// <summary>
-        /// VARCHAR (100)
-        /// </summary>
-        public string Email
-        {
-            get
-            {
-                return this._Email;
-            }
-            set
-            {
-                this._Email = value;
-            }
-        }
-        
-        /// <summary>
-        /// VARCHAR (100)
+        /// text(text)
         /// </summary>
         public string Password
         {
@@ -87,9 +70,9 @@ namespace MyDbs.Sqlite001
         }
         
         /// <summary>
-        /// DATETIME
+        /// timestamptz(timestamp with time zone)
         /// </summary>
-        public System.DateTime CreateTime
+        public System.Nullable<System.DateTime> CreateTime
         {
             get
             {

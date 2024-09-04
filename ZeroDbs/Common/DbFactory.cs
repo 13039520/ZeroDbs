@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ZeroDbs.Common
 {
-    public static class DbFactory
+    internal static class DbFactory
     {
         private static List<DbCreater> dbCreaters = new List<DbCreater>();
         private static object dbCreatersLock = new object();
@@ -12,19 +12,20 @@ namespace ZeroDbs.Common
         private static void Initialization()
         {
             if (initializationFlag) { return; }
-            initializationFlag = true;
             TryAddDbCreater("SqlServer", (dbInfo) => { return new SqlServer.Db(dbInfo); });
             TryAddDbCreater("MySql", (dbInfo) => { return new MySql.Db(dbInfo); });
             TryAddDbCreater("Sqlite", (dbInfo) => { return new Sqlite.Db(dbInfo); });
+            TryAddDbCreater("PostgreSql", (dbInfo) => { return new PostgreSql.Db(dbInfo); });
+            initializationFlag = true;
         }
 
-        public static bool TryAddDbCreater(string dbType, DbCreateHandler create)
+        public static bool TryAddDbCreater(string dbType, DbCreateHandler creator)
         {
             lock (dbCreatersLock)
             {
                 if (null == dbCreaters.Find(o => o.DbType.Equals(dbType, StringComparison.OrdinalIgnoreCase)))
                 {
-                    dbCreaters.Add(new DbCreater { DbType = dbType, Create = create });
+                    dbCreaters.Add(new DbCreater { DbType = dbType, Create = creator });
                     return true;
                 }
                 return false;
@@ -43,7 +44,7 @@ namespace ZeroDbs.Common
             }
             return null;
         }
-        public static IDb Create(IDbInfo dbConfig, Common.DbExecuteHandler dbExecuteSqlEvent)
+        public static IDb Create(IDbInfo dbConfig, DbExecuteHandler dbExecuteSqlEvent)
         {
             IDb db = Create(dbConfig);
             if(db!=null&& dbExecuteSqlEvent != null)
@@ -52,5 +53,6 @@ namespace ZeroDbs.Common
             }
             return db;
         }
+
     }
 }

@@ -32,10 +32,10 @@ namespace ZeroDbs.Test
             dbService.AddDbConfig("Sqlite002", "Sqlite", "Data Source=D:\\Program Files\\SQLiteStudio\\Database\\DeviceInfo.db;version=3;datetimeformat=CurrentCulture");
             dbService.AddTableMapping<Device>("Sqlite002", "Device");
 
-            //CodeGenerator();
+            CodeGenerator();
             //InsertTest();
             //UpdateTest();
-            QueryTest();
+            //QueryTest();
         }
 
 
@@ -61,6 +61,12 @@ namespace ZeroDbs.Test
                 ConnectionString = "Data Source=D:\\Program Files\\SQLiteStudio\\database\\ZeroTestDb.db3;version=3;datetimeformat=CurrentCulture",
                 Key = "Sqlite001",
                 Type = "Sqlite"
+            });
+            generator.Dbs.Add(new ZeroDbs.Common.DbInfo
+            {
+                ConnectionString = "Host=192.168.10.2;Port=5432;Database=Db001;Username=postgres;Password=123456;",
+                Key = "Pg001",
+                Type = "PostgreSql"
             });
             generator.GeneratorConfig = new ZeroDbs.Tools.CodeGenerator.Config
             {

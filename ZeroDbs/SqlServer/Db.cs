@@ -125,12 +125,12 @@ namespace ZeroDbs.SqlServer
                     column.MaxLength = Convert.ToInt64(reader["MaxLength"]);
                     column.Byte = Convert.ToInt64(reader["Byte"]);
                     column.DecimalDigits = Convert.ToInt32(reader["DecimalDigits"]);
-                    column.DefaultValue = this.DataTypeMaping.GetDotNetDefaultValue(reader["DefaultValue"].ToString(), reader["Type"].ToString(), column.MaxLength);
+                    column.DefaultValue = this.DataTypeMaping.GetDotNetDefaultValueText(reader["DefaultValue"].ToString(), reader["Type"].ToString(), column.MaxLength);
                     column.Description = reader["Description"].ToString();
                     column.IsIdentity = Convert.ToBoolean(reader["IsIdentity"]);
                     column.IsNullable = Convert.ToBoolean(reader["IsNullable"]);
                     column.IsPrimaryKey = Convert.ToBoolean(reader["IsPrimaryKey"]);
-                    column.Type = this.DataTypeMaping.GetDotNetTypeString(reader["Type"].ToString(), column.MaxLength);
+                    column.Type = this.DataTypeMaping.GetDotNetTypeFullName(reader["Type"].ToString(), column.MaxLength);
                     column.Name = reader["Name"].ToString();
 
                     dbDataTableInfo.Colunms.Add(column);
@@ -148,7 +148,7 @@ namespace ZeroDbs.SqlServer
             catch (Exception ex)
             {
                 cmd.Dispose();
-                throw ex;
+                throw;
             }
         }
         public override List<ITableInfo> GetTables()
@@ -222,12 +222,12 @@ namespace ZeroDbs.SqlServer
                         column.MaxLength = Convert.ToInt64(reader["MaxLength"]);
                         column.Byte = Convert.ToInt64(reader["Byte"]);
                         column.DecimalDigits = Convert.ToInt32(reader["DecimalDigits"]);
-                        column.DefaultValue = this.DataTypeMaping.GetDotNetDefaultValue(reader["DefaultValue"].ToString(), reader["Type"].ToString(), column.MaxLength);
+                        column.DefaultValue = this.DataTypeMaping.GetDotNetDefaultValueText(reader["DefaultValue"].ToString(), reader["Type"].ToString(), column.MaxLength);
                         column.Description = reader["Description"].ToString();
                         column.IsIdentity = Convert.ToBoolean(reader["IsIdentity"]);
                         column.IsNullable = Convert.ToBoolean(reader["IsNullable"]);
                         column.IsPrimaryKey = Convert.ToBoolean(reader["IsPrimaryKey"]);
-                        column.Type = this.DataTypeMaping.GetDotNetTypeString(reader["Type"].ToString(), column.MaxLength);
+                        column.Type = this.DataTypeMaping.GetDotNetTypeFullName(reader["Type"].ToString(), column.MaxLength);
                         column.Name = reader["Name"].ToString();
 
                         m.Colunms.Add(column);
@@ -242,7 +242,7 @@ namespace ZeroDbs.SqlServer
             catch (Exception ex)
             {
                 cmd.Dispose();
-                throw ex;
+                throw;
             }
         }
 

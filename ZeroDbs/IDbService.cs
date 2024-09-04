@@ -24,6 +24,8 @@ namespace ZeroDbs
         bool AddTableMapping<DbEntity>(string dbKey, string tableName) where DbEntity : class;
         bool AddTableMapping(string entityFullName, string dbKey, string tableName);
         bool AddDbConfig(string dbKey, string dbType, string dbConnectionString);
+        Common.PageQuery PageQuery();
+        Common.ListQuery ListQuery();
 
     }
 }
