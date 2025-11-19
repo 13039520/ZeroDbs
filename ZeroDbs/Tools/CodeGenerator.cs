@@ -178,7 +178,6 @@ namespace ZeroDbs.Tools
                 }
                 string className = System.Text.RegularExpressions.Regex.Replace(table.Name, @"^(t|v|tb|view)_", "", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
                 className = FirstLetterToUpper(className);
-                className = (table.IsView ? "v" : "t") + className;
 
                 EntityCodeDom codeDom = new EntityCodeDom(nameSpace, className, isPartialClass, tDescription, new string[0], new CodeAttributeDeclaration[] {
                     new CodeAttributeDeclaration("Serializable")

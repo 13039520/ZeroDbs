@@ -10,7 +10,7 @@ namespace MyDbs.Sqlite001
     /// TABLE:User
     /// </summary>
     [Serializable()]
-    public class tUser
+    public class User
     {
         
         #region -- Members --

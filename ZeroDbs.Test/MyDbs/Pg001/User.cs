@@ -1,16 +1,16 @@
 ﻿// Version 1.0.0
-// Date : 2024-09-02
+// Date : 2025-11-19
 
-namespace MyDbs.SqlServer001
+namespace MyDbs.Pg001
 {
     using System;
     
     
     /// <summary>
-    /// TABLE:User
+    /// 用户表
     /// </summary>
     [Serializable()]
-    public class tUser
+    public class User
     {
         
         #region -- Members --
@@ -18,16 +18,14 @@ namespace MyDbs.SqlServer001
         
         private string _Name;
         
-        private string _Email;
-        
         private string _Password;
         
-        private System.DateTime _CreateTime = DateTime.Now;
+        private System.Nullable<System.DateTime> _CreateTime;
         #endregion
         
         #region -- Properties --
         /// <summary>
-        /// [Identity][PrimaryKey]ID
+        /// [Identity][PrimaryKey]int4(integer)
         /// </summary>
         public int ID
         {
@@ -42,7 +40,7 @@ namespace MyDbs.SqlServer001
         }
         
         /// <summary>
-        /// Name
+        /// text(text)
         /// </summary>
         public string Name
         {
@@ -57,22 +55,7 @@ namespace MyDbs.SqlServer001
         }
         
         /// <summary>
-        /// Email
-        /// </summary>
-        public string Email
-        {
-            get
-            {
-                return this._Email;
-            }
-            set
-            {
-                this._Email = value;
-            }
-        }
-        
-        /// <summary>
-        /// Password
+        /// text(text)
         /// </summary>
         public string Password
         {
@@ -87,9 +70,9 @@ namespace MyDbs.SqlServer001
         }
         
         /// <summary>
-        /// CreateTime
+        /// timestamptz(timestamp with time zone)
         /// </summary>
-        public System.DateTime CreateTime
+        public System.Nullable<System.DateTime> CreateTime
         {
             get
             {
