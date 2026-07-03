@@ -14,12 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="ZeroDbConfig.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
     <Folder Include="MyDbs\MySql001\" />
     <Folder Include="MyDbs\Pg001\" />
     <Folder Include="MyDbs\Sqlite001\" />

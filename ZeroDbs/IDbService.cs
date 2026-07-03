@@ -1,31 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace ZeroDbs
 {
-    public interface IDbService: IDbOperator
+    public interface IDbService: IEnumerable<IDatabase>
     {
-        Dictionary<string, IDb> GetDbs();
-        Dictionary<string, IDb> GetDbs(List<IDbInfo> dbConfigList);
-        IDb GetDb<DbEntity>() where DbEntity : class, new();
-        IDb GetDb(string entityFullName);
-        IDb GetDbByDbKey(string dbKey);
-        IStrCommon StrCommon { get; }
-        IDbCommand GetDbCommand<DbEntity>() where DbEntity : class, new();
-        IDbCommand GetDbCommand(string entityFullName);
-        IDbCommand GetDbCommandByDbKey(string dbKey);
-        IDbTransactionScope GetDbTransactionScope<DbEntity>(System.Data.IsolationLevel level, string identification = "", string groupId = "") where DbEntity : class, new();
-        IDbTransactionScope GetDbTransactionScope(string entityFullName, System.Data.IsolationLevel level, string identification = "", string groupId = "");
-        IDbTransactionScope GetDbTransactionScopeByDbKey(string dbKey, System.Data.IsolationLevel level, string identification = "", string groupId = "");
-        IDbTransactionScopeCollection GetDbTransactionScopeCollection();
-
-
-        bool AddTableMapping<DbEntity>(string dbKey, string tableName) where DbEntity : class;
-        bool AddTableMapping(string entityFullName, string dbKey, string tableName);
-        bool AddDbConfig(string dbKey, string dbType, string dbConnectionString);
-        Common.PageQuery PageQuery();
-        Common.ListQuery ListQuery();
-
+        int Count { get; }
+        ISnowflakeIdGenerator Snowflake { get; }
+        void AddNewDb(IDbConfig config);
+        IDatabase GetDb(string dbKey);
     }
+
 }
