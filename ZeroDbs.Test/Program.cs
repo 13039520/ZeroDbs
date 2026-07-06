@@ -4,9 +4,6 @@ using System.IO;
 
 namespace ZeroDbs.Test
 {
-    /// <summary>
-    /// 
-    /// </summary>
     class Program
     {
         static ZeroDbs.IDbService dbService = null;
@@ -14,14 +11,14 @@ namespace ZeroDbs.Test
         static void Main(string[] args)
         {
             //Trying to create a SQLite database directory
-            string dir = Path.GetDirectoryName(Path.GetFullPath("./Data/Dbs/events.db"));
+            string dir = Path.GetDirectoryName(Path.GetFullPath("./Data/Dbs/testdb.db"));
             Directory.CreateDirectory(dir);
 
 
             var snowflake = Factory.CreateSnowflakeIdGenerator(1, 1);
             var dbs = new System.Collections.Generic.List<IDbConfig>
             {
-                Factory.CreateDbConfig("Db001","SQLite","data source=./Data/Dbs/events.db"),
+                Factory.CreateDbConfig("Db001","SQLite","data source=./Data/Dbs/testdb.db"),
                 Factory.CreateDbConfig("Db002","MySql","Server=127.0.0.1;Port=3306;Database=testdb;User Id=root;Password=123456;")
             };
             dbService = Factory.DbServiceInit(snowflake, dbs);
