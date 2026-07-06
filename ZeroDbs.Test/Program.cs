@@ -31,8 +31,11 @@ namespace ZeroDbs.Test
 
             //GetDb
             var db = dbService.GetDb("db001");//SQLite
-            //Try create table
-            db.ExecuteNonQuery(db.RawSqlOptions("CREATE TABLE IF NOT EXISTS Table001 (ID BIGINT PRIMARY KEY NOT NULL,Name VARCHAR(255) NOT NULL,CreateTime DATETIME NOT NULL);"));
+            //Trying to create table
+            db.ExecuteNonQuery(db.RawSqlOptions(
+                db.SqlOptions("CREATE TABLE IF NOT EXISTS @n0(@n1 BIGINT PRIMARY KEY NOT NULL,@n2 VARCHAR(255) NOT NULL,@n3 DATETIME NOT NULL);")
+                .SetNames("Table001","ID","Name","CreateTime")));
+
             Console.WriteLine("----------Insert----------");
             var nRows = new List<MyEntity>
             {
@@ -68,6 +71,7 @@ namespace ZeroDbs.Test
             {
                 Console.WriteLine("{0}\t{1}\t{2}", r.ID, r.Name, r.CreateTime);
             }
+
             Console.WriteLine("----------SelectEach----------");
             db.SelectEach<MyEntity>(
                 db.SelectOptions<MyEntity>("Table001")
@@ -82,6 +86,7 @@ namespace ZeroDbs.Test
                 (m) => {
                     Console.WriteLine("{0}\t{1}\t{2}", m.ID, m.Name, m.CreateTime);
                 });
+
             Console.WriteLine("----------Page----------");
             var pageData = db.Page<MyEntity>(
                 db.PageOptions<MyEntity>("Table001")

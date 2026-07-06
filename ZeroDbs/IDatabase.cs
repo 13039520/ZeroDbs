@@ -21,15 +21,17 @@ namespace ZeroDbs
         Guid SequentialGuid();
         IInValueOptions InValueOptions<T>(params T[] values);
         IWherePartOptions WherePartOptions(string template, bool isAnd = true);
-        IWhereOptions WhereOptions(params IWherePartOptions[]? parts);
+        IWhereOptions WhereOptions(params IWherePartOptions[] parts);
         ISqlOptions SqlOptions(string template);
         ISelectOptions<T> SelectOptions<T>(string tableName);
         IPageOptions<T> PageOptions<T>(string tableName);
+        IRawSqlOptions RawSqlOptions(ISqlOptions sqlOpts);
         IRawSqlOptions RawSqlOptions(ISql sql);
         IRawSqlOptions RawSqlOptions(string cmdText, params object[]? cmdParams);
         INameOptions NameOptions(string name);
         INameOptions NameOptions(IEnumerable<string> names);
         IOrderbyOptions OrderbyOptions(string field, bool isAscending = true);
+        IKeyValueOptions KeyValueOptions();
         IKeyValueOptions KeyValueOptions(string key, object value);
         IKeyValueOptions KeyValueOptions(IDictionary<string, object> dictionary);
         #endregion

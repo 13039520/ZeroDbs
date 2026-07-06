@@ -215,7 +215,7 @@ namespace ZeroDbs
             if (string.IsNullOrWhiteSpace(template)) {  throw new ArgumentNullException(nameof(template)); }
             return new WherePartOptions(template, isAnd);
         }
-        public IWhereOptions WhereOptions(params IWherePartOptions[]? parts)
+        public IWhereOptions WhereOptions(params IWherePartOptions[] parts)
         {
             var opt = new WhereOptions(CompileWhere);
             if (parts != null && parts.Length > 0)
@@ -237,6 +237,11 @@ namespace ZeroDbs
         {
             return new PageOptions<T>().SetTableName(tableName);
         }
+        public IRawSqlOptions RawSqlOptions(ISqlOptions sqlOpts)
+        {
+            var t = sqlOpts.Compile();
+            return new RawSqlOptions().SetCmdText(t.Text, t.Params);
+        }
         public IRawSqlOptions RawSqlOptions(ISql sql) {
             return new RawSqlOptions().SetCmdText(sql.Text, sql.Params);
         }
@@ -254,6 +259,10 @@ namespace ZeroDbs
         public IOrderbyOptions OrderbyOptions(string field, bool isAscending = true)
         {
             return new OrderbyOptions(field, isAscending);
+        }
+        public IKeyValueOptions KeyValueOptions()
+        {
+            return new KeyValueOptions();
         }
         public IKeyValueOptions KeyValueOptions(IDictionary<string,object> dict)
         {
