@@ -6,24 +6,27 @@ namespace ZeroDbs.Test
 {
     class Program
     {
-        static ZeroDbs.IDbService dbService = null;
-
         static void Main(string[] args)
         {
+            //Single database :
+            var singelDb = DbFactory.CreateDatabase(
+                DbFactory.CreateDbConfig("MySQLite", "SQLite", "data source=./Data/Dbs/testdb.db"), 
+                DbFactory.CreateSnowflakeIdGenerator(1, 1));
+
             //Trying to create a SQLite database directory
             string dir = Path.GetDirectoryName(Path.GetFullPath("./Data/Dbs/testdb.db"));
             Directory.CreateDirectory(dir);
-
-
-            var snowflake = Factory.CreateSnowflakeIdGenerator(1, 1);
+            
+            //Multiple databases :
+            var snowflake = DbFactory.CreateSnowflakeIdGenerator(1, 1);
             var dbs = new System.Collections.Generic.List<IDbConfig>
             {
-                Factory.CreateDbConfig("Db001","SQLite","data source=./Data/Dbs/testdb.db"),
-                Factory.CreateDbConfig("Db002","MySql","Server=127.0.0.1;Port=3306;Database=testdb;User Id=root;Password=123456;")
+                DbFactory.CreateDbConfig("Db001","SQLite","data source=./Data/Dbs/testdb.db"),
+                DbFactory.CreateDbConfig("Db002","MySql","Server=127.0.0.1;Port=3306;Database=testdb;User Id=root;Password=123456;")
             };
-            dbService = Factory.DbServiceInit(snowflake, dbs);
-            dbService.AddNewDb(Factory.CreateDbConfig("Db003", "SqlServer", "Server=127.0.0.1,1433;Database=TestDb;User Id=sa;Password=123456;"));
-            dbService.AddNewDb(Factory.CreateDbConfig("Db004", "PostgreSQL", "Host=127.0.0.1;Port=5432;Database=testdb;Username=postgres;Password=123456;"));
+            var dbService = DbFactory.InitializeDbService(snowflake, dbs);
+            dbService.AddNewDb(DbFactory.CreateDbConfig("Db003", "SqlServer", "Server=127.0.0.1,1433;Database=TestDb;User Id=sa;Password=123456;"));
+            dbService.AddNewDb(DbFactory.CreateDbConfig("Db004", "PostgreSQL", "Host=127.0.0.1;Port=5432;Database=testdb;Username=postgres;Password=123456;"));
 
 
             //GetDb
@@ -102,6 +105,7 @@ namespace ZeroDbs.Test
                 Console.WriteLine("{0}\t{1}\t{2}", r.ID, r.Name, r.CreateTime);
             }
         }
+
         class MyEntity
         {
             public long ID { get; set; }

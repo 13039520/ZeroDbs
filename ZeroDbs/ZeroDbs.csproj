@@ -4,6 +4,7 @@
 		<TargetFrameworks>net8.0;net6.0;net5.0;net4.5</TargetFrameworks>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<PackageIcon>favicon.png</PackageIcon>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<Authors>ruzi</Authors>
 		<AssemblyVersion>4.5.0.0</AssemblyVersion>
 		<FileVersion>4.5.0.0</FileVersion>
@@ -16,6 +17,7 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<None Include="favicon.png" Pack="true" PackagePath="" />
+		<None Include="README.md" Pack="true" PackagePath="" />
 	</ItemGroup>
 	<ItemGroup Condition="'$(TargetFramework)' == 'net4.5'">
 		<PackageReference Include="Npgsql"><Version>4.0.14</Version></PackageReference>
