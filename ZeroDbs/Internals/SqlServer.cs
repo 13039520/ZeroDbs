@@ -192,6 +192,10 @@ namespace ZeroDbs
             if (index < 0) { throw new ArgumentOutOfRangeException(nameof(index)); }
             return '@' + index.ToString();
         }
+        public override string GetReturnIdentityColumnSqlPart(string returnIdentityColumnName)
+        {
+            return "SELECT SCOPE_IDENTITY();";
+        }
         protected override ISql CompileSelectOptions<T>(ISelectOptions<T> opts)
         {
             if (opts == null)

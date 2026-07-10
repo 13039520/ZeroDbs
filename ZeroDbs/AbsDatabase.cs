@@ -1,13 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Data;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Xml;
 
 namespace ZeroDbs
 {
@@ -180,6 +175,91 @@ namespace ZeroDbs
             }
             return new Sql { Text = sql, Params = ps.ToArray() };
         }
+        protected ISql CompileInsertSql(IInsertOptions opts, int pIndex)
+        {
+            if (opts == null) { throw new ArgumentNullException(nameof(opts)); }
+            if (string.IsNullOrWhiteSpace(opts.TableName)) { throw new ArgumentNullException(nameof(opts.TableName)); }
+            if (opts.KeyValuePairs == null || opts.KeyValuePairs.Count < 1) { throw new ArgumentNullException(nameof(opts.KeyValuePairs)); }
+
+            bool ignoreFieldsNotNull = opts.IgnoreFields != null && opts.IgnoreFields.Count > 0;
+
+            List<string> fields = new List<string>();
+            List<string> placeholders = new List<string>();
+            List<object> values = new List<object>();
+            int index = 0;
+            foreach (var item in opts.KeyValuePairs)
+            {
+                if (ignoreFieldsNotNull && opts.IgnoreFields.Contains(item.Key)) { continue; }
+                fields.Add(Quote(item.Key));
+                placeholders.Add(Param(index));
+                values.Add(item.Value);
+                index++;
+            }
+            if (index < 1) { throw new ArgumentException("none insert fields", nameof(opts.KeyValuePairs)); }
+            string format = string.Format("INSERT INTO {0}({{0}}) VALUES({{1}})", Quote(opts.TableName));
+            StringBuilder sql = new StringBuilder("INSERT INTO ");
+            sql.Append(Quote(opts.TableName));
+            sql.AppendFormat("({0}) VALUES({1});", string.Join(",", fields), string.Join(",", placeholders));
+            if (!string.IsNullOrWhiteSpace(opts.ReturnIdentityColumn))
+            {
+                sql.Append(GetReturnIdentityColumnSqlPart(opts.ReturnIdentityColumn));
+            }
+            return new Sql { Text = sql.ToString(), Params = values.ToArray() };
+        }
+        protected ISql CompileUpdateSql(IUpdateOptions opts, int pIndex)
+        {
+            if (opts == null) { throw new ArgumentNullException(nameof(opts)); }
+            if (string.IsNullOrWhiteSpace(opts.TableName)) { throw new ArgumentNullException(nameof(opts.TableName)); }
+            if (opts.KeyValuePairs == null || opts.KeyValuePairs.Count < 1) { throw new ArgumentNullException(nameof(opts.KeyValuePairs)); }
+
+            List<object> mixValues = new List<object>();
+            List<string> setParts = new List<string>();
+            ISql whereSql = null;
+            if (opts.Where != null && opts.Where.Count > 0)
+            {
+                whereSql = opts.Where.Compile(0);
+                mixValues.AddRange(whereSql.Params);
+            }
+            int index = mixValues.Count;
+            foreach (var v in opts.KeyValuePairs)
+            {
+                string pName = Param(index);
+                setParts.Add(string.Format("{0}={1}", Quote(v.Key), pName));
+                mixValues.Add(v.Value);
+                index++;
+            }
+            StringBuilder sql = new StringBuilder();
+            sql.Append("UPDATE ");
+            sql.Append(Quote(opts.TableName));
+            sql.Append(" SET ");
+            sql.Append(string.Join(",", setParts));
+            if (whereSql != null)
+            {
+                sql.Append(" WHERE ");
+                sql.Append(whereSql.Text);
+            }
+            return new Sql { Text = sql.ToString(), Params = mixValues.ToArray() };
+        }
+        protected ISql CompileDeleteSql(IDeleteOptions opts, int pIndex)
+        {
+            if (opts == null) { throw new ArgumentNullException(nameof(opts)); }
+            if (string.IsNullOrWhiteSpace(opts.TableName)) { throw new ArgumentNullException(nameof(opts.TableName)); }
+
+            StringBuilder sql = new StringBuilder();
+            sql.Append("DELETE FROM ");
+            sql.Append(Quote(opts.TableName));
+            ISql whereSql = null;
+            if (opts.Where != null && opts.Where.Count > 0)
+            {
+                whereSql = opts.Where.Compile(0);
+            }
+            if (whereSql != null)
+            {
+                sql.Append(" WHERE ");
+                sql.Append(whereSql.Text);
+            }
+            return new Sql { Text = sql.ToString(), Params = whereSql.Params };
+        }
         #endregion
 
         #region -- 通用辅助方法 --
@@ -195,6 +275,26 @@ namespace ZeroDbs
                 DbDataTypeName = dbDataTypeName,
                 Direction = direction.HasValue ? direction.Value : ParameterDirection.Input
             };
+        }
+        public IInsertOptions InsertOptions(string tableName)
+        {
+            return new InsertOptions(CompileInsertSql).SetTableName(tableName);
+        }
+        public IDeleteOptions DeleteOptions(string tableName)
+        {
+            return new DeleteOptions(CompileDeleteSql).SetTableName(tableName);
+        }
+        public IUpdateOptions UpdateOptions(string tableName)
+        {
+            return new UpdateOptions(CompileUpdateSql).SetTableName(tableName);
+        }
+        public ISelectOptions<T> SelectOptions<T>(string tableName)
+        {
+            return SelectOptions<T>().SetTableName(tableName);
+        }
+        public IPageOptions<T> PageOptions<T>(string tableName)
+        {
+            return new PageOptions<T>().SetTableName(tableName);
         }
         public ISelectOptions<T> SelectOptions<T>()
         {
@@ -228,14 +328,6 @@ namespace ZeroDbs
         {
             if(template == null) { throw new ArgumentNullException(nameof (template)); }
             return new SqlOptions(CompileSql, template);
-        }
-        public ISelectOptions<T> SelectOptions<T>(string tableName)
-        {
-            return SelectOptions<T>().SetTableName(tableName);
-        }
-        public IPageOptions<T> PageOptions<T>(string tableName)
-        {
-            return new PageOptions<T>().SetTableName(tableName);
         }
         public IRawSqlOptions RawSqlOptions(ISqlOptions sqlOpts)
         {
@@ -336,6 +428,7 @@ namespace ZeroDbs
 
         #region -- abstract method --
         public abstract void SetDbDataTypeMapping(string dbDataType, Type clrType);
+        public abstract string GetReturnIdentityColumnSqlPart(string returnIdentityColumnName);
         public abstract IDbDataParameter CreateParameter(string name, object value);
         public abstract IDbDataParameter CreateParameter(int index, object value);
         public abstract ITable GetTable(string tableName);

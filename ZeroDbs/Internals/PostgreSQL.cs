@@ -196,6 +196,10 @@ namespace ZeroDbs
             if (index < 0) { throw new ArgumentOutOfRangeException(nameof(index)); }
             return '@' + index.ToString();
         }
+        public override string GetReturnIdentityColumnSqlPart(string returnIdentityColumnName)
+        {
+            return "RETURNING " + Quote(returnIdentityColumnName) + ";";
+        }
 
 
         private Type CSharpType(string dbDataTypeName, bool isNullable)

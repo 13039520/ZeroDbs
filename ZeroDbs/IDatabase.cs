@@ -19,12 +19,15 @@ namespace ZeroDbs
         #region -- 输入辅助 --
         ISnowflakeIdGenerator Snowflake {  get; }
         Guid SequentialGuid();
+        IInsertOptions InsertOptions(string tableName);
+        IDeleteOptions DeleteOptions(string tableName);
+        IUpdateOptions UpdateOptions(string tableName);
+        ISelectOptions<T> SelectOptions<T>(string tableName);
+        IPageOptions<T> PageOptions<T>(string tableName);
         IInValueOptions InValueOptions<T>(params T[] values);
         IWherePartOptions WherePartOptions(string template, bool isAnd = true);
         IWhereOptions WhereOptions(params IWherePartOptions[] parts);
         ISqlOptions SqlOptions(string template);
-        ISelectOptions<T> SelectOptions<T>(string tableName);
-        IPageOptions<T> PageOptions<T>(string tableName);
         IRawSqlOptions RawSqlOptions(ISqlOptions sqlOpts);
         IRawSqlOptions RawSqlOptions(ISql sql);
         IRawSqlOptions RawSqlOptions(string cmdText, params object[]? cmdParams);
