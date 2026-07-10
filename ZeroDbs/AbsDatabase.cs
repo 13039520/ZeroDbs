@@ -527,7 +527,7 @@ namespace ZeroDbs
             });
         }
         /// <summary>
-        /// 分页查询(基于 LIMIT+OFFSET 语法，如果数据库不支持该查询方式请自行覆盖实现)
+        /// Paginated query (based on LIMIT+OFFSET syntax, if your database doesn't support this query method, please implement it yourself)
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="opts"></param>
