@@ -686,7 +686,7 @@ namespace ZeroDbs
             }
             if (setFields.ContainsAny(keyFields))
             {
-                throw new ArgumentException("参数\"setFields\"和\"keyFields\"存在重复项");
+                throw new ArgumentException("the parameters 'setFields' and 'keyFields' have duplicates");
             }
 
             string[] paramKeys = new string[setFields.Count + keyFields.Count];
@@ -722,13 +722,13 @@ namespace ZeroDbs
 
                         convert(t, pairs);
 
-                        if (paramKeys.Length > pairs.Count) { throw new ArgumentException($"生成的更新字典元素个数太少"); }
+                        if (paramKeys.Length > pairs.Count) { throw new ArgumentException("the dictionary has too few elements"); }
                         for (int i = 0; i < paramKeys.Length; i++)
                         {
                             object keyValue;
                             if (!pairs.TryGetValue(paramKeys[i], out keyValue))
                             {
-                                throw new ArgumentException($"生成的更新字典里必须包含\"{paramKeys[i]}\"的键值对");
+                                throw new ArgumentException($"the dictionary must contain the entry '{paramKeys[i]}'");
                             }
                             cmd.Parameters.Add(CreateParameter(i, keyValue));
                         }
