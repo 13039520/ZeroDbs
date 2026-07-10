@@ -55,10 +55,10 @@ namespace ZeroDbs
 
             List<object> ps = new List<object>();
             StringBuilder gSql = new StringBuilder();
-            int gIndex = 0;
+            int gIndex = pIndex;
             foreach (IWhereGroup group in opts)
             {
-                if (gIndex > 0)
+                if (gIndex > pIndex)
                 {
                     gSql.Append(group.IsAnd ? " AND " : " OR ");
                 }
@@ -79,7 +79,7 @@ namespace ZeroDbs
                     }
                     if (p.Params != null)
                     {
-                        int paramIndex = ps.Count;
+                        int paramIndex = pIndex + ps.Count;
                         List<string> pNames = new List<string>(p.Params.Length);
                         for (int i = 0; i < p.Params.Length; i++)
                         {
@@ -113,7 +113,7 @@ namespace ZeroDbs
                     }
                     gSql.Append(pSql);
                     partIndex++;
-                    pIndex++;
+                    gIndex++;
                 }
                 gSql.Append(")");
             }
@@ -212,21 +212,21 @@ namespace ZeroDbs
             if (string.IsNullOrWhiteSpace(opts.TableName)) { throw new ArgumentNullException(nameof(opts.TableName)); }
             if (opts.KeyValuePairs == null || opts.KeyValuePairs.Count < 1) { throw new ArgumentNullException(nameof(opts.KeyValuePairs)); }
 
-            List<object> mixValues = new List<object>();
+            List<object> values = new List<object>();
             List<string> setParts = new List<string>();
-            ISql whereSql = null;
-            if (opts.Where != null && opts.Where.Count > 0)
-            {
-                whereSql = opts.Where.Compile(0);
-                mixValues.AddRange(whereSql.Params);
-            }
-            int index = mixValues.Count;
+            int index = values.Count;
             foreach (var v in opts.KeyValuePairs)
             {
                 string pName = Param(index);
                 setParts.Add(string.Format("{0}={1}", Quote(v.Key), pName));
-                mixValues.Add(v.Value);
+                values.Add(v.Value);
                 index++;
+            }
+            ISql whereSql = null;
+            if (opts.Where != null && opts.Where.Count > 0)
+            {
+                whereSql = opts.Where.Compile(index);
+                values.AddRange(whereSql.Params);
             }
             StringBuilder sql = new StringBuilder();
             sql.Append("UPDATE ");
@@ -238,7 +238,7 @@ namespace ZeroDbs
                 sql.Append(" WHERE ");
                 sql.Append(whereSql.Text);
             }
-            return new Sql { Text = sql.ToString(), Params = mixValues.ToArray() };
+            return new Sql { Text = sql.ToString(), Params = values.ToArray() };
         }
         protected ISql CompileDeleteSql(IDeleteOptions opts, int pIndex)
         {

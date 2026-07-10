@@ -104,6 +104,47 @@ namespace ZeroDbs.Test
             {
                 Console.WriteLine("{0}\t{1}\t{2}", r.ID, r.Name, r.CreateTime);
             }
+
+            Console.WriteLine("----------SqlBuilder----------");
+            var insert = db.InsertOptions("User")
+                //.SetIgnoreFields(db.NameOptions("ID"))
+                //.SetReturnIdentityColumn("ID")
+                .SetKeyValuePairs(db.KeyValueOptions("Name", "Tom").Add("City", "Shanghai").Add("Age", 20).Add("State", 1));
+            ShowSqlInfo(insert.Compile());
+
+            var update = db.UpdateOptions("User")
+                .SetKeyValuePairs(db.KeyValueOptions("Name", "Tom").Add("City", "Shanghai").Add("Age", 60))
+                .SetWhere(db.WhereOptions(
+                    db.WherePartOptions("@n0=@p0").SetFields("ID").SetParams(1)
+                ));
+            ShowSqlInfo(update.Compile());
+
+            var delete = db.DeleteOptions("User")
+                .SetWhere(db.WhereOptions(
+                    db.WherePartOptions("@n0=@p0 AND @n1 IN(@p1)")
+                    .SetFields("ID", "State")
+                    .SetParams(1, db.InValueOptions<int>(1, 2, 3))
+                    ));
+            ShowSqlInfo(delete.Compile());
+
+        }
+        private static void ShowSqlInfo(ISql sql)
+        {
+            Console.WriteLine(sql.Text);
+            Console.Write("参数：");
+            if (sql.Params == null)
+            {
+                Console.WriteLine("无");
+                return;
+            }
+            Console.ForegroundColor = ConsoleColor.Green;
+            foreach (var o in sql.Params)
+            {
+                Console.Write(" ");
+                Console.Write(o);
+            }
+            Console.ResetColor();
+            Console.WriteLine();
         }
 
         class MyEntity
