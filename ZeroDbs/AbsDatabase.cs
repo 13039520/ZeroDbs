@@ -571,7 +571,7 @@ namespace ZeroDbs
             }
             string uniqueField = opts.UniqueField;
             StringBuilder sql = new StringBuilder();
-            if (!string.IsNullOrEmpty(uniqueField))//具有唯一性字段
+            if (!string.IsNullOrEmpty(uniqueField))
             {
                 uniqueField = Quote(uniqueField);
                 sql.AppendFormat("SELECT {0} FROM {1}", fieldsPart, tableName);
@@ -583,7 +583,7 @@ namespace ZeroDbs
                 sql.AppendFormat(") ORDER BY {0}", orderbyPart);
 
             }
-            else//没有唯一性字段
+            else
             {
                 sql.AppendFormat("SELECT {0} FROM {1}", fieldsPart, tableName);
                 sql.AppendFormat(" WHERE {0}", where);
