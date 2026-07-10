@@ -130,8 +130,9 @@ namespace ZeroDbs.Test
         }
         private static void ShowSqlInfo(ISql sql)
         {
+            Console.Write("SqlText: ");
             Console.WriteLine(sql.Text);
-            Console.Write("参数：");
+            Console.Write(" Params: ");
             if (sql.Params == null)
             {
                 Console.WriteLine("无");
@@ -140,8 +141,8 @@ namespace ZeroDbs.Test
             Console.ForegroundColor = ConsoleColor.Green;
             foreach (var o in sql.Params)
             {
-                Console.Write(" ");
                 Console.Write(o);
+                Console.Write(" ");
             }
             Console.ResetColor();
             Console.WriteLine();
