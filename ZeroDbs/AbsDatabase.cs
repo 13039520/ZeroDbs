@@ -1017,7 +1017,19 @@ namespace ZeroDbs
                     do
                     {
                         var table = new DataTable();
-                        table.Load(reader);
+                        for (int i = 0; i < reader.FieldCount; i++)
+                        {
+                            table.Columns.Add(reader.GetName(i), reader.GetFieldType(i));
+                        }
+                        while (reader.Read())
+                        {
+                            var row = table.NewRow();
+                            for (int i = 0; i < reader.FieldCount; i++)
+                            {
+                                row[i] = reader.GetValue(i);
+                            }
+                            table.Rows.Add(row);
+                        }
                         tables.Add(table);
                     }
                     while (reader.NextResult());
